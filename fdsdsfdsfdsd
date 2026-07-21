@@ -1,0 +1,29 @@
+diff.astextplain.textconv=astextplain
+filter.lfs.clean=git-lfs clean -- %f
+filter.lfs.smudge=git-lfs smudge -- %f
+filter.lfs.process=git-lfs filter-process
+filter.lfs.required=true
+http.sslbackend=schannel
+core.autocrlf=true
+core.fscache=true
+core.symlinks=false
+pull.rebase=false
+credential.helper=manager
+credential.https://dev.azure.com.usehttppath=true
+init.defaultbranch=master
+user.email=puma.17.01.71@gmail.com
+user.name=NilPuma
+safe.directory=D:/INNOVA GIT - Nilton/wa_manu
+al_innova
+safe.directory=D:/INNOVA GIT - Nilton/wa_manu
+al_innova
+safe.directory=D:/INNOVA GIT - Nilton/wa_manual_innova
+safe.directory=D:/INNOVA/wa_recuerdos
+core.repositoryformatversion=0
+core.filemode=false
+core.bare=false
+core.logallrefupdates=true
+core.symlinks=false
+core.ignorecase=true
+remote.origin.url=https://github.com/NilPuma/wa_taller_automotriz.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
