@@ -27,7 +27,7 @@ router.get('/cliente', (req, res) => {
 
 
 // end point backend
-router.get('/api/usuarios', controladorUsuarios.listarUsuarios);
+router.get('/api/listarUsuarios', controladorUsuarios.listarUsuarios);
 
 
 module.exports = router;

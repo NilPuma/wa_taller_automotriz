@@ -24,7 +24,7 @@ const templateConfiguracion = document.querySelector('#templateConfiguracion').c
 
 
 /* Variables globales */
-let listadoGeneralContactos = {};
+let listadoGeneralUsuarios = {};
 
 
 
@@ -39,16 +39,27 @@ let listadoGeneralContactos = {};
 
 
 btnMenuContactos.addEventListener('click', function(){
-    
-    contenedorReactivo.innerHTML = "";
 
-    templateContactos.querySelector('.mis-contactos').textContent = "Yo me reenderizo cuando haces clic en contactos mecanico";
-   
+    axios.get('/api/listarUsuarios').then(respuesta => {
+        listadoGeneralUsuarios = respuesta.data;
+        console.log(listadoGeneralUsuarios);
 
-    const clone = templateContactos.cloneNode(true);
-    fragmento.appendChild(clone);
+    listadoGeneralUsuarios.forEach(usuario => {
+        templateContactos.querySelector('.email').textContent = usuario.email;
+        templateContactos.querySelector('.rol').textContent = usuario.id_rol;
+        templateContactos.querySelector('.tipo-persona').textContent = usuario.id_tipo_persona;
+
+        const clone = templateContactos.cloneNode(true);
+        fragmento.appendChild(clone);
+    })
 
     contenedorReactivo.appendChild(fragmento);
+
+    }).catch(error => {
+        console.error('Error al listar usuarios:', error);
+    });
+    
+    contenedorReactivo.innerHTML = "";
 });
 
 btnMenuGaleria.addEventListener('click', function(){
