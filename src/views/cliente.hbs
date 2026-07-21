@@ -1,0 +1,120 @@
+<div id="bodyAdministrador">
+    
+    <div id="sideMenu" class="menu-colapsado">
+        {{!-- Header --}}
+        <div id="cabecera">
+            <div id="titulo"><span>MI TALLER</span></div>
+            <div id="menuBtn">
+                <div class="btn-hamburger"></div>
+                <div class="btn-hamburger"></div>
+                <div class="btn-hamburger"></div>
+            </div>
+        </div>
+        {{!-- Perfil --}}
+        <div id="perfil">
+            <div id="foto"><img src="/img/perfil.png" alt="" ></div>
+            <div id="nombre"><span>CLIENTE</span></div>
+        </div>
+        {{!-- Items --}}
+        <div id="menuItems">
+            <div class="item">
+                <a href="#" id="btnMenuInicio">
+                    <div class="icono"><img src="/icons/home.svg" alt="" ></div>
+                    <div class="titulo"><span>Inicio</span></div>
+                </a>
+            </div>
+            <div class="item-separator">
+            </div>
+            <div class="item">
+                <a href="#" id="btnMenuContactos">
+                    <div class="icono"><img src="/icons/personas.svg" alt="" ></div>
+                    <div class="titulo"><span>Contactos</span></div>
+                </a>
+            </div>
+            <div class="item-separator">
+            </div>
+            <div class="item">
+                <a href="#" id="btnMenuGaleria">
+                    <div class="icono"><img src="/icons/home.svg" alt="" ></div>
+                    <div class="titulo"><span>Menu-Opcional</span></div>
+                </a>
+            </div>
+            <div class="item-separator">
+            </div>
+            <div class="item">
+                <a href="#" id="btnMenuAlbum">
+                    <div class="icono"><img src="/icons/home.svg" alt="" ></div>
+                    <div class="titulo"><span>Menu-Opcional</span></div>
+                </a>
+            </div>
+            <div class="item-separator">
+            </div>
+            <div class="item">
+                <a href="#" id="btnMenuNotificacion">
+                    <div class="icono"><img src="/icons/notificacion.svg" alt="" ></div>
+                    <div class="titulo"><span>Notificación</span></div>
+                </a>
+            </div>
+            <div class="item-separator">
+            </div>
+            <div class="item">
+                <a href="#" id="btnMenuConfiguracion">
+                    <div class="icono"><img src="/icons/configuracion.svg" alt="" ></div>
+                    <div class="titulo"><span>Configuración</span></div>
+                </a>
+            </div>
+            <div class="item-separator">
+            </div>
+            <div class="item">
+                <a href="#" id="btnMenuCerrar">
+                    <div class="icono"><img src="/icons/turn-off.svg" alt="" ></div>
+                    <div class="titulo"><span>Cerrar Sesion</span></div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {{!-- ================Area pricipal de trabajo================ --}}
+
+    <section id="contenedorPrincipal">
+        <div id="header">
+            <div class="contenedor-header row d-flex align-items-center">
+                {{!-- <div class="col">
+                    <div>
+                        <img src="img/logo.png" alt="" width="120px" class="rounded">
+                    </div>
+                </div> --}}
+                <div class="col">
+                    <span>Perfil Cliente</span>
+                </div>
+                <div class="col text-end">
+                    <span><a href="/" class="btn-salir"><i class="bi bi-geo-alt-fill"></i>&nbsp Interval</a></span>
+                </div>
+            </div>
+        </div>
+
+        {{!-- Area reactiva administrador  --}}
+        <div class="row">
+            <div class="col">
+                <div id="contenedorReactivo">
+                    {{!-- Aqui se reenderiza todo  --}}
+                    <span>Yo me despliego cuando incias sesion </span>
+                </div>
+
+                {{!-- Templates  --}}
+                <template id="templateContactos">
+                    <div class="bg-danger">
+                        <span class="mis-contactos"></span>
+                    </div>
+                </template>
+                <template id="templateGaleria">
+                    <div class="bg-danger">
+                        <span class="mi-galeria"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/cliente.js"></script>

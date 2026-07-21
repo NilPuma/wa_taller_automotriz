@@ -1,0 +1,134 @@
+<div>
+  <section id="inicio">
+    <div class="container">
+      <div class="espacio">
+        <div class="row">
+          <div class="col">
+            <div class="row align-items-center  p-3">
+              <div class="col-sm-12 col-md-6 col-lg-6 text-center">
+                <h2 class="overlay-title">Lleva tu <span class="enfasis">TALLER</span> a otro nivel</h2>
+                <p class="fs-5 text-white">
+                  -- Sistemas Integrado para talleres automotriz. --
+                </p>
+              </div>
+
+              {{!-- Seccion de login --}}
+              <div class="col-sm-12 col-md-6 col-lg-6">
+                <div id="contenedorLogin" class="row">
+                  <div class="col-12 col-lg-6 col-md-8">
+                    <form id="formulario_login" action="" class="form-group p-4 shadow">
+                      <div>
+                        <div class="text-center mb-4">
+                          <img id="logo" src="/img/logo.png" alt="" class="img-fluid logo" width="150px">
+                        </div>
+                        <div>
+                          <input id="correoSesion" class="inputs form-control mb-3 text-black" type="text"
+                            placeholder="Correo del usuario">
+                        </div>
+                        <div>
+                          <input id="passwordSesion" class="inputs form-control mb-3" type="password"
+                            placeholder="Contraseña">
+                        </div>
+                        <div>
+                          <a href="#"><span class="btn btn-login form-control mt-3 mb-5 fs-5"
+                              onclick="validarUsuario()">Ingresar</span></a>
+                        </div>
+                        <div class="row d-lg-flex justify-content-between">
+                          <div class="col-auto">
+                            <span class="text-white my-3 border-bottom puntero" href="" data-bs-toggle="modal"
+                              data-bs-target="#modalRecuperacion">Olvide Contraseña</span>
+                          </div>
+                          <div class="col-auto text-lg-end">
+                            <span class="text-white my-3 border-bottom puntero" href="" data-bs-toggle="modal"
+                              data-bs-target="#modalRegistro">Registrarse</span>
+                          </div>
+                        </div>
+                      </div>
+
+                    </form>
+
+                    <!-- Modal de registro de Usuario -->
+                    <div class="modal fade" id="modalRegistro" data-bs-backdrop="static" data-bs-keyboard="false"
+                      tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Registro de datos</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body modalData">
+                            <div class="p-4">
+                              <label for="">&nbsp Nombres</label>
+                              <input id="nombres" class="form-control mb-3 style-input" type="text">
+                              <label for="">&nbsp Alias</label>
+                              <input id="nick" class="form-control mb-3 style-input" type="text">
+                              <label for="">&nbsp Telefono</label>
+                              <input id="telefono" class="form-control mb-3 style-input" type="number">
+                              <label for="">&nbsp Correo (Sera tu usuario de iniciar sesion)</label>
+                              <input id="correoRegistro" class="form-control mb-3 style-input" type="text">
+                              <label for="">&nbsp Contraseña</label>
+                              <input id="passwordRegistro" class="form-control mb-3 style-input" type="password">
+                              {{!-- <span
+                                class="lbx-datos-select nav-link dropdown-toggle border border-1 rounded-2 mb-3 text-dark"
+                                data-bs-toggle="dropdown" role="button" aria-expanded="false">Seleccione tipo
+                                documento</span>
+                              <ul class="dropdown-menu">
+                                <li><a class="dropdown-item lbx-datos op-ruc">RUC</a></li>
+                                <li><a class="dropdown-item lbx-datos op-dni">DNI</a></li>
+                                <li><a class="dropdown-item lbx-datos op-otro">OTRO</a></li>
+                              </ul>
+                              <div id="contenedorDatos">
+
+                              </div> --}}
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <span type="button" class="btn style-btn-afirmar btn-guardar-registro">Registrarse</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Modal de recuperación de contraseña -->
+                    <div class="modal fade" id="modalRecuperacion" data-bs-backdrop="static" data-bs-keyboard="false"
+                      tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Recuperar contraseña</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body modalData">
+                            <div class="p-4">
+                              <label for="">Ingrese correo que haya sido registrado</label>
+                              <input id="correoRecuperacion" class="form-control mb-3 style-input" type="text">
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <span type="button" class="btn style-btn-afirmar btn-recueprar-password">Validar y
+                              Recuperar</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="footer">
+    <div class="text-center">
+      {{!-- <marquee behavior="" direction="">Formularios a medida by Innova Sistemas Integrales S.A.C. - 977499954
+      </marquee>
+      <a href="https://innovasistemas.pe/" class="text-center">© 2025 Innova Sistemas Integrales S.A.C.</a> --}}
+    </div>
+  </section>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/index.js"></script>
