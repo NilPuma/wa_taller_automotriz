@@ -7,15 +7,12 @@
   --color4: #02A302;
   --color5: #fe0000;
 
-
-
   --borde-boton: 10px;
 
   /* ESTILOS PARA MENU DE NAVEGACIÓN */
   --width: 250px;
   --padding: 10px;
   --width-collapsed: 50px;
-
 }
 
 body {
@@ -25,7 +22,6 @@ body {
   background-color: var(--color2);
   color: var(--color3);
   overflow-x: hidden;
-  /* margin-left: var(--width-collapsed); */
 }
 
 a {
@@ -37,7 +33,6 @@ a:hover {
   color: #565353;
 }
 
-
 .icono-vacio {
   font-size: 50px;
   color: #CC0000;
@@ -48,21 +43,20 @@ a:hover {
   color: var(--color3);
 }
 
-.contenedor-header{
+.contenedor-header {
   height: 60px;
 }
 
-/* =============================ESTILOS  PARA MENU DE NAVEGACIÓN=========================== */
-#bodyAdministrador{
+/* =============================ESTILOS PARA MENU DE NAVEGACIÓN=========================== */
+#bodyAdministrador {
   margin-left: var(--width-collapsed);
 }
 
-.body-expandido{
-  /* margin-left: var(--width); */
+.body-expandido {
   margin-left: calc(var(--width) - var(--width-collapsed));
 }
 
-#sideMenu{
+#sideMenu {
   background-color: var(--color1);
   text-decoration: none;
   color: var(--color3);
@@ -70,43 +64,42 @@ a:hover {
   height: 100%;
   left: 0;
   top: 0;
+  z-index: 1000;
 }
 
 /* Estilo para header */
-
-#sideMenu #cabecera{
+#sideMenu #cabecera {
   box-sizing: border-box;
   border-bottom: solid 1px var(--color2);
-  /* height: 60px;
-  align-items:center; */
 }
 
-#sideMenu #cabecera #titulo{
+#sideMenu #cabecera #titulo {
   box-sizing: border-box;
   overflow: hidden;
   vertical-align: middle;
 }
 
-#sideMenu #cabecera #titulo, #sideMenu #cabecera #menuBtn{
+#sideMenu #cabecera #titulo,
+#sideMenu #cabecera #menuBtn {
   vertical-align: middle;
 }
 
-#sideMenu #cabecera #menuBtn{
+#sideMenu #cabecera #menuBtn {
   display: inline-block;
 }
 
-#sideMenu #cabecera #menuBtn{
+#sideMenu #cabecera #menuBtn {
   cursor: pointer;
   padding: 10px;
   width: var(--width-collapsed);
   box-sizing: border-box;
 }
 
-#sideMenu #cabecera #menuBtn:hover{
+#sideMenu #cabecera #menuBtn:hover {
   background-color: var(--color2);
 }
 
-#sideMenu #cabecera #menuBtn .btn-hamburger{
+#sideMenu #cabecera #menuBtn .btn-hamburger {
   background-color: var(--color3);
   width: 100%;
   height: 3px;
@@ -114,113 +107,128 @@ a:hover {
 }
 
 /* Estilos para perfil */
-#sideMenu #perfil{
+#sideMenu #perfil {
   border-bottom: solid 1px #D1D6DD;
   padding: var(--padding) 0;
   text-align: center;
 }
-#sideMenu #perfil #foto{
+
+#sideMenu #perfil #foto {
   box-sizing: border-box;
   padding: var(--padding);
   margin: 0 auto;
 }
-#sideMenu #perfil #foto img{
+
+#sideMenu #perfil #foto img {
   border-radius: 50%;
   width: 50%;
 }
-#sideMenu #perfil #foto, #sideMenu #perfil #nombre{
+
+#sideMenu #perfil #foto,
+#sideMenu #perfil #nombre {
   font-size: 24;
   padding: var(--padding) 0;
   overflow: hidden;
 }
 
 /* Items */
-#sideMenu #menuItems{
+#sideMenu #menuItems {
   overflow: hidden;
 }
-#sideMenu #menuItems .item{
+
+#sideMenu #menuItems .item {
   width: var(--width);
 }
-#sideMenu #menuItems .item .icono{
+
+#sideMenu #menuItems .item .icono {
   display: inline-block;
 }
+
 #sideMenu #menuItems .item .icono,
-#sideMenu #menuItems .item .titulo{
+#sideMenu #menuItems .item .titulo {
   font-size: 15px;
   vertical-align: middle;
   overflow: hidden;
   display: inline-block;
 }
-#sideMenu #menuItems .item a{
+
+#sideMenu #menuItems .item a {
   display: block;
 }
-#sideMenu #menuItems .item a:hover{
+
+#sideMenu #menuItems .item a:hover {
   background-color: var(--color2);
 }
-#sideMenu #menuItems .item .icono{
+
+#sideMenu #menuItems .item .icono {
   box-sizing: border-box;
   padding: var(--padding);
   width: var(--width-collapsed);
 }
-#sideMenu #menuItems .item .icono img{
+
+#sideMenu #menuItems .item .icono img {
   width: 100%;
 }
-#sideMenu #menuItems .item .titulo{
+
+#sideMenu #menuItems .item .titulo {
   padding: var(--padding) 0;
   margin-left: 10px;
   margin-right: 30px;
 }
-#sideMenu #menuItems .item-separator{
+
+#sideMenu #menuItems .item-separator {
   height: 1px;
   border-bottom: solid 1px var(--color2);
-  /* margin: 15px 0; */
 }
 
-.menu-expandido{
+.menu-expandido {
   width: var(--width);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
-.menu-expandido #cabecera #titulo{
+
+.menu-expandido #cabecera #titulo {
   display: inline-block;
   width: calc(100% - 50px);
   margin-right: -5px;
   padding: var(--padding);
 }
-.menu-expandido #cabecera #titulo span{
+
+.menu-expandido #cabecera #titulo span {
   width: calc(var(--width) - var(--width-collapsed) -5px);
   overflow: hidden;
   display: inline-block;
 }
 
-.menu-expandido #perfil #foto{
+.menu-expandido #perfil #foto {
   width: 200px;
 }
 
-.menu-expandido #perfil #nombre{
+.menu-expandido #perfil #nombre {
   width: 100%;
 }
 
-.menu-colapsado{
+.menu-colapsado {
   width: var(--width-collapsed);
 }
-.menu-colapsado #cabecera #titulo{
+
+.menu-colapsado #cabecera #titulo {
   width: 0;
   height: 0;
   padding: 0;
   margin: 0;
 }
 
-.menu-colapsado #perfil #nombre{
+.menu-colapsado #perfil #nombre {
   display: none;
 }
 
-.menu-colapsado .item{
+.menu-colapsado .item {
   width: 100px;
 }
+
 /* ===================================FIN MENU DE NAVEGACION=================================== */
 
 /* ===================================INICIO GLOBAL=================================== */
-
 #inicio {
   background:
     linear-gradient(rgba(5, 7, 12, 0.2), rgba(5, 7, 12, 0.9)),
@@ -237,7 +245,6 @@ a:hover {
   font-weight: bold;
   margin-bottom: 0.5rem;
   color: #eff1f5;
-  /* max-width: 40%; */
 }
 
 .enfasis {
@@ -249,14 +256,14 @@ a:hover {
 #contenedorLogin {
   height: 100vh;
   width: 30%;
-  /* background-size: cover; */
-  background: rgba(255, 255, 255, 0.5); /* blanco al 50% */
+  background: rgba(255, 255, 255, 0.5);
   justify-content: center;
   align-content: center;
   position: absolute;
   right: 0;
   top: 0;
 }
+
 #formulario_login {
   background: rgba(12, 12, 15, 0.445);
   border-radius: 10px;
@@ -299,7 +306,118 @@ a:hover {
 }
 
 /* ===================================CONDUCTOR=================================== */
-
 #contenedorPrincipal {
-  background: #4dea0f;
+  background-color: #f0f2f5;
+}
+
+/* ===================================MECANICO=================================== */
+
+/* Dashboard - Solo espaciado base */
+#dashboard {
+  padding: 20px 30px;
+}
+
+/* Gráficos circulares SVG */
+.card-kpi-grafico {
+  width: 70px;
+  height: 70px;
+}
+
+.porcentaje-texto {
+  font-size: 0.55rem;
+  font-weight: bold;
+  fill: var(--color3);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+/* ESTILOS SVG PARA GRÁFICOS CIRCULARES */
+.circulo-fondo {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3;
+}
+
+.circulo-progreso {
+  fill: none;
+  stroke-width: 3;
+}
+
+/* Colores específicos para cada gráfico circular */
+#grafico-ordenes .circulo-progreso {
+  stroke: var(--color3);
+}
+
+#grafico-proceso .circulo-progreso {
+  stroke: var(--color4);
+}
+
+#grafico-finalizadas .circulo-progreso {
+  stroke: #28a745;
+}
+
+/* Badge personalizado para estado "Pendiente" (único color que Bootstrap no tiene) */
+.badge-pendiente {
+  background-color: #e0a72e !important;
+  color: #fff !important;
+}
+
+/* Efecto hover en filas de tabla */
+.table-hover tbody tr:hover {
+  cursor: pointer;
+  background-color: rgba(12, 44, 64, 0.05) !important;
+}
+
+/* Estado vacío de tabla */
+.tabla-vacia {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+}
+
+/* ============ GRÁFICO DE BARRAS MINI ============ */
+.grafico-barras-mini {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 60px;
+  width: 70px;
+}
+
+.grafico-barras-mini .barra {
+  flex: 1;
+  background: #e0e0e0;
+  border-radius: 3px 3px 0 0;
+  min-width: 10px;
+  transition: background 0.2s ease, height 0.3s ease;
+  position: relative;
+}
+
+.grafico-barras-mini .barra.activa {
+  background: var(--color3);
+}
+
+.grafico-barras-mini .barra.activa::after {
+  content: attr(data-valor);
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  color: var(--color3);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* ===================================RESPONSIVE=================================== */
+@media (max-width: 768px) {
+  #dashboard {
+    padding: 15px;
+  }
+  
+  .card-kpi-grafico {
+    width: 80px;
+    height: 80px;
+    align-self: center;
+  }
 }

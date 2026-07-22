@@ -1,3 +1,8 @@
+{{!-- ============================================================
+     TEMPLATE: mecanico.hbs (Layout principal del mecánico)
+     Incluye el dashboard como contenido inicial
+     ============================================================ --}}
+
 <div id="bodyAdministrador">
     
     <div id="sideMenu" class="menu-colapsado">
@@ -23,66 +28,58 @@
                     <div class="titulo"><span>Inicio</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuContactos">
+                <a href="#" id="btnMenuOrdenes">
                     <div class="icono"><img src="/icons/ordenes.svg" alt="" ></div>
                     <div class="titulo"><span>Ordenes</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuGaleria">
+                <a href="#" id="btnMenuAgenda">
                     <div class="icono"><img src="/icons/agenda.svg" alt="" ></div>
                     <div class="titulo"><span>Agenda</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuAlbum">
+                <a href="#" id="btnMenuHistorial">
                     <div class="icono"><img src="/icons/historial.svg" alt="" ></div>
                     <div class="titulo"><span>Historial</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuNotificacion">
+                <a href="#" id="btnMenuConsumo">
                     <div class="icono"><img src="/icons/notificacion.svg" alt="" ></div>
                     <div class="titulo"><span>Consumo</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuConfiguracion">
+                <a href="#" id="btnMenuEvidencias">
                     <div class="icono"><img src="/icons/fotos.svg" alt="" ></div>
                     <div class="titulo"><span>Evidencias</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuCerrar">
-                    <div class="icono"><img src="/icons/turn-off.svg" alt="" ></div>
+                <a href="#" id="btnMenuCotizaciones">
+                    <div class="icono"><img src="/icons/dolar.svg" alt="" ></div>
                     <div class="titulo"><span>Cotizaciones</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuCerrar">
-                    <div class="icono"><img src="/icons/turn-off.svg" alt="" ></div>
+                <a href="#" id="btnMenuCitas">
+                    <div class="icono"><img src="/icons/citas.svg" alt="" ></div>
                     <div class="titulo"><span>Citas</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuCerrar">
+                <a href="#" id="btnMenuCerrarSesion">
                     <div class="icono"><img src="/icons/turn-off.svg" alt="" ></div>
                     <div class="titulo"><span>Cerrar Sesion</span></div>
                 </a>
@@ -90,49 +87,405 @@
         </div>
     </div>
 
-    {{!-- ================Area pricipal de trabajo================ --}}
+    {{!-- ================Area principal de trabajo================ --}}
 
     <section id="contenedorPrincipal">
         <div id="header">
-            <div class="contenedor-header row d-flex align-items-center">
-                {{!-- <div class="col">
-                    <div>
-                        <img src="img/logo.png" alt="" width="120px" class="rounded">
-                    </div>
-                </div> --}}
-                <div class="col">
+            <div class="contenedor-header d-flex align-items-center justify-content-between px-3">
+                <div>
                     <span>Perfil Mecánico</span>
                 </div>
-                <div class="col text-end">
-                    <span><a href="/" class="btn-salir"><i class="bi bi-geo-alt-fill"></i>&nbsp Interval</a></span>
+                <div>
+                    <span><a href="/" class="btn-salir"><i class="bi bi-geo-alt-fill"></i>&nbsp; Interval</a></span>
                 </div>
             </div>
         </div>
 
-        {{!-- Area reactiva administrador  --}}
-        <div class="row">
-            <div class="col">
-                <div id="contenedorReactivo">
-                    {{!-- Aqui se reenderiza todo  --}}
-                    <span>Yo me despliego cuando incias sesion </span>
+        {{!-- Area reactiva mecanico  --}}
+        <div id="contenedorReactivo">
+            
+            {{!-- ================= DASHBOARD CON BOOTSTRAP ================= --}}
+            <div id="dashboard" class="p-4">
+
+                <h1 class="text-center fw-bold mb-4">DASHBOARD</h1>
+
+                {{!-- KPI Cards con Bootstrap --}}
+                <div class="row g-3 mb-4">
+                    
+                    {{!-- Card: Órdenes Asignadas --}}
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body d-flex justify-content-between align-items-center p-3">
+                                <div>
+                                    <span class="fw-semibold text-secondary d-block mb-2">Órdenes Asignadas</span>
+                                    <div class="d-flex align-items-baseline gap-2">
+                                        <strong class="fs-3 text-dark valor-ordenes-asignadas">--</strong>
+                                        <small class="text-muted">Pendientes</small>
+                                    </div>
+                                </div>
+                                <div id="grafico-ordenes" class="card-kpi-grafico">
+                                    <svg viewBox="0 0 36 36" class="w-100 h-100">
+                                        <path class="circulo-fondo"
+                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="circulo-progreso"
+                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                            stroke-dasharray="0, 100" transform="rotate(-90 18 18)"/>
+                                        <text x="18" y="20.5" class="porcentaje-texto">--</text>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{!-- Card: Trabajos en Proceso --}}
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body d-flex justify-content-between align-items-center p-3">
+                                <div>
+                                    <span class="fw-semibold text-secondary d-block mb-2">Trabajos en Proceso</span>
+                                    <div class="d-flex align-items-baseline gap-2">
+                                        <strong class="fs-3 text-dark valor-trabajos-proceso">--</strong>
+                                        <small class="text-muted">En ejecución</small>
+                                    </div>
+                                </div>
+                                <div id="grafico-proceso" class="card-kpi-grafico">
+                                    <svg viewBox="0 0 36 36" class="w-100 h-100">
+                                        <path class="circulo-fondo"
+                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="circulo-progreso"
+                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                            stroke-dasharray="0, 100" transform="rotate(-90 18 18)"/>
+                                        <text x="18" y="20.5" class="porcentaje-texto">--</text>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{!-- Card: Órdenes Finalizadas Hoy --}}
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body d-flex justify-content-between align-items-center p-3">
+                                <div>
+                                    <span class="fw-semibold text-secondary d-block mb-2">Órdenes Finalizadas Hoy</span>
+                                    <div class="d-flex align-items-baseline gap-2">
+                                        <strong class="fs-3 text-dark valor-ordenes-finalizadas">--</strong>
+                                        <small class="text-muted">Completadas</small>
+                                    </div>
+                                </div>
+                                <div id="grafico-finalizadas" class="card-kpi-grafico">
+                                    <svg viewBox="0 0 36 36" class="w-100 h-100">
+                                        <path class="circulo-fondo"
+                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                        <path class="circulo-progreso"
+                                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                            stroke-dasharray="0, 100" transform="rotate(-90 18 18)"/>
+                                        <text x="18" y="20.5" class="porcentaje-texto">--</text>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{!-- Card: Tiempo Promedio --}}
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body d-flex justify-content-between align-items-center p-3">
+                                <div>
+                                    <span class="fw-semibold text-secondary d-block mb-2">Tiempo Promedio</span>
+                                    <div class="d-flex align-items-baseline gap-2">
+                                        <strong class="fs-3 text-dark valor-tiempo-promedio">--</strong>
+                                        <small class="text-muted">Por orden</small>
+                                    </div>
+                                </div>
+                                <div id="grafico-barras" class="grafico-barras-mini">
+                                    <div class="barra"></div>
+                                    <div class="barra"></div>
+                                    <div class="barra"></div>
+                                    <div class="barra"></div>
+                                    <div class="barra activa" data-valor="--"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {{!-- Templates  --}}
-                <template id="templateContactos">
-                    <div class="bg-danger">
-                        <span class="email"></span>
-                        <span class="rol"></span>
-                        <span class="tipo-persona"></span>
+                {{!-- Tabla de Órdenes Pendientes con Bootstrap --}}
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white border-bottom">
+                        <h5 class="mb-0 fw-bold">Órdenes Pendientes</h5>
                     </div>
-                </template>
-                <template id="templateGaleria">
-                    <div class="bg-danger">
-                        <span class="mi-galeria"></span>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">N° DE ORDEN</th>
+                                        <th>CLIENTE</th>
+                                        <th>TIPO DE SERVICIO</th>
+                                        <th>MECÁNICO</th>
+                                        <th>ESTADO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-ordenes-body">
+                                    <!-- Se llena dinámicamente con JS -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </template>
+                </div>
+
+            </div>
+            {{!-- ================= FIN DASHBOARD ================= --}}
+
+        </div>
+
+        {{!-- ================= MODAL NUEVA ORDEN ================= --}}
+        <div class="modal fade" id="modalNuevaOrden" tabindex="-1" aria-labelledby="modalNuevaOrdenLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    {{!-- Header --}}
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold" id="modalNuevaOrdenLabel">NUEVA ORDEN</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    {{!-- Body --}}
+                    <div class="modal-body">
+                        <form id="formNuevaOrden">
+                            <div class="row g-3">
+                                {{!-- Nro Orden (automático) --}}
+                                <div class="col-md-3">
+                                    <label for="inputNroOrden" class="form-label fw-semibold">Nro Orden</label>
+                                    <input type="text" class="form-control" id="inputNroOrden" readonly disabled>
+                                </div>
+                                {{!-- Placa / Matrícula --}}
+                                <div class="col-md-3">
+                                    <label for="inputPlaca" class="form-label fw-semibold">Placa</label>
+                                    <input type="text" class="form-control text-uppercase" id="inputPlaca" 
+                                           name="placa" placeholder="ABC-123" required>
+                                </div>
+                                {{!-- Cliente --}}
+                                <div class="col-md-3">
+                                    <label for="inputCliente" class="form-label fw-semibold">Cliente</label>
+                                    <input type="text" class="form-control" id="inputCliente" 
+                                           name="cliente" placeholder="Nombre del cliente" required>
+                                </div>
+                                {{!-- Documento --}}
+                                <div class="col-md-3">
+                                    <label for="inputDocumento" class="form-label fw-semibold">Documento</label>
+                                    <input type="text" class="form-control" id="inputDocumento" 
+                                           name="documento" placeholder="DNI / RUC">
+                                </div>
+                                {{!-- Tipo de Servicio (dropdown) --}}
+                                <div class="col-md-6">
+                                    <label for="selectTipoServicio" class="form-label fw-semibold">Tipo de Servicio</label>
+                                    <select class="form-select" id="selectTipoServicio" name="tipoServicio" required>
+                                        <option value="" selected disabled>Seleccione un servicio</option>
+                                    </select>
+                                </div>
+                                {{!-- Mecánico (dropdown) --}}
+                                <div class="col-md-6">
+                                    <label for="selectMecanico" class="form-label fw-semibold">Mecánico</label>
+                                    <select class="form-select" id="selectMecanico" name="mecanico" required>
+                                        <option value="" selected disabled>Seleccione un mecánico</option>
+                                    </select>
+                                </div>
+                                {{!-- Descripción --}}
+                                <div class="col-12">
+                                    <label for="textareaDescripcion" class="form-label fw-semibold">Descripción</label>
+                                    <textarea class="form-control" id="textareaDescripcion" name="descripcion" 
+                                              rows="3" placeholder="Descripción de la falla o del trabajo a realizar"></textarea>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    {{!-- Footer --}}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" form="formNuevaOrden" class="btn btn-success" id="btnGuardarOrden">
+                            <i class="bi bi-check-circle"></i> Guardar Orden
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
+        {{!-- ================= FIN MODAL NUEVA ORDEN ================= --}}
+
+        {{!-- ================= MODAL HORARIO AGENDA ================= --}}
+        <div class="modal fade" id="modalHorario" tabindex="-1" aria-labelledby="modalHorarioLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    {{!-- Header --}}
+                    <div class="modal-header">
+                        <h5 class="modal-title fw-bold" id="modalHorarioLabel">HORARIO</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    {{!-- Tabs: mecánico / día --}}
+                    <div class="modal-tabs px-3 pt-2">
+                        <span class="tab-mecanico fw-bold" id="nombreMecanicoModal">MECANICO</span>
+                        <span class="tab-separador">|</span>
+                        <div class="tab-dias d-inline-flex gap-1" id="tabsDiasHorario">
+                            <a href="#" class="tab-dia active" data-dia="LUNES">LUNES</a>
+                            <a href="#" class="tab-dia" data-dia="MARTES">MARTES</a>
+                            <a href="#" class="tab-dia" data-dia="MIERCOLES">MIERCOLES</a>
+                            <a href="#" class="tab-dia" data-dia="JUEVES">JUEVES</a>
+                            <a href="#" class="tab-dia" data-dia="VIERNES">VIERNES</a>
+                            <a href="#" class="tab-dia" data-dia="SABADO">SABADO</a>
+                        </div>
+                    </div>
+                    {{!-- Body --}}
+                    <div class="modal-body">
+                        <input type="hidden" id="diaSeleccionadoHorario" value="LUNES">
+                        {{!-- Selector de rango horario --}}
+                        <div class="fila-agregar-horario d-flex align-items-center gap-2 mb-3">
+                            <select class="form-select form-select-sm" id="selectHoraInicio">
+                                <option value="" selected disabled>--:--</option>
+                            </select>
+                            <span class="fw-semibold">A</span>
+                            <select class="form-select form-select-sm" id="selectHoraFin">
+                                <option value="" selected disabled>--:--</option>
+                            </select>
+                            <button type="button" class="btn btn-sm btn-agregar-horario" id="btnAgregarHorario">AGREGAR</button>
+                        </div>
+                        <hr>
+                        {{!-- Lista de bloques ocupados --}}
+                        <div id="listaBloquesOcupados">
+                            <p class="text-muted mb-0">No hay horarios ocupados este día.</p>
+                        </div>
+                        {{!-- Template para nuevos bloques --}}
+                        <template id="templateBloqueOcupado">
+                            <div class="bloque-ocupado d-flex align-items-center gap-2 mb-2">
+                                <span class="badge-ocupado-modal">OCUPADO</span>
+                                <span class="bloque-horario"></span>
+                                <a href="#" class="btn-eliminar-bloque ms-auto" title="Quitar horario">&#128465;</a>
+                            </div>
+                        </template>
+                    </div>
+                    {{!-- Footer --}}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CANCELAR</button>
+                        <button type="button" class="btn btn-guardar-horario" id="btnGuardarHorario">GUARDAR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{!-- ================= FIN MODAL HORARIO AGENDA ================= --}}
+
+        {{!-- Template para la vista de Órdenes --}}
+        <template id="templateOrdenes">
+            <div id="ordenes" class="p-4">
+                {{!-- Header --}}
+                <div class="ordenes-header d-flex align-items-center justify-content-between mb-4">
+                    <div style="width:40px;"></div>
+                    <h1 class="text-center fw-bold mb-0 flex-grow-1">LISTA DE ORDENES</h1>
+                    <button type="button" class="btn btn-success btn-sm" id="btnAbrirModalOrden" data-bs-toggle="modal" data-bs-target="#modalNuevaOrden">
+                        <i class="bi bi-plus-circle"></i> NUEVA ORDEN
+                    </button>
+                </div>
+
+                {{!-- Buscador --}}
+                <div class="ordenes-buscador d-flex align-items-center justify-content-end mb-3">
+                    <label for="inputBuscarOrden" class="fw-semibold me-2">BUSCAR:</label>
+                    <input type="text" id="inputBuscarOrden" class="form-control form-control-sm" style="max-width: 280px;" placeholder="Buscar por orden, cliente o matrícula...">
+                </div>
+
+                {{!-- Tabla de Ordenes --}}
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0 tabla-ordenes-listado">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>N° DE ORDEN</th>
+                                        <th>MATRICULA</th>
+                                        <th>CLIENTE</th>
+                                        <th>TIPO DE SERVICIO</th>
+                                        <th>MECANICO</th>
+                                        <th>DESCRIPCION</th>
+                                        <th>ESTADO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-ordenes-listado-body">
+                                    {{!-- Se llena dinámicamente con JS --}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                {{!-- Paginación --}}
+                <nav class="ordenes-paginacion d-flex justify-content-end mt-3">
+                    <ul class="pagination pagination-sm mb-0" id="paginacionOrdenes">
+                        <li class="page-item">
+                            <a class="page-link" href="#" id="btnPaginaAnterior">&lt;</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="#" data-pagina="1">1</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#" data-pagina="2">2</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#" id="btnPaginaSiguiente">&gt;&gt;</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </template>
+
+        {{!-- Template para la vista de Agenda --}}
+        <template id="templateAgenda">
+            <div id="agenda" class="p-4">
+                {{!-- Header --}}
+                <div class="agenda-header d-flex align-items-center justify-content-between mb-4">
+                    <div style="width:40px;"></div>
+                    <h1 class="text-center fw-bold mb-0 flex-grow-1">AGENDA DEL MECANICO</h1>
+                    <a href="#" id="btnCerrarAgenda" class="btn btn-outline-secondary btn-sm">CERRAR</a>
+                </div>
+
+                <h2 class="agenda-titulo h4 fw-bold">AGENDA</h2>
+                <p class="agenda-nombre text-muted" id="agendaNombreMecanico">Mecánico</p>
+
+                {{!-- Tabla Semanal --}}
+                <div class="table-responsive">
+                    <table class="table table-bordered agenda-tabla mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="col-hora">HORA</th>
+                                <th>
+                                    <span>LUNES</span>
+                                    <a href="#" class="btn-editar-dia ms-1" data-dia="LUNES" title="Editar día">&#9998;</a>
+                                </th>
+                                <th>
+                                    <span>MARTES</span>
+                                    <a href="#" class="btn-editar-dia ms-1" data-dia="MARTES" title="Editar día">&#9998;</a>
+                                </th>
+                                <th>
+                                    <span>MIERCOLES</span>
+                                    <a href="#" class="btn-editar-dia ms-1" data-dia="MIERCOLES" title="Editar día">&#9998;</a>
+                                </th>
+                                <th>
+                                    <span>JUEVES</span>
+                                    <a href="#" class="btn-editar-dia ms-1" data-dia="JUEVES" title="Editar día">&#9998;</a>
+                                </th>
+                                <th>
+                                    <span>VIERNES</span>
+                                    <a href="#" class="btn-editar-dia ms-1" data-dia="VIERNES" title="Editar día">&#9998;</a>
+                                </th>
+                                <th>
+                                    <span>SABADO</span>
+                                    <a href="#" class="btn-editar-dia ms-1" data-dia="SABADO" title="Editar día">&#9998;</a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="agenda-tabla-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </template>
     </section>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="/js/mecanico.js"></script>
