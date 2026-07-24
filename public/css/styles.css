@@ -421,3 +421,649 @@ a:hover {
     align-self: center;
   }
 }
+
+/* ========== ESTILOS PRESUPUESTO PRO (SOLO PARA MODAL COTIZACION 2) ========== */
+#modalNuevaCotizacion2 .modal-content {
+    font-family: 'Roboto', sans-serif;
+    background: #ecf0f1;
+    border-radius: 12px;
+    border: none;
+}
+
+#modalNuevaCotizacion2 .modal-header {
+    background: linear-gradient(135deg, #1e272e 0%, #34495e 100%);
+    color: white;
+    border-bottom: 5px solid #2980b9;
+    border-radius: 12px 12px 0 0;
+    padding: 20px 25px;
+}
+
+#modalNuevaCotizacion2 .modal-title {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+    font-size: 1.3em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+#modalNuevaCotizacion2 .modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+#modalNuevaCotizacion2 .modal-body {
+    padding: 20px 25px;
+}
+
+#modalNuevaCotizacion2 .modal-footer {
+    border-top: 1px solid #d1d9e6;
+    padding: 15px 25px;
+    background: #fff;
+    border-radius: 0 0 12px 12px;
+}
+
+/* TARJETAS DEL MODAL */
+#modalNuevaCotizacion2 .card-presupuesto {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    position: relative;
+    border: none;
+}
+
+#modalNuevaCotizacion2 .card-presupuesto::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: #2c3e50;
+}
+
+/* SECTION HEADER */
+#modalNuevaCotizacion2 .section-header-presupuesto {
+    background: #2c3e50;
+    color: white;
+    padding: 10px 15px;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* INPUTS NEUMORFISMO */
+#modalNuevaCotizacion2 .input-neumorfico {
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    background: #ecf0f3;
+    box-shadow: inset 5px 5px 10px #d1d9e6, inset -5px -5px 10px #ffffff;
+    outline: none;
+    transition: all 0.3s ease;
+    font-family: 'Roboto', sans-serif;
+    color: #555;
+    font-size: 0.9em;
+}
+
+#modalNuevaCotizacion2 .input-neumorfico:focus {
+    color: #2980b9;
+    background: #eef2f5;
+    box-shadow: inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #ffffff, 0 0 3px rgba(41, 128, 185, 0.2);
+}
+
+#modalNuevaCotizacion2 input[readonly].input-neumorfico {
+    background: #e0e6ed;
+    box-shadow: inset 2px 2px 5px #cbd5e0;
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+#modalNuevaCotizacion2 select.input-neumorfico {
+    cursor: pointer;
+}
+
+/* LABELS ESTILO PRESUPUESTO PRO */
+#modalNuevaCotizacion2 .label-presupuesto {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+    color: #7f8c8d;
+    font-size: 0.7em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* BOTONES AGREGAR */
+#modalNuevaCotizacion2 .btn-agregar-presupuesto {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75em;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 5px;
+    transition: 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#modalNuevaCotizacion2 .btn-agregar-presupuesto:hover {
+    background: #7f8c8d;
+}
+
+/* BOTÓN ELIMINAR */
+#modalNuevaCotizacion2 .btn-eliminar-presupuesto {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 1.2em;
+    opacity: 0.7;
+    transition: 0.2s;
+}
+
+#modalNuevaCotizacion2 .btn-eliminar-presupuesto:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* RESUMEN FINANCIERO */
+#modalNuevaCotizacion2 .resumen-presupuesto {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    border-top: 6px solid #e67e22;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+#modalNuevaCotizacion2 .final-calc-area {
+    background: #2c3e50;
+    border-radius: 10px;
+    padding: 20px;
+    color: white;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    align-items: center;
+}
+
+#modalNuevaCotizacion2 .calc-label {
+    font-size: 0.75em;
+    opacity: 0.8;
+    display: block;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+#modalNuevaCotizacion2 .calc-amount {
+    font-size: 1.4em;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 900;
+}
+
+#modalNuevaCotizacion2 .input-anticipo-presupuesto {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    text-align: right;
+    font-size: 1.3em;
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    outline: none;
+}
+
+#modalNuevaCotizacion2 .input-anticipo-presupuesto:focus {
+    background: rgba(255,255,255,0.2);
+    border-color: #2980b9;
+}
+
+/* BADGES DE ITEMS AGREGADOS */
+#modalNuevaCotizacion2 .badge-servicio {
+    background: #2980b9;
+    color: white;
+    font-size: 0.7em;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+#modalNuevaCotizacion2 .badge-producto {
+    background: #e67e22;
+    color: white;
+    font-size: 0.7em;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+/* ITEMS AGREGADOS A LA LISTA */
+#modalNuevaCotizacion2 .item-servicio-lista {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+    padding: 6px 10px;
+    font-size: 0.85em;
+}
+
+#modalNuevaCotizacion2 .item-producto-lista {
+    display: grid;
+    grid-template-columns: 2fr 0.5fr 0.8fr 0.8fr 30px;
+    gap: 10px;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 6px 0;
+    font-size: 0.85em;
+}
+
+/* BOTONES FOOTER */
+#modalNuevaCotizacion2 .btn-cancelar-presupuesto {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#modalNuevaCotizacion2 .btn-cancelar-presupuesto:hover {
+    background: #7f8c8d;
+}
+
+#modalNuevaCotizacion2 .btn-guardar-presupuesto {
+    background: #2980b9;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(41, 128, 185, 0.4);
+    transition: 0.2s;
+}
+
+#modalNuevaCotizacion2 .btn-guardar-presupuesto:hover {
+    background: #2471a3;
+    transform: translateY(-2px);
+}
+
+/* RESPONSIVE DEL MODAL */
+@media (max-width: 768px) {
+    #modalNuevaCotizacion2 .final-calc-area {
+        grid-template-columns: 1fr;
+    }
+    
+    #modalNuevaCotizacion2 .calc-amount {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+}
+
+/* ---------- UTILIDADES DE DIMENSIONES ---------- */
+.w-40 {
+  width: 40px;
+}
+
+.w-50 {
+  width: 50px;
+}
+
+.w-60 {
+  width: 60px;
+}
+
+.w-80 {
+  width: 80px;
+}
+
+.max-w-280 {
+  max-width: 280px;
+}
+
+.max-w-320 {
+  max-width: 320px;
+}
+
+.max-h-250 {
+  max-height: 250px;
+}
+
+.max-h-400 {
+  max-height: 400px;
+}
+
+/* ---------- UTILIDADES DE TIPOGRAFÍA ---------- */
+.font-07 {
+  font-size: 0.7rem;
+}
+
+.font-085 {
+  font-size: 0.85em;
+}
+
+/* ---------- VISTA ÓRDENES ---------- */
+.ordenes-header {
+  position: relative;
+}
+
+.ordenes-header .w-40 {
+  flex-shrink: 0;
+}
+
+.ordenes-buscador .form-control-sm {
+  max-width: 280px;
+}
+
+/* ---------- VISTA COTIZACIONES ---------- */
+
+/* Columna Izquierda: Lista de cotizaciones por placa */
+.lista-cotizaciones {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Columna Central: Datos del cliente */
+.info-cliente-cotizacion .text-muted {
+  font-size: 0.7rem;
+}
+
+/* Mensaje sin placa/cliente */
+#mensajeSinPlaca,
+#mensajeSinCliente {
+  min-height: 150px;
+}
+
+/* --- Tabla de Items Agregados --- */
+.tabla-items-container {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+#tablaItemsCotizacion th:nth-child(1) {
+  width: 60px; /* Tipo */
+}
+
+#tablaItemsCotizacion th:nth-child(3) {
+  width: 50px; /* Cant. */
+}
+
+#tablaItemsCotizacion th:nth-child(4) {
+  width: 80px; /* P. Unit. */
+}
+
+#tablaItemsCotizacion th:nth-child(5) {
+  width: 80px; /* Subtotal */
+}
+
+#tablaItemsCotizacion th:nth-child(6) {
+  width: 40px; /* Acción eliminar */
+}
+
+/* Columna Derecha: Resumen */
+.total-final {
+  background-color: #e8f5e9;
+  padding: 1rem;
+  border-radius: 0.375rem;
+}
+
+/* --- Placa activa en lista --- */
+.placa-activa strong {
+  letter-spacing: 2px;
+}
+
+/* ---------- VISTA COTIZACIONES 2 ---------- */
+.cotizaciones2-header .w-40 {
+  flex-shrink: 0;
+}
+
+#inputBuscarCotizacion2 {
+  max-width: 320px;
+}
+
+/* ---------- MODAL HORARIO AGENDA ---------- */
+#modalHorario .tab-mecanico {
+  color: var(--color3);
+}
+
+#modalHorario .tab-dia {
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+#modalHorario .tab-dia:hover {
+  background: var(--color2);
+}
+
+#modalHorario .tab-dia.active {
+  background: var(--color3);
+  color: var(--color1);
+}
+
+#modalHorario .bloque-ocupado {
+  background: #fff3cd;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ffc107;
+}
+
+#modalHorario .badge-ocupado-modal {
+  background: #dc3545;
+  color: white;
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+#modalHorario .bloque-horario {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+#modalHorario .btn-eliminar-bloque {
+  color: #dc3545;
+  font-size: 1rem;
+  text-decoration: none;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+#modalHorario .btn-eliminar-bloque:hover {
+  opacity: 1;
+}
+
+#modalHorario .btn-agregar-horario {
+  background: var(--color3);
+  color: var(--color1);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background 0.2s;
+}
+
+#modalHorario .btn-agregar-horario:hover {
+  background: var(--color4);
+}
+
+#modalHorario .btn-guardar-horario {
+  background: var(--color4);
+  color: var(--color1);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background 0.2s;
+}
+
+#modalHorario .btn-guardar-horario:hover {
+  background: #038a03;
+}
+
+/* ---------- MODAL NUEVA ORDEN ---------- */
+#modalNuevaOrden .modal-header {
+  background: var(--color3);
+  color: var(--color1);
+}
+
+#modalNuevaOrden .modal-header .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+#modalNuevaOrden #btnGuardarOrden {
+  padding: 8px 20px;
+  font-weight: 600;
+}
+
+/* ---------- AGENDA (Vista semanal) ---------- */
+.agenda-tabla .col-hora {
+  width: 80px;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 600;
+  background: var(--color2);
+}
+
+.agenda-tabla th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.agenda-tabla .btn-editar-dia {
+  font-size: 0.8rem;
+  text-decoration: none;
+  color: var(--color3);
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.agenda-tabla .btn-editar-dia:hover {
+  opacity: 1;
+  color: var(--color4);
+}
+
+/* ---------- MEDIA QUERIES ---------- */
+@media (max-width: 768px) {
+  .w-40,
+  .w-50,
+  .w-60,
+  .w-80 {
+    width: auto;
+  }
+
+  .max-w-280,
+  .max-w-320 {
+    max-width: 100%;
+  }
+
+  .max-h-250,
+  .max-h-400 {
+    max-height: none;
+  }
+
+  .final-calc-area {
+    grid-template-columns: 1fr;
+  }
+
+  #tablaItemsCotizacion th:nth-child(1),
+  #tablaItemsCotizacion th:nth-child(3),
+  #tablaItemsCotizacion th:nth-child(4),
+  #tablaItemsCotizacion th:nth-child(5),
+  #tablaItemsCotizacion th:nth-child(6) {
+    width: auto;
+  }
+}
+
+/* ========== MODAL COTIZACION 2 - SCROLL INTERNO ========== */
+
+/* Altura máxima del modal (90% del viewport) */
+#modalNuevaCotizacion2 .modal-dialog {
+  max-height: 90vh;
+  margin-top: 5vh;
+  margin-bottom: 5vh;
+}
+
+/* El contenido del modal usa flex column */
+#modalNuevaCotizacion2 .modal-content {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Evita scroll externo */
+}
+
+/* Header fijo arriba */
+#modalNuevaCotizacion2 .modal-header {
+  flex-shrink: 0; /* No se encoge */
+  z-index: 10;
+}
+
+/* Footer fijo abajo */
+#modalNuevaCotizacion2 .modal-footer {
+  flex-shrink: 0; /* No se encoge */
+  z-index: 10;
+}
+
+/* Body con scroll */
+#modalNuevaCotizacion2 .modal-body {
+  flex: 1 1 auto; /* Ocupa el espacio disponible */
+  overflow-y: auto; /* Scroll vertical solo aquí */
+  overflow-x: hidden;
+  padding: 20px 25px;
+  
+  /* Scrollbar estilizado */
+  scrollbar-width: thin;
+  scrollbar-color: #bdc3c7 #ecf0f1;
+}
+
+/* Scrollbar para Chrome/Safari */
+#modalNuevaCotizacion2 .modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+#modalNuevaCotizacion2 .modal-body::-webkit-scrollbar-track {
+  background: #ecf0f1;
+  border-radius: 4px;
+}
+
+#modalNuevaCotizacion2 .modal-body::-webkit-scrollbar-thumb {
+  background: #bdc3c7;
+  border-radius: 4px;
+}
+
+#modalNuevaCotizacion2 .modal-body::-webkit-scrollbar-thumb:hover {
+  background: #95a5a6;
+}
+
+/* Sombra sutil en header y footer para indicar scroll */
+#modalNuevaCotizacion2 .modal-header {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#modalNuevaCotizacion2 .modal-footer {
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+}
+
+/* Asegurar que las tarjetas no desborden */
+#modalNuevaCotizacion2 .card-presupuesto {
+  min-width: 0; /* Evita desbordamiento en grid */
+}

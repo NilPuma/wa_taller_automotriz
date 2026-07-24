@@ -72,6 +72,13 @@
             </div>
             <div class="item-separator"></div>
             <div class="item">
+                <a href="#" id="btnMenuCotizaciones2">
+                    <div class="icono"><img src="/icons/dolar.svg" alt="" ></div>
+                    <div class="titulo"><span>Cotizaciones 2</span></div>
+                </a>
+            </div>
+            <div class="item-separator"></div>
+            <div class="item">
                 <a href="#" id="btnMenuCitas">
                     <div class="icono"><img src="/icons/citas.svg" alt="" ></div>
                     <div class="titulo"><span>Citas</span></div>
@@ -105,9 +112,9 @@
         <div id="contenedorReactivo">
             
             {{!-- ================= DASHBOARD CON BOOTSTRAP ================= --}}
-            <div id="dashboard" class="p-4">
+            <div id="dashboard" class="p-4 container">
 
-                <h1 class="text-center fw-bold mb-4">DASHBOARD</h1>
+                <h1 class="text-center fw-bold mb-4 ">DASHBOARD</h1>
 
                 {{!-- KPI Cards con Bootstrap --}}
                 <div class="row g-3 mb-4">
@@ -371,12 +378,215 @@
         </div>
         {{!-- ================= FIN MODAL HORARIO AGENDA ================= --}}
 
+        {{!-- ================= MODAL NUEVA COTIZACION 2 (ESTILO PRESUPUESTO PRO) ================= --}}
+        <div class="modal fade" id="modalNuevaCotizacion2" tabindex="-1" aria-labelledby="modalNuevaCotizacion2Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl modal-scrollable">
+                <div class="modal-content">
+                    {{!-- Header --}}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalNuevaCotizacion2Label">
+                            <i class="fas fa-file-invoice"></i> NUEVA COTIZACIÓN
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    {{!-- Body --}}
+                    <div class="modal-body">
+
+                        {{!-- TARJETA 1: Placa y Mecánico --}}
+                        <div class="card-presupuesto">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="label-presupuesto">
+                                        <i class="fas fa-car"></i> Placa del Vehículo
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" class="input-neumorfico text-uppercase" id="inputPlacaCot2" placeholder="ABC-123">
+                                        <button class="btn btn-primary btn-sm ms-2" type="button" id="btnBuscarPlacaCot2" title="Buscar vehículo" style="border-radius: 10px;">
+                                            <i class="fas fa-search"></i> Buscar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="label-presupuesto" for="selectMecanicoCot2">
+                                        <i class="fas fa-user-cog"></i> Mecánico
+                                    </label>
+                                    <select class="input-neumorfico" id="selectMecanicoCot2">
+                                        <option value="" selected disabled>Seleccione un mecánico</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{!-- TARJETA 2: Datos Cliente y Vehículo --}}
+                        <div class="card-presupuesto">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div style="border-right: 1px dashed #ccc; padding-right: 15px;">
+                                        <div class="section-header-presupuesto" style="background: #2980b9;">
+                                            <span><i class="fas fa-user"></i> DATOS DEL CLIENTE</span>
+                                        </div>
+                                        <div id="infoClienteCot2" class="d-none">
+                                            <p style="margin:3px 0;"><strong id="cot2ClienteNombre">--</strong></p>
+                                            <p style="margin:3px 0; font-size:0.85em;">Telefono: <span id="cot2ClienteTelefono">--</span></p>
+                                            <p style="margin:3px 0; font-size:0.85em;">Email: <span id="cot2ClienteEmail">--</span></p>
+                                            <p style="margin:3px 0; font-size:0.85em;">Documento: <span id="cot2ClienteDocumento">--</span></p>
+                                        </div>
+                                        <div id="mensajeSinClienteCot2" style="color:#95a5a6; font-size:0.85em;">
+                                            Busque una placa para ver los datos del cliente.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div style="padding-left: 15px;">
+                                        <div class="section-header-presupuesto" style="background: #2980b9;">
+                                            <span><i class="fas fa-car-side"></i> DATOS DEL VEHÍCULO</span>
+                                        </div>
+                                        <div id="infoVehiculoCot2" class="d-none">
+                                            <p style="margin:3px 0;"><strong id="cot2VehiculoNombre">--</strong></p>
+                                            <p style="margin:3px 0; font-size:0.85em;">Placa: <span id="cot2VehiculoPlaca">--</span></p>
+                                            <p style="margin:3px 0; font-size:0.85em;">Color: <span id="cot2VehiculoColor">--</span></p>
+                                            <p style="margin:3px 0; font-size:0.85em;">Kilometraje: <span id="cot2VehiculoKm">--</span></p>
+                                        </div>
+                                        <div id="mensajeSinVehiculoCot2" style="color:#95a5a6; font-size:0.85em;">
+                                            Busque una placa para ver los datos del vehículo.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{!-- TARJETA 3: Servicios --}}
+                        <div class="card-presupuesto">
+                            <div class="section-header-presupuesto">
+                                <span><i class="fas fa-clipboard-list"></i> 1. SERVICIOS</span>
+                                <span id="totServiciosCot2" style="background:#fff; color:#2c3e50; padding:2px 10px; border-radius:4px; font-size:0.9em;">S/ 0.00</span>
+                            </div>
+                            {{!-- Fila para agregar --}}
+                            <div class="row g-2 align-items-end mb-3 p-2" style="background:#f8f9fa; border-radius:8px;">
+                                <div class="col-5">
+                                    <select class="input-neumorfico" id="selectServicioCot2">
+                                        <option value="" selected disabled>Seleccione un servicio</option>
+                                    </select>
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" class="input-neumorfico text-center" id="inputCantidadServicioCot2" value="1" min="1">
+                                </div>
+                                <div class="col-3">
+                                    <input type="text" class="input-neumorfico text-end" id="inputPrecioServicioCot2" value="0.00" readonly>
+                                </div>
+                                <div class="col-2">
+                                    <button type="button" class="btn-agregar-presupuesto" id="btnAgregarServicioCot2">
+                                        <i class="fas fa-plus"></i> Agregar
+                                    </button>
+                                </div>
+                            </div>
+                            {{!-- Lista de servicios agregados --}}
+                            <div id="listServiciosCot2"></div>
+                        </div>
+
+                        {{!-- TARJETA 4: Refacciones --}}
+                        <div class="card-presupuesto">
+                            <div class="section-header-presupuesto" style="background: #e67e22;">
+                                <span><i class="fas fa-box-open"></i> 2. REFACCIONES Y MATERIALES</span>
+                                <span id="totRefaccionesCot2" style="background:#fff; color:#e67e22; padding:2px 10px; border-radius:4px; font-size:0.9em;">S/ 0.00</span>
+                            </div>
+                            {{!-- Fila para agregar --}}
+                            <div class="row g-2 align-items-end mb-3 p-2" style="background:#f8f9fa; border-radius:8px;">
+                                <div class="col-5">
+                                    <select class="input-neumorfico" id="selectProductoCot2">
+                                        <option value="" selected disabled>Seleccione un producto</option>
+                                    </select>
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" class="input-neumorfico text-center" id="inputCantidadProductoCot2" value="1" min="1">
+                                </div>
+                                <div class="col-3">
+                                    <input type="text" class="input-neumorfico text-end" id="inputPrecioProductoCot2" value="0.00" readonly>
+                                </div>
+                                <div class="col-2">
+                                    <button type="button" class="btn-agregar-presupuesto" id="btnAgregarProductoCot2" style="background:#f39c12;">
+                                        <i class="fas fa-plus"></i> Agregar
+                                    </button>
+                                </div>
+                            </div>
+                            {{!-- Encabezados --}}
+                            <div style="font-size:0.75em; color:#7f8c8d; margin-bottom:5px; display:grid; grid-template-columns: 2fr 0.5fr 0.8fr 0.8fr 30px; gap:10px; font-weight:bold;">
+                                <span>Concepto</span><span>Cant.</span><span>Costo U.</span><span>Total</span><span></span>
+                            </div>
+                            {{!-- Lista de refacciones agregadas --}}
+                            <div id="listRefaccionesCot2"></div>
+                        </div>
+
+                        {{!-- TARJETA 5: Resumen Financiero --}}
+                        <div class="resumen-presupuesto">
+                            <h3 style="margin-top:0; margin-bottom:20px; font-family:'Exo 2',sans-serif; text-transform:uppercase; color:#2c3e50; border-bottom:1px solid #eee; padding-bottom:10px; font-size:1em;">
+                                <i class="fas fa-calculator"></i> Resumen Financiero
+                            </h3>
+
+                            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:25px; text-align:center;">
+                                <div style="background:#f8f9fa; padding:15px; border-radius:10px; border:1px solid #eee;">
+                                    <span style="display:block; font-size:0.7em; color:#7f8c8d; font-weight:bold; text-transform:uppercase; margin-bottom:5px;">Servicios</span>
+                                    <strong id="resumenServiciosCot2" style="font-size:1.2em; color:#2c3e50;">S/ 0.00</strong>
+                                </div>
+                                <div style="background:#f8f9fa; padding:15px; border-radius:10px; border:1px solid #eee;">
+                                    <span style="display:block; font-size:0.7em; color:#7f8c8d; font-weight:bold; text-transform:uppercase; margin-bottom:5px;">Refacciones</span>
+                                    <strong id="resumenRefaccionesCot2" style="font-size:1.2em; color:#2c3e50;">S/ 0.00</strong>
+                                </div>
+                                <div style="background:#f8f9fa; padding:15px; border-radius:10px; border:1px solid #eee;">
+                                    <span style="display:block; font-size:0.7em; color:#7f8c8d; font-weight:bold; text-transform:uppercase; margin-bottom:5px;">Total</span>
+                                    <strong id="resumenTotalCot2" style="font-size:1.2em; color:#27ae60;">S/ 0.00</strong>
+                                </div>
+                            </div>
+
+                            <div class="final-calc-area">
+                                <div style="text-align:right;">
+                                    <span class="calc-label">TOTAL PRESUPUESTO</span>
+                                    <div class="calc-amount" id="totalFinalCot2">S/ 0.00</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <span class="calc-label">ANTICIPO / A CUENTA</span>
+                                    <input type="number" id="inputAnticipoCot2" class="input-anticipo-presupuesto" placeholder="S/ 0.00" min="0">
+                                </div>
+                                <div style="text-align:right; color:#f1c40f;">
+                                    <span class="calc-label">RESTANTE POR PAGAR</span>
+                                    <div class="calc-amount" id="saldoRestanteCot2">S/ 0.00</div>
+                                </div>
+                            </div>
+
+                            {{!-- Validez --}}
+                            <div style="margin-top:15px; display:flex; align-items:center; gap:10px;">
+                                <label class="label-presupuesto" for="selectValidezCot2" style="margin-bottom:0;">
+                                    <i class="fas fa-clock"></i> Validez:
+                                </label>
+                                <select class="input-neumorfico" id="selectValidezCot2" style="width:auto;">
+                                    <option value="7" selected>7 días</option>
+                                    <option value="15">15 días</option>
+                                    <option value="30">30 días</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    {{!-- Footer --}}
+                    <div class="modal-footer">
+                        <button type="button" class="btn-cancelar-presupuesto" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="button" class="btn-guardar-presupuesto" id="btnGuardarCotizacion2">
+                            <i class="fas fa-save"></i> Guardar Cotización
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{!-- ================= FIN MODAL NUEVA COTIZACION 2 ================= --}}
+
         {{!-- Template para la vista de Órdenes --}}
         <template id="templateOrdenes">
-            <div id="ordenes" class="p-4">
+            <div id="ordenes" class="p-4 container">
                 {{!-- Header --}}
                 <div class="ordenes-header d-flex align-items-center justify-content-between mb-4">
-                    <div style="width:40px;"></div>
+                    <div class="w-40"></div>
                     <h1 class="text-center fw-bold mb-0 flex-grow-1">LISTA DE ORDENES</h1>
                     <button type="button" class="btn btn-success btn-sm" id="btnAbrirModalOrden" data-bs-toggle="modal" data-bs-target="#modalNuevaOrden">
                         <i class="bi bi-plus-circle"></i> NUEVA ORDEN
@@ -386,7 +596,7 @@
                 {{!-- Buscador --}}
                 <div class="ordenes-buscador d-flex align-items-center justify-content-end mb-3">
                     <label for="inputBuscarOrden" class="fw-semibold me-2">BUSCAR:</label>
-                    <input type="text" id="inputBuscarOrden" class="form-control form-control-sm" style="max-width: 280px;" placeholder="Buscar por orden, cliente o matrícula...">
+                    <input type="text" id="inputBuscarOrden" class="form-control form-control-sm max-w-280" placeholder="Buscar por orden, cliente o matrícula...">
                 </div>
 
                 {{!-- Tabla de Ordenes --}}
@@ -435,13 +645,7 @@
 
         {{!-- Template para la vista de Agenda --}}
         <template id="templateAgenda">
-            <div id="agenda" class="p-4">
-                {{!-- Header --}}
-                <div class="agenda-header d-flex align-items-center justify-content-between mb-4">
-                    <div style="width:40px;"></div>
-                    <h1 class="text-center fw-bold mb-0 flex-grow-1">AGENDA DEL MECANICO</h1>
-                    <a href="#" id="btnCerrarAgenda" class="btn btn-outline-secondary btn-sm">CERRAR</a>
-                </div>
+            <div id="agenda" class="p-4 container">
 
                 <h2 class="agenda-titulo h4 fw-bold">AGENDA</h2>
                 <p class="agenda-nombre text-muted" id="agendaNombreMecanico">Mecánico</p>
@@ -484,6 +688,377 @@
                 </div>
             </div>
         </template>
+
+        {{!-- Template para la vista de Cotizaciones --}}
+        <template id="templateCotizaciones">
+            <div id="cotizaciones" class="p-4 container-fluid">
+                
+                {{!-- Header --}}
+                <div class="cotizaciones-header d-flex align-items-center justify-content-between mb-4">
+                    <div class="w-40"></div>
+                    <h1 class="text-center fw-bold mb-0 flex-grow-1">COTIZACIONES</h1>
+                </div>
+
+                {{!-- Contenido en 3 columnas --}}
+                <div class="row g-4">
+                    
+                    {{!-- ==================== COLUMNA IZQUIERDA: Lista de Cotizaciones por Placa ==================== --}}
+                    <div class="col-lg-3">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-white border-bottom">
+                                <h5 class="mb-0 fw-bold">
+                                    <i class="bi bi-file-earmark-text"></i> Cotizaciones
+                                </h5>
+                            </div>
+                            <div class="card-body p-3 d-flex flex-column">
+                                
+                                {{!-- Placa mostrada --}}
+                                <div class="placa-activa mb-3 p-2 bg-light rounded text-center">
+                                    <small class="text-muted d-block">Vehículo</small>
+                                    <strong class="fs-5 text-uppercase" id="placaActivaCotizacion">--</strong>
+                                </div>
+
+                                {{!-- Buscador de cotizaciones --}}
+                                <div class="input-group input-group-sm mb-3">
+                                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" id="inputBuscarCotizacion" 
+                                           placeholder="Buscar cotización...">
+                                </div>
+
+                                {{!-- Lista de cotizaciones de la placa --}}
+                                <div class="lista-cotizaciones flex-grow-1 overflow-auto max-h-400" 
+                                     id="listaCotizaciones">
+                                </div>
+
+                                {{!-- Mensaje cuando no hay placa --}}
+                                <div id="mensajeSinPlaca" class="text-center text-muted py-4">
+                                    <i class="bi bi-car-front fs-3 d-block mb-2"></i>
+                                    <small>Ingrese una placa para ver sus cotizaciones</small>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    {{!-- ==================== COLUMNA CENTRAL: Datos del Vehículo + Mecánico + Items ==================== --}}
+                    <div class="col-lg-5">
+                        
+                        {{!-- Sección Superior: Datos del Cliente y Vehículo + Mecánico --}}
+                        <div class="row g-3 mb-3">
+                            
+                            {{!-- Placa y Mecánico --}}
+                            <div class="col-md-6">
+                                <div class="card shadow-sm border-0 h-100">
+                                    <div class="card-header bg-white border-bottom py-2">
+                                        <h6 class="mb-0 fw-bold"><i class="bi bi-gear"></i> Datos de Cotización</h6>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        {{!-- Input Placa --}}
+                                        <div class="mb-3">
+                                            <label for="inputPlacaCotizacion" class="form-label fw-semibold small">
+                                                <i class="bi bi-car-front"></i> Placa del Vehículo
+                                            </label>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" class="form-control text-uppercase" 
+                                                       id="inputPlacaCotizacion" 
+                                                       placeholder="ABC-123">
+                                                <button class="btn btn-primary" type="button" 
+                                                        id="btnBuscarPlaca" title="Buscar vehículo">
+                                                    <i class="bi bi-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {{!-- Dropdown Mecánico --}}
+                                        <div class="mb-2">
+                                            <label for="selectMecanicoCotizacion" class="form-label fw-semibold small">
+                                                <i class="bi bi-person-gear"></i> Mecánico
+                                            </label>
+                                            <select class="form-select form-select-sm" id="selectMecanicoCotizacion">
+                                                <option value="" selected disabled>Seleccione un mecánico</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{!-- Datos del Cliente --}}
+                            <div class="col-md-6">
+                                <div class="card shadow-sm border-0 h-100">
+                                    <div class="card-header bg-white border-bottom py-2">
+                                        <h6 class="mb-0 fw-bold"><i class="bi bi-person"></i> Datos del Cliente</h6>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <div id="infoClienteCotizacion" class="small d-none">
+                                            <div class="mb-2">
+                                                <span class="text-muted d-block font-07">NOMBRE</span>
+                                                <strong id="clienteNombre">--</strong>
+                                            </div>
+                                            <div class="mb-2">
+                                                <span class="text-muted d-block font-07">EMAIL</span>
+                                                <span id="clienteEmail" class="text-primary">--</span>
+                                            </div>
+                                            <div class="mb-2">
+                                                <span class="text-muted d-block font-07">TELÉFONO</span>
+                                                <span id="clienteTelefono">--</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-muted d-block font-07">VEHÍCULO</span>
+                                                <span id="clienteVehiculo" class="fw-semibold">--</span>
+                                            </div>
+                                        </div>
+                                        <div id="mensajeSinCliente" class="text-center text-muted py-3">
+                                            <i class="bi bi-search fs-4 d-block mb-1"></i>
+                                            <small>Busque una placa para ver los datos del cliente</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{!-- Sección Inferior: Servicios y Productos --}}
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-white border-bottom py-2">
+                                <h6 class="mb-0 fw-bold"><i class="bi bi-cart"></i> Servicios y Productos</h6>
+                            </div>
+                            <div class="card-body p-3">
+                                
+                                {{!-- ===== SECCIÓN SERVICIOS ===== --}}
+                                <div class="mb-3">
+                                    <h6 class="fw-bold small text-primary mb-2">
+                                        <i class="bi bi-tools"></i> SERVICIOS
+                                    </h6>
+                                    <div class="row g-2 align-items-end">
+                                        <div class="col-5">
+                                            <label for="selectServicioCotizacion" class="form-label fw-semibold small">Servicio</label>
+                                            <select class="form-select form-select-sm" id="selectServicioCotizacion">
+                                                <option value="" selected disabled>Seleccione un servicio</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-2">
+                                            <label for="inputCantidadServicio" class="form-label fw-semibold small">Cant.</label>
+                                            <input type="number" class="form-control form-control-sm" 
+                                                   id="inputCantidadServicio" value="1" min="1">
+                                        </div>
+                                        <div class="col-3">
+                                            <label class="form-label fw-semibold small">P. Unit.</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-light">S/</span>
+                                                <input type="text" class="form-control text-end" 
+                                                       id="inputPrecioServicio" value="0.00" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-2">
+                                            <button type="button" class="btn btn-primary btn-sm w-100" id="btnAgregarServicio" title="Agregar servicio">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-2">
+
+                                {{!-- ===== SECCIÓN PRODUCTOS ===== --}}
+                                <div class="mb-3">
+                                    <h6 class="fw-bold small text-success mb-2">
+                                        <i class="bi bi-box-seam"></i> PRODUCTOS
+                                    </h6>
+                                    <div class="row g-2 align-items-end">
+                                        <div class="col-5">
+                                            <label for="selectProductoCotizacion" class="form-label fw-semibold small">Producto</label>
+                                            <select class="form-select form-select-sm" id="selectProductoCotizacion">
+                                                <option value="" selected disabled>Seleccione un producto</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-2">
+                                            <label for="inputCantidadProducto" class="form-label fw-semibold small">Cant.</label>
+                                            <input type="number" class="form-control form-control-sm" 
+                                                   id="inputCantidadProducto" value="1" min="1">
+                                        </div>
+                                        <div class="col-3">
+                                            <label class="form-label fw-semibold small">P. Unit.</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-light">S/</span>
+                                                <input type="text" class="form-control text-end" 
+                                                       id="inputPrecioProducto" value="0.00" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-2">
+                                            <button type="button" class="btn btn-success btn-sm w-100" id="btnAgregarProducto" title="Agregar producto">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-2">
+
+                                {{!-- Tabla de items agregados --}}
+                                <div class="tabla-items-container overflow-auto max-h-250">
+                                    <table class="table table-sm table-hover align-middle mb-0" id="tablaItemsCotizacion">
+                                        <thead class="table-light sticky-top">
+                                            <tr>
+                                                <th class="small w-60">Tipo</th>
+                                                <th class="small">Descripción</th>
+                                                <th class="small text-center w-50">Cant.</th>
+                                                <th class="small text-end w-80">P. Unit.</th>
+                                                <th class="small text-end w-80">Subtotal</th>
+                                                <th class="small text-center w-40"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbodyItemsCotizacion">
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted py-3">
+                                                    <i class="bi bi-inbox"></i> No hay items agregados
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot class="table-light">
+                                            <tr>
+                                                <td colspan="4" class="text-end fw-bold small">SUBTOTAL:</td>
+                                                <td class="text-end fw-bold small" id="subtotalCotizacion">S/ 0.00</td>
+                                                <td></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    {{!-- ==================== COLUMNA DERECHA: Detalles + Total + Generar ==================== --}}
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-header bg-white border-bottom">
+                                <h5 class="mb-0 fw-bold"><i class="bi bi-clipboard-check"></i> Resumen</h5>
+                            </div>
+                            <div class="card-body p-3 d-flex flex-column">
+                                
+                                {{!-- Observaciones / Detalles --}}
+                                <div class="mb-3">
+                                    <label for="textareaObservacionesCotizacion" class="form-label fw-semibold small">
+                                        <i class="bi bi-pencil-square"></i> Observaciones / Detalles
+                                    </label>
+                                    <textarea class="form-control form-control-sm" 
+                                              id="textareaObservacionesCotizacion" 
+                                              rows="5" 
+                                              placeholder="Ingrese observaciones, condiciones, notas adicionales..."></textarea>
+                                </div>
+
+                                <hr>
+
+                                {{!-- Resumen de totales --}}
+                                <div class="resumen-totales mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small text-muted">Subtotal:</span>
+                                        <span class="small fw-semibold" id="resumenSubtotal">S/ 0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small text-muted">IGV (18%):</span>
+                                        <span class="small fw-semibold" id="resumenIGV">S/ 0.00</span>
+                                    </div>
+                                </div>
+
+                                {{!-- Total Final --}}
+                                <div class="total-final p-3 rounded mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">TOTAL</span>
+                                        <span class="fw-bold fs-5 text-success" id="totalFinalCotizacion">S/ 0.00</span>
+                                    </div>
+                                </div>
+
+                                {{!-- Fecha de cotización --}}
+                                <div class="mb-3">
+                                    <label for="inputFechaCotizacion" class="form-label fw-semibold small">
+                                        <i class="bi bi-calendar3"></i> Fecha
+                                    </label>
+                                    <input type="date" class="form-control form-control-sm" id="inputFechaCotizacion">
+                                </div>
+
+                                {{!-- Validez de la cotización --}}
+                                <div class="mb-3">
+                                    <label for="selectValidezCotizacion" class="form-label fw-semibold small">
+                                        <i class="bi bi-clock-history"></i> Validez
+                                    </label>
+                                    <select class="form-select form-select-sm" id="selectValidezCotizacion">
+                                        <option value="7" selected>7 días</option>
+                                        <option value="15">15 días</option>
+                                        <option value="30">30 días</option>
+                                        <option value="60">60 días</option>
+                                    </select>
+                                </div>
+
+                                <div class="mt-auto">
+                                    {{!-- Botón Generar Cotización --}}
+                                    <button type="button" class="btn btn-success w-100 mb-2" id="btnGenerarCotizacion">
+                                        <i class="bi bi-file-earmark-pdf"></i> GENERAR COTIZACIÓN
+                                    </button>
+                                    
+                                    {{!-- Botón Limpiar --}}
+                                    <button type="button" class="btn btn-outline-secondary w-100" id="btnLimpiarCotizacion">
+                                        <i class="bi bi-eraser"></i> Limpiar Todo
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </template>
+
+        {{!-- Template para la vista de Cotizaciones 2 --}}
+        <template id="templateCotizaciones2">
+            <div id="cotizaciones2" class="p-4 container">
+
+                {{!-- Header --}}
+                <div class="cotizaciones2-header d-flex align-items-center justify-content-between mb-4">
+                    <div class="w-40"></div>
+                    <h1 class="text-center fw-bold mb-0 flex-grow-1">COTIZACIONES</h1>
+                </div>
+
+                {{!-- Buscador + Botón Nueva Cotización --}}
+                <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                    <div class="input-group input-group-sm max-w-320">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="inputBuscarCotizacion2" placeholder="Buscar por código, placa o cliente...">
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm" id="btnNuevaCotizacion2"
+                            data-bs-toggle="modal" data-bs-target="#modalNuevaCotizacion2">
+                        <i class="bi bi-plus-circle"></i> NUEVA COTIZACIÓN
+                    </button>
+                </div>
+
+                {{!-- Tabla general de Cotizaciones --}}
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3">CÓDIGO</th>
+                                        <th>PLACA</th>
+                                        <th>CLIENTE</th>
+                                        <th>MECÁNICO</th>
+                                        <th>FECHA</th>
+                                        <th class="text-center">ITEMS</th>
+                                        <th class="text-end">TOTAL</th>
+                                        <th class="text-center">ESTADO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-cotizaciones2-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </template>
+
     </section>
 </div>
 
