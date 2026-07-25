@@ -1067,3 +1067,159 @@ a:hover {
 #modalNuevaCotizacion2 .card-presupuesto {
   min-width: 0; /* Evita desbordamiento en grid */
 }
+
+/* =========================================
+   INPUT NEUMÓRFICO - ESTILO GLOBAL
+   Ajustado para todo el sistema (tamaño compacto)
+   ========================================= */
+
+/* --- Inputs de texto, número, búsqueda, etc. --- */
+.input-neumorfico-global,
+input[type="text"].input-neumorfico-global,
+input[type="number"].input-neumorfico-global,
+input[type="search"].input-neumorfico-global,
+input[type="date"].input-neumorfico-global,
+input[type="datetime-local"].input-neumorfico-global,
+textarea.input-neumorfico-global {
+    width: 100%;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #ecf0f3;
+    box-shadow: inset 3px 3px 6px #d1d9e6, inset -3px -3px 6px #ffffff;
+    outline: none;
+    transition: all 0.25s ease;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.875rem;
+    color: #555;
+    line-height: 1.5;
+    box-sizing: border-box;
+}
+
+/* --- Placeholder --- */
+.input-neumorfico-global::placeholder {
+    color: #95a5a6;
+    font-size: 0.8rem;
+}
+
+/* --- Al recibir foco --- */
+.input-neumorfico-global:focus {
+    color: #2980b9;
+    background: #eef2f5;
+    box-shadow: 
+        inset 1px 1px 3px #d1d9e6, 
+        inset -1px -1px 3px #ffffff, 
+        0 0 4px rgba(41, 128, 185, 0.25);
+}
+
+/* --- Solo lectura (readonly) --- */
+.input-neumorfico-global:read-only,
+input[readonly].input-neumorfico-global {
+    background: #e0e6ed;
+    box-shadow: inset 2px 2px 4px #cbd5e0;
+    color: #2c3e50;
+    font-weight: 600;
+    cursor: default;
+}
+
+/* --- Deshabilitado --- */
+.input-neumorfico-global:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #e8ecf1;
+    box-shadow: inset 1px 1px 2px #d1d9e6;
+}
+
+/* --- Selects --- */
+select.input-neumorfico-global {
+    width: 100%;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #ecf0f3;
+    box-shadow: inset 3px 3px 6px #d1d9e6, inset -3px -3px 6px #ffffff;
+    outline: none;
+    transition: all 0.25s ease;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.875rem;
+    color: #555;
+    cursor: pointer;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 30px;
+}
+
+select.input-neumorfico-global:focus {
+    color: #2980b9;
+    background: #eef2f5;
+    box-shadow: 
+        inset 1px 1px 3px #d1d9e6, 
+        inset -1px -1px 3px #ffffff, 
+        0 0 4px rgba(41, 128, 185, 0.25);
+}
+
+/* --- Textarea --- */
+textarea.input-neumorfico-global {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* --- Textarea focus --- */
+textarea.input-neumorfico-global:focus {
+    color: #2980b9;
+    background: #eef2f5;
+    box-shadow: 
+        inset 1px 1px 3px #d1d9e6, 
+        inset -1px -1px 3px #ffffff, 
+        0 0 4px rgba(41, 128, 185, 0.25);
+}
+
+/* --- Inputs de fecha --- */
+input[type="date"].input-neumorfico-global::-webkit-calendar-picker-indicator {
+    filter: opacity(0.6);
+    cursor: pointer;
+}
+
+input[type="date"].input-neumorfico-global::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+/* --- Tamaño pequeño (para filtros/buscadores) --- */
+.input-neumorfico-global.input-sm {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+}
+
+select.input-neumorfico-global.input-sm {
+    padding: 4px 28px 4px 10px;
+    font-size: 0.8rem;
+    background-position: right 8px center;
+}
+
+/* --- Tamaño grande (para campos destacados) --- */
+.input-neumorfico-global.input-lg {
+    padding: 10px 16px;
+    font-size: 1rem;
+    border-radius: 10px;
+}
+
+/* --- Compatibilidad con inputs de Bootstrap --- */
+.input-group .input-neumorfico-global {
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+    border-top-left-radius: 8px !important;
+    border-bottom-left-radius: 8px !important;
+}
+
+/* --- Responsive: tamaño completo en móvil --- */
+@media (max-width: 768px) {
+    .input-neumorfico-global {
+        font-size: 16px; /* Evita zoom en iOS */
+    }
+}

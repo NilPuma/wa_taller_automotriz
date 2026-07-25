@@ -13,8 +13,6 @@ const btnMenuInicio = document.querySelector('#btnMenuInicio');
 const btnMenuOrdenes = document.querySelector('#btnMenuOrdenes');
 const btnMenuAgenda = document.querySelector('#btnMenuAgenda');
 const btnMenuHistorial = document.querySelector('#btnMenuHistorial');
-const btnMenuConsumo = document.querySelector('#btnMenuConsumo');
-const btnMenuEvidencias = document.querySelector('#btnMenuEvidencias');
 const btnMenuCotizaciones = document.querySelector('#btnMenuCotizaciones');
 const btnMenuCotizaciones2 = document.querySelector('#btnMenuCotizaciones2');
 const btnMenuCitas = document.querySelector('#btnMenuCitas');
@@ -38,6 +36,14 @@ let mecanicosDisponibles = [];
 let filaIdCounterCot2 = 0;
 let vehiculoActivoCot2 = null;
 
+// Variables para Órdenes (nueva vista fusionada)
+let ordenSeleccionada = null;
+let evidencias = { antes: [], despues: [] };
+let productosConsumidos = [];
+let idCounterConsumo = 0;
+let paginaActual = 1;
+const itemsPorPagina = 5;
+
 // ============ 2. DATOS FICTICIOS ============
 
 // Datos del Dashboard
@@ -51,6 +57,20 @@ let dashboardData = {
     tiempoPromedio: '2.3h',
     alturasBarras: [60, 80, 70, 70, 50]
 };
+
+// Órdenes de trabajo (datos mock)
+const ordenesMockData = [
+    { id: 1, codigo: 'ORD-001', placa: 'ABC-123', cliente: 'Juan Pérez', documento: '12345678', vehiculo: 'Toyota Corolla 2020', mecanico: 'Juan Pérez', servicio: 'Cambio de Aceite', descripcion: 'Cambio de aceite sintético y filtro', estado: 'pendiente', fecha: '2024-07-20' },
+    { id: 2, codigo: 'ORD-002', placa: 'XYZ-789', cliente: 'María López', documento: '87654321', vehiculo: 'Honda Civic 2021', mecanico: 'María López', servicio: 'Alineación y Balanceo', descripcion: 'Alineación completa más balanceo de las 4 ruedas', estado: 'proceso', fecha: '2024-07-19' },
+    { id: 3, codigo: 'ORD-003', placa: 'DEF-456', cliente: 'Carlos Ruiz', documento: '45678912', vehiculo: 'Nissan Sentra 2019', mecanico: 'Carlos Ruiz', servicio: 'Cambio de Frenos', descripcion: 'Cambio de pastillas delanteras y rectificado de discos', estado: 'finalizada', fecha: '2024-07-18' },
+    { id: 4, codigo: 'ORD-004', placa: 'ABC-123', cliente: 'Juan Pérez', documento: '12345678', vehiculo: 'Toyota Corolla 2020', mecanico: 'Juan Pérez', servicio: 'Mantenimiento Preventivo', descripcion: 'Mantenimiento de los 40,000 km', estado: 'pendiente', fecha: '2024-07-17' },
+    { id: 5, codigo: 'ORD-005', placa: 'XYZ-789', cliente: 'María López', documento: '87654321', vehiculo: 'Honda Civic 2021', mecanico: 'María López', servicio: 'Diagnóstico Computarizado', descripcion: 'Scanner para verificar check engine', estado: 'proceso', fecha: '2024-07-16' },
+    { id: 6, codigo: 'ORD-006', placa: 'DEF-456', cliente: 'Carlos Ruiz', documento: '45678912', vehiculo: 'Nissan Sentra 2019', mecanico: 'Carlos Ruiz', servicio: 'Cambio de Batería', descripcion: 'Instalación de batería nueva 12V 60Ah', estado: 'finalizada', fecha: '2024-07-15' },
+    { id: 7, codigo: 'ORD-007', placa: 'GHI-012', cliente: 'Ana Torres', documento: '78945612', vehiculo: 'Kia Sportage 2022', mecanico: 'Juan Pérez', servicio: 'Cambio de Llantas', descripcion: 'Cambio de las 4 llantas 225/60 R17', estado: 'pendiente', fecha: '2024-07-14' },
+    { id: 8, codigo: 'ORD-008', placa: 'JKL-345', cliente: 'Pedro Sánchez', documento: '32165498', vehiculo: 'Hyundai Tucson 2020', mecanico: 'María López', servicio: 'Reparación de Motor', descripcion: 'Reparación de junta de culata', estado: 'proceso', fecha: '2024-07-13' },
+    { id: 9, codigo: 'ORD-009', placa: 'MNO-678', cliente: 'Luisa García', documento: '65498732', vehiculo: 'Mazda CX-5 2023', mecanico: 'Carlos Ruiz', servicio: 'Cambio de Aceite', descripcion: 'Cambio de aceite y filtro de aire', estado: 'finalizada', fecha: '2024-07-12' },
+    { id: 10, codigo: 'ORD-010', placa: 'PQR-901', cliente: 'Roberto Díaz', documento: '98765432', vehiculo: 'Chevrolet Tracker 2021', mecanico: 'Juan Pérez', servicio: 'Alineación y Balanceo', descripcion: 'Alineación computarizada', estado: 'pendiente', fecha: '2024-07-11' },
+];
 
 // Datos de la Agenda
 let agendaData = {
@@ -360,7 +380,668 @@ function inicializarModalHorario(datos, diaInicial = 'LUNES') {
     }
 }
 
-// ============ 6. FUNCIONES DE COTIZACIONES ============
+// ============ 6. FUNCIONES DE LA VISTA DE ÓRDENES (FUSIONADA) ============
+
+function obtenerOrdenesFiltradas(filtro = 'todas', busqueda = '') {
+    let resultado = [...ordenesMockData];
+    
+    // Aplicar filtro de estado
+    if (filtro !== 'todas') {
+        resultado = resultado.filter(orden => orden.estado === filtro);
+    }
+    
+    // Aplicar búsqueda
+    if (busqueda.trim()) {
+        const termino = busqueda.trim().toUpperCase();
+        resultado = resultado.filter(orden => 
+            orden.codigo.toUpperCase().includes(termino) ||
+            orden.placa.toUpperCase().includes(termino) ||
+            orden.cliente.toUpperCase().includes(termino)
+        );
+    }
+    
+    return resultado;
+}
+
+function renderizarListaOrdenes(ordenes, pagina = 1) {
+    const contenedor = document.querySelector('#listaOrdenesConsumo');
+    if (!contenedor) return;
+    
+    const inicio = (pagina - 1) * itemsPorPagina;
+    const fin = inicio + itemsPorPagina;
+    const ordenesPaginadas = ordenes.slice(inicio, fin);
+    const totalPaginas = Math.ceil(ordenes.length / itemsPorPagina);
+    
+    if (ordenesPaginadas.length === 0) {
+        contenedor.innerHTML = `
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                <small>No se encontraron órdenes</small>
+            </div>`;
+        return;
+    }
+    
+    contenedor.innerHTML = ordenesPaginadas.map(orden => {
+        let badgeClass = 'bg-secondary';
+        if (orden.estado === 'pendiente') badgeClass = 'bg-warning text-dark';
+        else if (orden.estado === 'proceso') badgeClass = 'bg-info text-dark';
+        else if (orden.estado === 'finalizada') badgeClass = 'bg-success';
+        
+        const estadoNombre = orden.estado.charAt(0).toUpperCase() + orden.estado.slice(1);
+        const isSelected = ordenSeleccionada && ordenSeleccionada.id === orden.id;
+        
+        return `
+            <div class="item-orden p-2 border rounded mb-2 ${isSelected ? 'border-primary bg-light' : ''}" 
+                 data-id="${orden.id}" style="cursor: pointer;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong class="d-block small">${orden.codigo}</strong>
+                        <small class="text-muted">${orden.placa} - ${orden.cliente}</small>
+                    </div>
+                    <span class="badge ${badgeClass}">${estadoNombre}</span>
+                </div>
+                <small class="text-muted d-block mt-1">${orden.servicio}</small>
+            </div>`;
+    }).join('');
+    
+    // Actualizar paginación
+    actualizarPaginacionOrdenes(pagina, totalPaginas);
+    
+    // Agregar event listeners a cada orden
+    contenedor.querySelectorAll('.item-orden').forEach(item => {
+        item.addEventListener('click', () => {
+            const ordenId = parseInt(item.getAttribute('data-id'));
+            seleccionarOrden(ordenId);
+        });
+    });
+}
+
+function actualizarPaginacionOrdenes(paginaActual, totalPaginas) {
+    const paginacion = document.querySelector('#paginacionOrdenes ul');
+    if (!paginacion) return;
+    
+    let html = '';
+    
+    // Botón anterior
+    html += `
+        <li class="page-item ${paginaActual <= 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-pagina="${paginaActual - 1}">&lt;</a>
+        </li>`;
+    
+    // Páginas
+    for (let i = 1; i <= totalPaginas; i++) {
+        html += `
+            <li class="page-item ${i === paginaActual ? 'active' : ''}">
+                <a class="page-link" href="#" data-pagina="${i}">${i}</a>
+            </li>`;
+    }
+    
+    // Botón siguiente
+    html += `
+        <li class="page-item ${paginaActual >= totalPaginas ? 'disabled' : ''}">
+            <a class="page-link" href="#" data-pagina="${paginaActual + 1}">&gt;&gt;</a>
+        </li>`;
+    
+    paginacion.innerHTML = html;
+    
+    // Event listeners para paginación
+    paginacion.querySelectorAll('.page-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pagina = parseInt(link.getAttribute('data-pagina'));
+            if (pagina && pagina >= 1 && pagina <= totalPaginas) {
+                paginaActual = pagina;
+                const filtroActivo = document.querySelector('.filtro-orden.active')?.getAttribute('data-filtro') || 'todas';
+                const busqueda = document.querySelector('#inputBuscarOrden')?.value || '';
+                const ordenesFiltradas = obtenerOrdenesFiltradas(filtroActivo, busqueda);
+                renderizarListaOrdenes(ordenesFiltradas, paginaActual);
+            }
+        });
+    });
+}
+
+function seleccionarOrden(ordenId) {
+    ordenSeleccionada = ordenesMockData.find(o => o.id === ordenId);
+    if (!ordenSeleccionada) return;
+    
+    // Mostrar información de la orden
+    const infoOrden = document.querySelector('#infoOrdenConsumo');
+    const mensajeSinOrden = document.querySelector('#mensajeSinOrdenConsumo');
+    const seccionEvidencias = document.querySelector('#seccionEvidencias');
+    const accionesOrden = document.querySelector('#accionesOrden');
+    const formAgregarConsumo = document.querySelector('#formAgregarConsumo');
+    const tablaConsumoContainer = document.querySelector('#tablaConsumoContainer');
+    const mensajeSinOrdenLista = document.querySelector('#mensajeSinOrdenConsumoLista');
+    const footerConsumo = document.querySelector('#footerConsumo');
+    
+    if (infoOrden) infoOrden.classList.remove('d-none');
+    if (mensajeSinOrden) mensajeSinOrden.style.display = 'none';
+    if (seccionEvidencias) seccionEvidencias.classList.remove('d-none');
+    if (accionesOrden) accionesOrden.classList.remove('d-none');
+    if (formAgregarConsumo) formAgregarConsumo.classList.remove('d-none');
+    if (tablaConsumoContainer) tablaConsumoContainer.classList.remove('d-none');
+    if (mensajeSinOrdenLista) mensajeSinOrdenLista.style.display = 'none';
+    if (footerConsumo) footerConsumo.classList.remove('d-none');
+    
+    // Llenar datos
+    document.querySelector('#consumoOrdenCodigo').textContent = ordenSeleccionada.codigo;
+    document.querySelector('#consumoOrdenCliente').textContent = ordenSeleccionada.cliente;
+    document.querySelector('#consumoOrdenDocumento').textContent = ordenSeleccionada.documento;
+    document.querySelector('#consumoOrdenVehiculo').textContent = `${ordenSeleccionada.vehiculo} (${ordenSeleccionada.placa})`;
+    document.querySelector('#consumoOrdenMecanico').textContent = ordenSeleccionada.mecanico;
+    document.querySelector('#consumoOrdenServicio').textContent = ordenSeleccionada.servicio;
+    document.querySelector('#consumoOrdenFecha').textContent = ordenSeleccionada.fecha;
+    document.querySelector('#consumoOrdenDescripcion').textContent = ordenSeleccionada.descripcion;
+    
+    // Estado con badge
+    const estadoBadge = document.querySelector('#consumoOrdenEstado');
+    estadoBadge.textContent = ordenSeleccionada.estado.charAt(0).toUpperCase() + ordenSeleccionada.estado.slice(1);
+    estadoBadge.className = 'badge';
+    if (ordenSeleccionada.estado === 'pendiente') estadoBadge.classList.add('bg-warning', 'text-dark');
+    else if (ordenSeleccionada.estado === 'proceso') estadoBadge.classList.add('bg-info', 'text-dark');
+    else if (ordenSeleccionada.estado === 'finalizada') estadoBadge.classList.add('bg-success');
+    
+    // Actualizar botones de acción según estado
+    const btnIniciar = accionesOrden.querySelector('[data-estado="proceso"]');
+    const btnFinalizar = accionesOrden.querySelector('[data-estado="finalizada"]');
+    
+    if (btnIniciar) btnIniciar.style.display = ordenSeleccionada.estado === 'pendiente' ? '' : 'none';
+    if (btnFinalizar) btnFinalizar.style.display = ordenSeleccionada.estado === 'proceso' ? '' : 'none';
+    
+    // Resetear evidencias y consumo para esta orden
+    evidencias = { antes: [], despues: [] };
+    productosConsumidos = [];
+    idCounterConsumo = 0;
+    
+    renderizarGaleriaEvidencias();
+    renderizarTablaConsumo();
+    actualizarTotalConsumo();
+    llenarDropdownProductosConsumo();
+    
+    // Actualizar lista de órdenes para resaltar la seleccionada
+    const filtroActivo = document.querySelector('.filtro-orden.active')?.getAttribute('data-filtro') || 'todas';
+    const busqueda = document.querySelector('#inputBuscarOrden')?.value || '';
+    const ordenesFiltradas = obtenerOrdenesFiltradas(filtroActivo, busqueda);
+    renderizarListaOrdenes(ordenesFiltradas, paginaActual);
+}
+
+function cambiarEstadoOrden(nuevoEstado) {
+    if (!ordenSeleccionada) return;
+    
+    const estadoAnterior = ordenSeleccionada.estado;
+    ordenSeleccionada.estado = nuevoEstado;
+    
+    // Actualizar en el array mock
+    const index = ordenesMockData.findIndex(o => o.id === ordenSeleccionada.id);
+    if (index !== -1) {
+        ordenesMockData[index].estado = nuevoEstado;
+    }
+    
+    // Actualizar dashboard
+    actualizarContadoresDashboard();
+    
+    // Refrescar vista
+    seleccionarOrden(ordenSeleccionada.id);
+    
+    const mensaje = nuevoEstado === 'proceso' ? 'iniciado' : 'finalizado';
+    console.log(`✅ Orden ${ordenSeleccionada.codigo} ${mensaje} correctamente`);
+}
+
+function actualizarContadoresDashboard() {
+    dashboardData.ordenesAsignadas = ordenesMockData.filter(o => o.estado === 'pendiente').length;
+    dashboardData.trabajosProceso = ordenesMockData.filter(o => o.estado === 'proceso').length;
+    dashboardData.ordenesFinalizadas = ordenesMockData.filter(o => o.estado === 'finalizada' && o.fecha === new Date().toISOString().split('T')[0]).length;
+    dashboardData.totalOrdenes = ordenesMockData.length;
+    dashboardData.totalTrabajos = dashboardData.trabajosProceso + dashboardData.ordenesAsignadas;
+    dashboardData.totalFinalizadas = ordenesMockData.filter(o => o.estado === 'finalizada').length;
+}
+
+// ============ 7. FUNCIONES DE EVIDENCIAS ============
+
+function seleccionarImagenes(etapa) {
+    const inputArchivo = document.querySelector('#inputArchivoEvidencia');
+    if (!inputArchivo) return;
+    
+    inputArchivo.setAttribute('data-etapa', etapa);
+    inputArchivo.click();
+}
+
+function tomarFoto(etapa) {
+    // Simulación de tomar foto (en producción usaría la API de cámara)
+    const nuevaImagen = {
+        id: Date.now(),
+        url: `https://picsum.photos/200/200?random=${Math.random()}`,
+        etapa: etapa,
+        fecha: new Date().toISOString()
+    };
+    
+    evidencias[etapa].push(nuevaImagen);
+    renderizarGaleriaEvidencias();
+}
+
+function manejarArchivosSeleccionados(event) {
+    const files = event.target.files;
+    const etapa = event.target.getAttribute('data-etapa') || 'antes';
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const nuevaImagen = {
+                    id: Date.now() + i,
+                    url: e.target.result,
+                    etapa: etapa,
+                    fecha: new Date().toISOString(),
+                    nombre: file.name
+                };
+                evidencias[etapa].push(nuevaImagen);
+                renderizarGaleriaEvidencias();
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    // Limpiar input para permitir seleccionar el mismo archivo nuevamente
+    event.target.value = '';
+}
+
+function eliminarEvidencia(etapa, id) {
+    evidencias[etapa] = evidencias[etapa].filter(img => img.id !== id);
+    renderizarGaleriaEvidencias();
+}
+
+function renderizarGaleriaEvidencias() {
+    const galeriaAntes = document.querySelector('#galeriaAntes');
+    const galeriaDespues = document.querySelector('#galeriaDespues');
+    
+    if (galeriaAntes) {
+        if (evidencias.antes.length === 0) {
+            galeriaAntes.innerHTML = '<small class="text-muted">Sin imágenes</small>';
+        } else {
+            galeriaAntes.innerHTML = evidencias.antes.map(img => `
+                <div class="imagen-evidencia position-relative" style="width: 100px; height: 100px;">
+                    <img src="${img.url}" alt="Evidencia antes" class="rounded" style="width: 100%; height: 100%; object-fit: cover;">
+                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle py-0 px-1 btn-eliminar-img" 
+                            data-etapa="antes" data-id="${img.id}" title="Eliminar" style="font-size: 0.6rem;">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        // Event listeners para eliminar
+        galeriaAntes.querySelectorAll('.btn-eliminar-img').forEach(btn => {
+            btn.addEventListener('click', () => {
+                eliminarEvidencia('antes', parseInt(btn.getAttribute('data-id')));
+            });
+        });
+    }
+    
+    if (galeriaDespues) {
+        if (evidencias.despues.length === 0) {
+            galeriaDespues.innerHTML = '<small class="text-muted">Sin imágenes</small>';
+        } else {
+            galeriaDespues.innerHTML = evidencias.despues.map(img => `
+                <div class="imagen-evidencia position-relative" style="width: 100px; height: 100px;">
+                    <img src="${img.url}" alt="Evidencia después" class="rounded" style="width: 100%; height: 100%; object-fit: cover;">
+                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle py-0 px-1 btn-eliminar-img" 
+                            data-etapa="despues" data-id="${img.id}" title="Eliminar" style="font-size: 0.6rem;">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        galeriaDespues.querySelectorAll('.btn-eliminar-img').forEach(btn => {
+            btn.addEventListener('click', () => {
+                eliminarEvidencia('despues', parseInt(btn.getAttribute('data-id')));
+            });
+        });
+    }
+}
+
+// ============ 8. FUNCIONES DE CONSUMO DE PRODUCTOS ============
+
+function llenarDropdownProductosConsumo() {
+    const select = document.querySelector('#selectProductoConsumo');
+    if (!select) return;
+    
+    while (select.options.length > 1) select.remove(1);
+    
+    if (!productosDisponibles.length) {
+        productosDisponibles = cotizacionesMockData.productos;
+    }
+    
+    productosDisponibles.forEach(producto => {
+        const option = document.createElement('option');
+        option.value = producto.id;
+        option.textContent = `${producto.nombre} - S/ ${producto.precio.toFixed(2)}`;
+        option.setAttribute('data-precio', producto.precio);
+        option.setAttribute('data-nombre', producto.nombre);
+        select.appendChild(option);
+    });
+}
+
+function actualizarPrecioConsumo() {
+    const select = document.querySelector('#selectProductoConsumo');
+    const inputPrecio = document.querySelector('#inputPrecioConsumo');
+    if (!select || !inputPrecio) return;
+    
+    const selectedOption = select.options[select.selectedIndex];
+    inputPrecio.value = (selectedOption && selectedOption.getAttribute('data-precio'))
+        ? parseFloat(selectedOption.getAttribute('data-precio')).toFixed(2)
+        : '0.00';
+}
+
+function agregarProductoConsumo() {
+    const select = document.querySelector('#selectProductoConsumo');
+    const inputCantidad = document.querySelector('#inputCantidadConsumo');
+    const inputPrecio = document.querySelector('#inputPrecioConsumo');
+    
+    if (!select || !inputCantidad || !inputPrecio) return;
+    
+    const itemId = select.value;
+    const selectedOption = select.options[select.selectedIndex];
+    
+    if (!itemId || !selectedOption || selectedOption.value === '') {
+        alert('Seleccione un repuesto válido');
+        return;
+    }
+    
+    const nombre = selectedOption.getAttribute('data-nombre');
+    const cantidad = parseInt(inputCantidad.value) || 1;
+    const precioUnitario = parseFloat(inputPrecio.value) || 0;
+    
+    productosConsumidos.push({
+        id: ++idCounterConsumo,
+        itemId: parseInt(itemId),
+        nombre: nombre,
+        cantidad: cantidad,
+        precioUnitario: precioUnitario,
+        subtotal: cantidad * precioUnitario
+    });
+    
+    renderizarTablaConsumo();
+    actualizarTotalConsumo();
+    
+    // Resetear
+    select.selectedIndex = 0;
+    inputCantidad.value = 1;
+    inputPrecio.value = '0.00';
+}
+
+function eliminarProductoConsumo(id) {
+    productosConsumidos = productosConsumidos.filter(p => p.id !== id);
+    renderizarTablaConsumo();
+    actualizarTotalConsumo();
+}
+
+function renderizarTablaConsumo() {
+    const tbody = document.querySelector('#tbodyProductosConsumo');
+    if (!tbody) return;
+    
+    if (productosConsumidos.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-muted py-3">
+                    <i class="bi bi-inbox"></i> No hay repuestos agregados
+                </td>
+            </tr>`;
+        return;
+    }
+    
+    tbody.innerHTML = productosConsumidos.map(p => `
+        <tr>
+            <td class="small">${p.nombre}</td>
+            <td class="small text-center">${p.cantidad}</td>
+            <td class="small text-end">S/ ${p.precioUnitario.toFixed(2)}</td>
+            <td class="small text-end">S/ ${p.subtotal.toFixed(2)}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1 btn-elim-consumo" 
+                        data-id="${p.id}" title="Eliminar">
+                    <i class="bi bi-trash small"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    
+    tbody.querySelectorAll('.btn-elim-consumo').forEach(btn => {
+        btn.addEventListener('click', () => {
+            eliminarProductoConsumo(parseInt(btn.getAttribute('data-id')));
+        });
+    });
+}
+
+function actualizarTotalConsumo() {
+    const totalElemento = document.querySelector('#totalConsumo');
+    if (!totalElemento) return;
+    
+    const total = productosConsumidos.reduce((sum, p) => sum + p.subtotal, 0);
+    totalElemento.textContent = `S/ ${total.toFixed(2)}`;
+}
+
+function guardarConsumoYEvidencias() {
+    if (!ordenSeleccionada) {
+        alert('Seleccione una orden primero');
+        return;
+    }
+    
+    const total = productosConsumidos.reduce((sum, p) => sum + p.subtotal, 0);
+    const totalEvidencias = evidencias.antes.length + evidencias.despues.length;
+    
+    const datos = {
+        ordenId: ordenSeleccionada.id,
+        ordenCodigo: ordenSeleccionada.codigo,
+        productos: [...productosConsumidos],
+        totalConsumo: total,
+        evidencias: { ...evidencias },
+        totalEvidencias: totalEvidencias,
+        fecha: new Date().toISOString()
+    };
+    
+    console.log('Datos guardados:', datos);
+    
+    const mensaje = `✅ Consumo y evidencias guardados exitosamente\n\n` +
+                    `Orden: ${ordenSeleccionada.codigo}\n` +
+                    `Productos consumidos: ${productosConsumidos.length}\n` +
+                    `Total consumo: S/ ${total.toFixed(2)}\n` +
+                    `Evidencias: ${totalEvidencias} imágenes\n\n` +
+                    `(Revisa la consola para ver el objeto completo)`;
+    
+    alert(mensaje);
+}
+
+function configurarEventosOrdenes() {
+    // Filtros
+    document.querySelectorAll('.filtro-orden').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filtro-orden').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const filtro = btn.getAttribute('data-filtro');
+            const busqueda = document.querySelector('#inputBuscarOrden')?.value || '';
+            const ordenesFiltradas = obtenerOrdenesFiltradas(filtro, busqueda);
+            paginaActual = 1;
+            renderizarListaOrdenes(ordenesFiltradas, paginaActual);
+        });
+    });
+    
+    // Buscador
+    const inputBuscar = document.querySelector('#inputBuscarOrden');
+    if (inputBuscar) {
+        inputBuscar.addEventListener('input', () => {
+            const filtro = document.querySelector('.filtro-orden.active')?.getAttribute('data-filtro') || 'todas';
+            const busqueda = inputBuscar.value;
+            const ordenesFiltradas = obtenerOrdenesFiltradas(filtro, busqueda);
+            paginaActual = 1;
+            renderizarListaOrdenes(ordenesFiltradas, paginaActual);
+        });
+    }
+    
+    // Botones de cambiar estado
+    document.querySelectorAll('.cambiar-estado-orden').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const nuevoEstado = btn.getAttribute('data-estado');
+            if (nuevoEstado) {
+                cambiarEstadoOrden(nuevoEstado);
+            }
+        });
+    });
+    
+    // Evidencias
+    document.querySelectorAll('.btn-seleccionar-imagen').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const etapa = btn.getAttribute('data-etapa');
+            if (etapa) {
+                seleccionarImagenes(etapa);
+            }
+        });
+    });
+    
+    document.querySelectorAll('.btn-tomar-foto').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const etapa = btn.getAttribute('data-etapa');
+            if (etapa) {
+                tomarFoto(etapa);
+            }
+        });
+    });
+    
+    const inputArchivo = document.querySelector('#inputArchivoEvidencia');
+    if (inputArchivo) {
+        inputArchivo.addEventListener('change', manejarArchivosSeleccionados);
+    }
+    
+    // Consumo
+    const selectProductoConsumo = document.querySelector('#selectProductoConsumo');
+    if (selectProductoConsumo) {
+        selectProductoConsumo.addEventListener('change', actualizarPrecioConsumo);
+    }
+    
+    const btnAgregarConsumo = document.querySelector('#btnAgregarConsumo');
+    if (btnAgregarConsumo) {
+        btnAgregarConsumo.addEventListener('click', agregarProductoConsumo);
+    }
+    
+    const btnGuardarConsumo = document.querySelector('#btnGuardarConsumo');
+    if (btnGuardarConsumo) {
+        btnGuardarConsumo.addEventListener('click', guardarConsumoYEvidencias);
+    }
+    
+    // Botón Nueva Orden
+    const btnAbrirModal = document.querySelector('#btnAbrirModalOrden');
+    if (btnAbrirModal) {
+        // El modal ya está configurado con data-bs-toggle y data-bs-target
+    }
+    
+    // Botón Guardar Orden del modal
+    const btnGuardarOrden = document.querySelector('#btnGuardarOrden');
+    if (btnGuardarOrden) {
+        btnGuardarOrden.addEventListener('click', guardarNuevaOrden);
+    }
+}
+
+function guardarNuevaOrden() {
+    const placa = document.querySelector('#inputPlaca')?.value?.trim();
+    const cliente = document.querySelector('#inputCliente')?.value?.trim();
+    const documento = document.querySelector('#inputDocumento')?.value?.trim();
+    const servicioSelect = document.querySelector('#selectTipoServicio');
+    const mecanicoSelect = document.querySelector('#selectMecanico');
+    const descripcion = document.querySelector('#textareaDescripcion')?.value?.trim();
+    
+    if (!placa || !cliente) {
+        alert('Complete los campos obligatorios (Placa y Cliente)');
+        return;
+    }
+    
+    const nuevoId = ordenesMockData.length + 1;
+    const nuevaOrden = {
+        id: nuevoId,
+        codigo: `ORD-${String(nuevoId).padStart(3, '0')}`,
+        placa: placa.toUpperCase(),
+        cliente: cliente,
+        documento: documento || '--',
+        vehiculo: placa.toUpperCase(),
+        mecanico: mecanicoSelect?.options[mecanicoSelect.selectedIndex]?.textContent || '--',
+        servicio: servicioSelect?.options[servicioSelect.selectedIndex]?.textContent || '--',
+        descripcion: descripcion || 'Sin descripción',
+        estado: 'pendiente',
+        fecha: new Date().toISOString().split('T')[0]
+    };
+    
+    ordenesMockData.unshift(nuevaOrden);
+    actualizarContadoresDashboard();
+    
+    // Cerrar modal
+    const modalEl = document.querySelector('#modalNuevaOrden');
+    if (modalEl) {
+        const modalInstancia = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modalInstancia.hide();
+    }
+    
+    // Refrescar lista
+    const filtro = document.querySelector('.filtro-orden.active')?.getAttribute('data-filtro') || 'todas';
+    const busqueda = document.querySelector('#inputBuscarOrden')?.value || '';
+    const ordenesFiltradas = obtenerOrdenesFiltradas(filtro, busqueda);
+    renderizarListaOrdenes(ordenesFiltradas, paginaActual);
+    
+    // Seleccionar la nueva orden
+    seleccionarOrden(nuevoId);
+    
+    alert(`✅ Orden ${nuevaOrden.codigo} creada exitosamente`);
+}
+
+function inicializarVistaOrdenes() {
+    // Resetear estado
+    ordenSeleccionada = null;
+    evidencias = { antes: [], despues: [] };
+    productosConsumidos = [];
+    idCounterConsumo = 0;
+    paginaActual = 1;
+    
+    // Asegurar que los dropdowns del modal tengan datos
+    llenarDropdownsModalOrden();
+    
+    // Configurar eventos
+    configurarEventosOrdenes();
+    
+    // Cargar lista inicial
+    const ordenesFiltradas = obtenerOrdenesFiltradas('todas', '');
+    renderizarListaOrdenes(ordenesFiltradas, paginaActual);
+}
+
+function llenarDropdownsModalOrden() {
+    // Llenar dropdown de servicios en el modal
+    const selectServicio = document.querySelector('#selectTipoServicio');
+    if (selectServicio && selectServicio.options.length <= 1) {
+        if (!serviciosDisponibles.length) {
+            serviciosDisponibles = cotizacionesMockData.servicios;
+        }
+        serviciosDisponibles.forEach(servicio => {
+            const option = document.createElement('option');
+            option.value = servicio.id;
+            option.textContent = servicio.nombre;
+            selectServicio.appendChild(option);
+        });
+    }
+    
+    // Llenar dropdown de mecánicos en el modal
+    const selectMecanico = document.querySelector('#selectMecanico');
+    if (selectMecanico && selectMecanico.options.length <= 1) {
+        if (!mecanicosDisponibles.length) {
+            mecanicosDisponibles = cotizacionesMockData.mecanicos;
+        }
+        mecanicosDisponibles.forEach(mecanico => {
+            const option = document.createElement('option');
+            option.value = mecanico.id;
+            option.textContent = mecanico.nombre;
+            selectMecanico.appendChild(option);
+        });
+    }
+}
+
+// ============ 9. FUNCIONES DE COTIZACIONES ============
 
 function inicializarCotizaciones() {
     serviciosDisponibles = cotizacionesMockData.servicios;
@@ -808,9 +1489,6 @@ function configurarEventosCotizaciones() {
     const btnLimpiar = document.querySelector('#btnLimpiarCotizacion');
     if (btnLimpiar) btnLimpiar.addEventListener('click', limpiarCotizacion);
     
-    const btnCerrar = document.querySelector('#btnCerrarCotizaciones');
-    if (btnCerrar) btnCerrar.addEventListener('click', () => btnMenuInicio.click());
-    
     const inputBuscar = document.querySelector('#inputBuscarCotizacion');
     if (inputBuscar) {
         inputBuscar.addEventListener('input', () => {
@@ -824,7 +1502,7 @@ function configurarEventosCotizaciones() {
     }
 }
 
-// ============ 7. FUNCIONES DE COTIZACIONES 2 ============
+// ============ 10. FUNCIONES DE COTIZACIONES 2 ============
 
 let serviciosAgregadosCot2 = [];
 let refaccionesAgregadasCot2 = [];
@@ -964,7 +1642,6 @@ function agregarServicioDesdeDropdown() {
     renderizarListaServiciosCot2();
     calcTotalesCot2();
 
-    // Resetear
     select.selectedIndex = 0;
     inputCantidad.value = 1;
     inputPrecio.value = '0.00';
@@ -1002,7 +1679,6 @@ function agregarProductoDesdeDropdown() {
     renderizarListaRefaccionesCot2();
     calcTotalesCot2();
 
-    // Resetear
     select.selectedIndex = 0;
     inputCantidad.value = 1;
     inputPrecio.value = '0.00';
@@ -1151,7 +1827,6 @@ function buscarVehiculoCot2() {
 
     vehiculoActivoCot2 = { placa, ...vehiculo };
 
-    // Datos del cliente
     document.querySelector('#cot2ClienteNombre').textContent = vehiculo.cliente;
     document.querySelector('#cot2ClienteTelefono').textContent = vehiculo.telefono;
     document.querySelector('#cot2ClienteEmail').textContent = vehiculo.email;
@@ -1159,7 +1834,6 @@ function buscarVehiculoCot2() {
     infoCliente?.classList.remove('d-none');
     if (mensajeSinCliente) mensajeSinCliente.style.display = 'none';
 
-    // Datos del vehículo
     document.querySelector('#cot2VehiculoNombre').textContent = vehiculo.marca;
     document.querySelector('#cot2VehiculoPlaca').textContent = placa;
     document.querySelector('#cot2VehiculoColor').textContent = vehiculo.color || '--';
@@ -1245,21 +1919,18 @@ function guardarCotizacion2() {
 }
 
 function configurarEventosCotizacion2() {
-    // Dropdowns de servicios
     const selectServicio = document.querySelector('#selectServicioCot2');
     if (selectServicio) selectServicio.addEventListener('change', actualizarPrecioServicioCot2);
 
     const btnAgregarServicio = document.querySelector('#btnAgregarServicioCot2');
     if (btnAgregarServicio) btnAgregarServicio.addEventListener('click', agregarServicioDesdeDropdown);
 
-    // Dropdowns de productos
     const selectProducto = document.querySelector('#selectProductoCot2');
     if (selectProducto) selectProducto.addEventListener('change', actualizarPrecioProductoCot2);
 
     const btnAgregarProducto = document.querySelector('#btnAgregarProductoCot2');
     if (btnAgregarProducto) btnAgregarProducto.addEventListener('click', agregarProductoDesdeDropdown);
 
-    // Buscar placa
     const btnBuscarPlaca = document.querySelector('#btnBuscarPlacaCot2');
     if (btnBuscarPlaca) btnBuscarPlaca.addEventListener('click', buscarVehiculoCot2);
 
@@ -1273,23 +1944,16 @@ function configurarEventosCotizacion2() {
         });
     }
 
-    // Anticipo
     const inputAnticipo = document.querySelector('#inputAnticipoCot2');
     if (inputAnticipo) inputAnticipo.addEventListener('input', calcTotalesCot2);
 
-    // Guardar
     const btnGuardar = document.querySelector('#btnGuardarCotizacion2');
     if (btnGuardar) btnGuardar.addEventListener('click', guardarCotizacion2);
 
-    // Buscador de tabla
     const inputBuscar = document.querySelector('#inputBuscarCotizacion2');
     if (inputBuscar) {
         inputBuscar.addEventListener('input', () => renderTablaCotizaciones2(inputBuscar.value));
     }
-
-    // Cerrar
-    const btnCerrar = document.querySelector('#btnCerrarCotizaciones2');
-    if (btnCerrar) btnCerrar.addEventListener('click', () => btnMenuInicio.click());
 }
 
 function inicializarCotizaciones2() {
@@ -1310,7 +1974,7 @@ function inicializarCotizaciones2() {
     configurarEventosCotizacion2();
 }
 
-// ============ 8. NAVEGACIÓN ============
+// ============ 11. NAVEGACIÓN ============
 
 btnMenuInicio.addEventListener('click', () => {
     contenedorReactivo.innerHTML = '';
@@ -1327,6 +1991,8 @@ btnMenuOrdenes.addEventListener('click', () => {
     const clone = templateOrdenes.cloneNode(true);
     fragmento.appendChild(clone);
     contenedorReactivo.appendChild(fragmento);
+    
+    setTimeout(() => inicializarVistaOrdenes(), 0);
 });
 
 btnMenuAgenda.addEventListener('click', () => {
@@ -1402,13 +2068,28 @@ btnMenuCotizaciones2.addEventListener('click', () => {
     setTimeout(() => inicializarCotizaciones2(), 0);
 });
 
-// ============ 9. SOCKETS (PREPARADOS) ============
+// Botones del menú sin template (placeholder)
+btnMenuHistorial.addEventListener('click', () => {
+    alert('📋 Módulo de Historial - En desarrollo');
+});
+
+btnMenuCitas.addEventListener('click', () => {
+    alert('📅 Módulo de Citas - En desarrollo');
+});
+
+btnMenuCerrarSesion.addEventListener('click', () => {
+    if (confirm('¿Está seguro de cerrar sesión?')) {
+        window.location.href = '/';
+    }
+});
+
+// ============ 12. SOCKETS (PREPARADOS) ============
 /* socket.on('/index/listarUsuarios', (data) => {
     listadoGeneralContactos = data;
     console.log(listadoGeneralContactos);
 }); */
 
-// ============ 10. INICIALIZACIÓN ============
+// ============ 13. INICIALIZACIÓN ============
 document.addEventListener('DOMContentLoaded', () => {
     actualizarDashboard(dashboardData);
     
