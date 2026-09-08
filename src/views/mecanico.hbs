@@ -249,44 +249,44 @@
                                 {{!-- Nro Orden (automático) --}}
                                 <div class="col-md-3">
                                     <label for="inputNroOrden" class="form-label fw-semibold">Nro Orden</label>
-                                    <input type="text" class="input-neumorfico-global" id="inputNroOrden" readonly disabled>
+                                    <input type="text" class="form-control" id="inputNroOrden" readonly disabled>
                                 </div>
                                 {{!-- Placa / Matrícula --}}
                                 <div class="col-md-3">
                                     <label for="inputPlaca" class="form-label fw-semibold">Placa</label>
-                                    <input type="text" class="input-neumorfico-global text-uppercase" id="inputPlaca" 
+                                    <input type="text" class="form-control text-uppercase" id="inputPlaca" 
                                            name="placa" placeholder="ABC-123" required>
                                 </div>
                                 {{!-- Cliente --}}
                                 <div class="col-md-3">
                                     <label for="inputCliente" class="form-label fw-semibold">Cliente</label>
-                                    <input type="text" class="input-neumorfico-global" id="inputCliente" 
+                                    <input type="text" class="form-control" id="inputCliente" 
                                            name="cliente" placeholder="Nombre del cliente" required>
                                 </div>
                                 {{!-- Documento --}}
                                 <div class="col-md-3">
                                     <label for="inputDocumento" class="form-label fw-semibold">Documento</label>
-                                    <input type="text" class="input-neumorfico-global" id="inputDocumento" 
+                                    <input type="text" class="form-control" id="inputDocumento" 
                                            name="documento" placeholder="DNI / RUC">
                                 </div>
                                 {{!-- Tipo de Servicio (dropdown) --}}
                                 <div class="col-md-6">
                                     <label for="selectTipoServicio" class="form-label fw-semibold">Tipo de Servicio</label>
-                                    <select class="input-neumorfico-global" id="selectTipoServicio" name="tipoServicio" required>
+                                    <select class="form-control" id="selectTipoServicio" name="tipoServicio" required>
                                         <option value="" selected disabled>Seleccione un servicio</option>
                                     </select>
                                 </div>
                                 {{!-- Mecánico (dropdown) --}}
                                 <div class="col-md-6">
                                     <label for="selectMecanico" class="form-label fw-semibold">Mecánico</label>
-                                    <select class="input-neumorfico-global" id="selectMecanico" name="mecanico" required>
+                                    <select class="form-control" id="selectMecanico" name="mecanico" required>
                                         <option value="" selected disabled>Seleccione un mecánico</option>
                                     </select>
                                 </div>
                                 {{!-- Descripción --}}
                                 <div class="col-12">
                                     <label for="textareaDescripcion" class="form-label fw-semibold">Descripción</label>
-                                    <textarea class="input-neumorfico-global" id="textareaDescripcion" name="descripcion" 
+                                    <textarea class="form-control" id="textareaDescripcion" name="descripcion" 
                                               rows="3" placeholder="Descripción de la falla o del trabajo a realizar"></textarea>
                                 </div>
                             </div>
@@ -331,11 +331,11 @@
                         <input type="hidden" id="diaSeleccionadoHorario" value="LUNES">
                         {{!-- Selector de rango horario --}}
                         <div class="fila-agregar-horario d-flex align-items-center gap-2 mb-3">
-                            <select class="input-neumorfico-global input-sm" id="selectHoraInicio">
+                            <select class="form-control form-control-sm" id="selectHoraInicio">
                                 <option value="" selected disabled>--:--</option>
                             </select>
                             <span class="fw-semibold">A</span>
-                            <select class="input-neumorfico-global input-sm" id="selectHoraFin">
+                            <select class="form-control form-control-sm" id="selectHoraFin">
                                 <option value="" selected disabled>--:--</option>
                             </select>
                             <button type="button" class="btn btn-sm btn-agregar-horario" id="btnAgregarHorario">AGREGAR</button>
@@ -386,7 +386,7 @@
                                         <i class="fas fa-car"></i> Placa del Vehículo
                                     </label>
                                     <div class="input-group">
-                                        <input type="text" class="input-neumorfico text-uppercase" id="inputPlacaCot2" placeholder="ABC-123">
+                                        <input type="text" class="form-control text-uppercase" id="inputPlacaCot2" placeholder="ABC-123">
                                         <button class="btn btn-primary btn-sm ms-2" type="button" id="btnBuscarPlacaCot2" title="Buscar vehículo" style="border-radius: 10px;">
                                             <i class="fas fa-search"></i> Buscar
                                         </button>
@@ -396,7 +396,7 @@
                                     <label class="label-presupuesto" for="selectMecanicoCot2">
                                         <i class="fas fa-user-cog"></i> Mecánico
                                     </label>
-                                    <select class="input-neumorfico" id="selectMecanicoCot2">
+                                    <select class="form-control" id="selectMecanicoCot2">
                                         <option value="" selected disabled>Seleccione un mecánico</option>
                                     </select>
                                 </div>
@@ -450,15 +450,15 @@
                             {{!-- Fila para agregar --}}
                             <div class="row g-2 align-items-end mb-3 p-2" style="background:#f8f9fa; border-radius:8px;">
                                 <div class="col-5">
-                                    <select class="input-neumorfico" id="selectServicioCot2">
+                                    <select class="form-control" id="selectServicioCot2">
                                         <option value="" selected disabled>Seleccione un servicio</option>
                                     </select>
                                 </div>
                                 <div class="col-2">
-                                    <input type="number" class="input-neumorfico text-center" id="inputCantidadServicioCot2" value="1" min="1">
+                                    <input type="number" class="form-control text-center" id="inputCantidadServicioCot2" value="1" min="1">
                                 </div>
                                 <div class="col-3">
-                                    <input type="text" class="input-neumorfico text-end" id="inputPrecioServicioCot2" value="0.00" readonly>
+                                    <input type="text" class="form-control text-end" id="inputPrecioServicioCot2" value="0.00" readonly>
                                 </div>
                                 <div class="col-2">
                                     <button type="button" class="btn-agregar-presupuesto" id="btnAgregarServicioCot2">
@@ -479,15 +479,15 @@
                             {{!-- Fila para agregar --}}
                             <div class="row g-2 align-items-end mb-3 p-2" style="background:#f8f9fa; border-radius:8px;">
                                 <div class="col-5">
-                                    <select class="input-neumorfico" id="selectProductoCot2">
+                                    <select class="form-control" id="selectProductoCot2">
                                         <option value="" selected disabled>Seleccione un producto</option>
                                     </select>
                                 </div>
                                 <div class="col-2">
-                                    <input type="number" class="input-neumorfico text-center" id="inputCantidadProductoCot2" value="1" min="1">
+                                    <input type="number" class="form-control text-center" id="inputCantidadProductoCot2" value="1" min="1">
                                 </div>
                                 <div class="col-3">
-                                    <input type="text" class="input-neumorfico text-end" id="inputPrecioProductoCot2" value="0.00" readonly>
+                                    <input type="text" class="form-control text-end" id="inputPrecioProductoCot2" value="0.00" readonly>
                                 </div>
                                 <div class="col-2">
                                     <button type="button" class="btn-agregar-presupuesto" id="btnAgregarProductoCot2" style="background:#f39c12;">
@@ -544,7 +544,7 @@
                                 <label class="label-presupuesto" for="selectValidezCot2" style="margin-bottom:0;">
                                     <i class="fas fa-clock"></i> Validez:
                                 </label>
-                                <select class="input-neumorfico" id="selectValidezCot2" style="width:auto;">
+                                <select class="form-control" id="selectValidezCot2" style="width:auto;">
                                     <option value="7" selected>7 días</option>
                                     <option value="15">15 días</option>
                                     <option value="30">30 días</option>
@@ -594,7 +594,7 @@
                                 <div class="ordenes-buscador mb-3">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                        <input type="text" class="input-neumorfico-global input-sm" id="inputBuscarOrden"
+                                        <input type="text" class="form-control form-control-sm" id="inputBuscarOrden"
                                                placeholder="Buscar por orden, placa o cliente...">
                                     </div>
                                 </div>
@@ -736,6 +736,8 @@
                                 </div>
 
                                 <input type="file" id="inputArchivoEvidencia" accept="image/*" multiple class="d-none">
+                                {{!-- NUEVO: Input para evidencias de productos --}}
+                                <input type="file" id="inputArchivoProductoEvidencia" accept="image/*" multiple class="d-none">
 
                             </div>
                         </div>
@@ -753,19 +755,19 @@
                                     <div class="row g-2 align-items-end mb-3">
                                         <div class="col-12 mb-2">
                                             <label for="selectProductoConsumo" class="form-label fw-semibold small">Repuesto / Producto</label>
-                                            <select class="input-neumorfico-global input-sm" id="selectProductoConsumo">
+                                            <select class="form-control form-control-sm" id="selectProductoConsumo">
                                                 <option value="" selected disabled>Seleccione un repuesto</option>
                                             </select>
                                         </div>
                                         <div class="col-4">
                                             <label for="inputCantidadConsumo" class="form-label fw-semibold small">Cant.</label>
-                                            <input type="number" class="input-neumorfico-global input-sm" id="inputCantidadConsumo" value="1" min="1">
+                                            <input type="number" class="form-control form-control-sm" id="inputCantidadConsumo" value="1" min="1">
                                         </div>
                                         <div class="col-5">
                                             <label class="form-label fw-semibold small">P. Unit.</label>
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text bg-light">S/</span>
-                                                <input type="text" class="input-neumorfico-global input-sm text-end" id="inputPrecioConsumo" value="0.00" readonly>
+                                                <input type="text" class="form-control form-control-sm text-end" id="inputPrecioConsumo" value="0.00" readonly>
                                             </div>
                                         </div>
                                         <div class="col-3">
@@ -782,7 +784,7 @@
                                     <small>Seleccione una orden para registrar repuestos utilizados</small>
                                 </div>
 
-                                {{!-- Tabla de productos consumidos --}}
+                                {{!-- Tabla de productos consumidos MODIFICADA con columna de Evidencia --}}
                                 <div id="tablaConsumoContainer" class="d-none flex-grow-1 overflow-auto max-h-250">
                                     <table class="table table-sm table-hover align-middle mb-0" id="tablaProductosConsumo">
                                         <thead class="table-light sticky-top">
@@ -791,12 +793,13 @@
                                                 <th class="small text-center w-50">Cant.</th>
                                                 <th class="small text-end w-80">P. Unit.</th>
                                                 <th class="small text-end w-80">Subtotal</th>
+                                                <th class="small text-center">Evidencia</th>
                                                 <th class="small text-center w-40"></th>
                                             </tr>
                                         </thead>
                                         <tbody id="tbodyProductosConsumo">
                                             <tr>
-                                                <td colspan="5" class="text-center text-muted py-3">
+                                                <td colspan="6" class="text-center text-muted py-3">
                                                     <i class="bi bi-inbox"></i> No hay repuestos agregados
                                                 </td>
                                             </tr>
@@ -903,7 +906,7 @@
                                 {{!-- Buscador de cotizaciones --}}
                                 <div class="input-group input-group-sm mb-3">
                                     <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                    <input type="text" class="input-neumorfico-global input-sm" id="inputBuscarCotizacion" 
+                                    <input type="text" class="form-control form-control-sm" id="inputBuscarCotizacion" 
                                            placeholder="Buscar cotización...">
                                 </div>
 
@@ -941,7 +944,7 @@
                                                 <i class="bi bi-car-front"></i> Placa del Vehículo
                                             </label>
                                             <div class="input-group input-group-sm">
-                                                <input type="text" class="input-neumorfico-global text-uppercase" 
+                                                <input type="text" class="form-control text-uppercase" 
                                                        id="inputPlacaCotizacion" 
                                                        placeholder="ABC-123">
                                                 <button class="btn btn-primary" type="button" 
@@ -956,7 +959,7 @@
                                             <label for="selectMecanicoCotizacion" class="form-label fw-semibold small">
                                                 <i class="bi bi-person-gear"></i> Mecánico
                                             </label>
-                                            <select class="input-neumorfico-global input-sm" id="selectMecanicoCotizacion">
+                                            <select class="form-control form-control-sm" id="selectMecanicoCotizacion">
                                                 <option value="" selected disabled>Seleccione un mecánico</option>
                                             </select>
                                         </div>
@@ -1013,20 +1016,20 @@
                                     <div class="row g-2 align-items-end">
                                         <div class="col-5">
                                             <label for="selectServicioCotizacion" class="form-label fw-semibold small">Servicio</label>
-                                            <select class="input-neumorfico-global input-sm" id="selectServicioCotizacion">
+                                            <select class="form-control form-control-sm" id="selectServicioCotizacion">
                                                 <option value="" selected disabled>Seleccione un servicio</option>
                                             </select>
                                         </div>
                                         <div class="col-2">
                                             <label for="inputCantidadServicio" class="form-label fw-semibold small">Cant.</label>
-                                            <input type="number" class="input-neumorfico-global input-sm" 
+                                            <input type="number" class="form-control form-control-sm" 
                                                    id="inputCantidadServicio" value="1" min="1">
                                         </div>
                                         <div class="col-3">
                                             <label class="form-label fw-semibold small">P. Unit.</label>
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text bg-light">S/</span>
-                                                <input type="text" class="input-neumorfico-global input-sm text-end" 
+                                                <input type="text" class="form-control form-control-sm text-end" 
                                                        id="inputPrecioServicio" value="0.00" readonly>
                                             </div>
                                         </div>
@@ -1048,20 +1051,20 @@
                                     <div class="row g-2 align-items-end">
                                         <div class="col-5">
                                             <label for="selectProductoCotizacion" class="form-label fw-semibold small">Producto</label>
-                                            <select class="input-neumorfico-global input-sm" id="selectProductoCotizacion">
+                                            <select class="form-control form-control-sm" id="selectProductoCotizacion">
                                                 <option value="" selected disabled>Seleccione un producto</option>
                                             </select>
                                         </div>
                                         <div class="col-2">
                                             <label for="inputCantidadProducto" class="form-label fw-semibold small">Cant.</label>
-                                            <input type="number" class="input-neumorfico-global input-sm" 
+                                            <input type="number" class="form-control form-control-sm" 
                                                    id="inputCantidadProducto" value="1" min="1">
                                         </div>
                                         <div class="col-3">
                                             <label class="form-label fw-semibold small">P. Unit.</label>
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text bg-light">S/</span>
-                                                <input type="text" class="input-neumorfico-global input-sm text-end" 
+                                                <input type="text" class="form-control form-control-sm text-end" 
                                                        id="inputPrecioProducto" value="0.00" readonly>
                                             </div>
                                         </div>
@@ -1122,7 +1125,7 @@
                                     <label for="textareaObservacionesCotizacion" class="form-label fw-semibold small">
                                         <i class="bi bi-pencil-square"></i> Observaciones / Detalles
                                     </label>
-                                    <textarea class="input-neumorfico-global input-sm" 
+                                    <textarea class="form-control form-control-sm" 
                                               id="textareaObservacionesCotizacion" 
                                               rows="5" 
                                               placeholder="Ingrese observaciones, condiciones, notas adicionales..."></textarea>
@@ -1155,7 +1158,7 @@
                                     <label for="inputFechaCotizacion" class="form-label fw-semibold small">
                                         <i class="bi bi-calendar3"></i> Fecha
                                     </label>
-                                    <input type="date" class="input-neumorfico-global input-sm" id="inputFechaCotizacion">
+                                    <input type="date" class="form-control form-control-sm" id="inputFechaCotizacion">
                                 </div>
 
                                 {{!-- Validez de la cotización --}}
@@ -1163,7 +1166,7 @@
                                     <label for="selectValidezCotizacion" class="form-label fw-semibold small">
                                         <i class="bi bi-clock-history"></i> Validez
                                     </label>
-                                    <select class="input-neumorfico-global input-sm" id="selectValidezCotizacion">
+                                    <select class="form-control form-control-sm" id="selectValidezCotizacion">
                                         <option value="7" selected>7 días</option>
                                         <option value="15">15 días</option>
                                         <option value="30">30 días</option>
@@ -1206,7 +1209,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                     <div class="input-group input-group-sm max-w-320">
                         <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                        <input type="text" class="input-neumorfico-global input-sm" id="inputBuscarCotizacion2" placeholder="Buscar por código, placa o cliente...">
+                        <input type="text" class="form-control form-control-sm" id="inputBuscarCotizacion2" placeholder="Buscar por código, placa o cliente...">
                     </div>
                     <button type="button" class="btn btn-success btn-sm" id="btnNuevaCotizacion2"
                             data-bs-toggle="modal" data-bs-target="#modalNuevaCotizacion2">

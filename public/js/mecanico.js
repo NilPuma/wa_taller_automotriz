@@ -43,6 +43,7 @@ let productosConsumidos = [];
 let idCounterConsumo = 0;
 let paginaActual = 1;
 const itemsPorPagina = 5;
+let productoActivoParaEvidencia = null;
 
 // ============ 2. DATOS FICTICIOS ============
 
@@ -759,7 +760,8 @@ function agregarProductoConsumo() {
         nombre: nombre,
         cantidad: cantidad,
         precioUnitario: precioUnitario,
-        subtotal: cantidad * precioUnitario
+        subtotal: cantidad * precioUnitario,
+        evidencias: []
     });
     
     renderizarTablaConsumo();
@@ -784,7 +786,7 @@ function renderizarTablaConsumo() {
     if (productosConsumidos.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center text-muted py-3">
+                <td colspan="6" class="text-center text-muted py-3">
                     <i class="bi bi-inbox"></i> No hay repuestos agregados
                 </td>
             </tr>`;
@@ -798,6 +800,22 @@ function renderizarTablaConsumo() {
             <td class="small text-end">S/ ${p.precioUnitario.toFixed(2)}</td>
             <td class="small text-end">S/ ${p.subtotal.toFixed(2)}</td>
             <td class="text-center">
+                <div class="d-flex align-items-center justify-content-center gap-1 flex-wrap" style="max-width:120px;">
+                    ${p.evidencias.map(img => `
+                        <div class="position-relative" style="width:28px;height:28px;">
+                            <img src="${img.url}" class="rounded" 
+                                 style="width:100%;height:100%;object-fit:cover;cursor:pointer;"
+                                 data-id-producto="${p.id}" data-id-img="${img.id}" 
+                                 title="${img.nombre || ''}">
+                        </div>
+                    `).join('')}
+                    <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1 btn-subir-evidencia-producto" 
+                            data-id-producto="${p.id}" title="Agregar evidencia">
+                        <i class="bi bi-camera small"></i>
+                    </button>
+                </div>
+            </td>
+            <td class="text-center">
                 <button type="button" class="btn btn-sm btn-outline-danger py-0 px-1 btn-elim-consumo" 
                         data-id="${p.id}" title="Eliminar">
                     <i class="bi bi-trash small"></i>
@@ -806,9 +824,29 @@ function renderizarTablaConsumo() {
         </tr>
     `).join('');
     
+    // Eliminar producto
     tbody.querySelectorAll('.btn-elim-consumo').forEach(btn => {
         btn.addEventListener('click', () => {
             eliminarProductoConsumo(parseInt(btn.getAttribute('data-id')));
+        });
+    });
+    
+    // 👇 Nuevo: botón para abrir selector de evidencia
+    tbody.querySelectorAll('.btn-subir-evidencia-producto').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const idProducto = parseInt(btn.getAttribute('data-id-producto'));
+            abrirSelectorEvidenciaProducto(idProducto);
+        });
+    });
+    
+    // 👇 Nuevo: click en miniatura para ver/eliminar
+    tbody.querySelectorAll('img[data-id-producto]').forEach(img => {
+        img.addEventListener('click', () => {
+            const idProducto = parseInt(img.getAttribute('data-id-producto'));
+            const idImg = parseInt(img.getAttribute('data-id-img'));
+            if (confirm('¿Eliminar esta evidencia?')) {
+                eliminarEvidenciaProducto(idProducto, idImg);
+            }
         });
     });
 }
@@ -850,6 +888,47 @@ function guardarConsumoYEvidencias() {
                     `(Revisa la consola para ver el objeto completo)`;
     
     alert(mensaje);
+}
+
+function abrirSelectorEvidenciaProducto(idProducto) {
+    productoActivoParaEvidencia = idProducto;
+    const input = document.querySelector('#inputArchivoProductoEvidencia');
+    if (input) input.click();
+}
+
+function manejarArchivosEvidenciaProducto(event) {
+    const files = event.target.files;
+    if (!productoActivoParaEvidencia) return;
+    
+    const producto = productosConsumidos.find(p => p.id === productoActivoParaEvidencia);
+    if (!producto) return;
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                producto.evidencias.push({
+                    id: Date.now() + i,
+                    url: e.target.result,
+                    nombre: file.name,
+                    fecha: new Date().toISOString()
+                });
+                renderizarTablaConsumo();
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    event.target.value = '';
+    productoActivoParaEvidencia = null;
+}
+
+function eliminarEvidenciaProducto(idProducto, idImg) {
+    const producto = productosConsumidos.find(p => p.id === idProducto);
+    if (!producto) return;
+    producto.evidencias = producto.evidencias.filter(img => img.id !== idImg);
+    renderizarTablaConsumo();
 }
 
 function configurarEventosOrdenes() {
@@ -939,6 +1018,11 @@ function configurarEventosOrdenes() {
     const btnGuardarOrden = document.querySelector('#btnGuardarOrden');
     if (btnGuardarOrden) {
         btnGuardarOrden.addEventListener('click', guardarNuevaOrden);
+    }
+
+    const inputArchivoProducto = document.querySelector('#inputArchivoProductoEvidencia');
+    if (inputArchivoProducto) {
+        inputArchivoProducto.addEventListener('change', manejarArchivosEvidenciaProducto);
     }
 }
 
@@ -2066,15 +2150,6 @@ btnMenuCotizaciones2.addEventListener('click', () => {
     contenedorReactivo.appendChild(fragmento);
 
     setTimeout(() => inicializarCotizaciones2(), 0);
-});
-
-// Botones del menú sin template (placeholder)
-btnMenuHistorial.addEventListener('click', () => {
-    alert('📋 Módulo de Historial - En desarrollo');
-});
-
-btnMenuCitas.addEventListener('click', () => {
-    alert('📅 Módulo de Citas - En desarrollo');
 });
 
 btnMenuCerrarSesion.addEventListener('click', () => {
