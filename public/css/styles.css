@@ -3,9 +3,11 @@
 :root {
   --color1: #FFFFFF;
   --color2: #F0F2F5;
-  --color3: #0C2C40;
+  --color3: #00162B;
   --color4: #02A302;
   --color5: #fe0000;
+  --color6: #131F33;
+  --color7: #f99303;
 
 
 
@@ -16,8 +18,11 @@
   --padding: 10px;
   --width-collapsed: 50px;
 
+  
+
 }
 
+/* =================ESTILOS BASE PERSONALIZADOS========================*/
 body {
   padding: 0;
   margin: 0;
@@ -37,12 +42,6 @@ a:hover {
   color: #565353;
 }
 
-
-.icono-vacio {
-  font-size: 50px;
-  color: #CC0000;
-}
-
 #header {
   background: var(--color1);
   color: var(--color3);
@@ -51,6 +50,153 @@ a:hover {
 .contenedor-header{
   height: 60px;
 }
+
+/* Formularios */
+.form-floating > .form-control {
+  background: var(--color2);
+  border: 1.5px solid color-mix(in srgb, var(--color3) 20%, transparent 80%);
+  border-radius: 8px;
+  padding: 16px 12px 4px 12px;
+  font-size: 0.82rem;
+  color: var(--color3);
+  height: 40px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-floating > .form-control:focus {
+  background: var(--color1);
+  border-color: var(--color7);
+  box-shadow: 0 0 0 3px rgba(187, 117, 20, 0.08);
+}
+
+.form-floating > .form-control::placeholder {
+  color: transparent;
+}
+
+/* Paceholder */
+.form-floating > label {
+  display: flex;
+  align-items: center;
+  padding: 11px 12px;
+  font-size: 0.82rem;
+  color: color-mix(in srgb, var(--color3) 50%, var(--color1) 50%);
+  transition: all 0.2s ease;
+  font-weight: 400;
+  pointer-events: none;
+  border: none;
+  height: 40px;
+}
+
+.form-floating > label i {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+  transform: scale(0.75) translateY(-8px);
+  color: color-mix(in srgb, var(--color3) 50%, var(--color1) 50%);
+  opacity: 80%;
+  height: auto;
+}
+
+.form-floating > .form-control:focus ~ label i,
+.form-floating > .form-control:not(:placeholder-shown) ~ label i {
+  opacity: 1;
+  color: var(--color3);
+}
+
+.form-floating > textarea.form-control {
+  height: 80px;
+  min-height: 80px;
+  padding-top: 20px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.form-floating > textarea.form-control ~ label {
+  padding-top: 13px;
+  height: 80px;
+  align-items: flex-start;
+}
+
+.form-floating > .form-control .is-invalid {
+  border-color: var(--color5) !important;
+  background: #fff5f5 !important;
+  animation: shake 0.5s ease-in-out;
+}
+
+.form-floating > .invalid-feedback {
+  margin-left: 12px;
+  font-size: 0.72rem;
+  margin-top: 4px;
+}
+
+/* Botones */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 12px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  background: transparent;
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primario {
+  background: var(--color3);
+  color: var(--color2);
+  /* border-color: var(--color7); */
+}
+
+.btn-primario:hover {
+  background: #003263;
+  border-color: var(--color7);
+  color: var(--color2);
+  box-shadow: 0 4px 15px rgba(40, 68, 115, 0.4);
+}
+
+.btn-primario:active {
+  box-shadow: 0 2px 8px rgba(40, 68, 115, 0.4);
+}
+
+.btn-cancelar {
+  background: transparent;
+  color: var(--color6);
+  border-color: var(--color6);
+}
+
+.btn-cancelar:hover {
+  background: var(--color6);
+  color: var(--color4);
+  border-color: var(--color6);
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+.btn-cancelar:active {
+  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
+}
+
 
 /* =============================ESTILOS  PARA MENU DE NAVEGACIÓN=========================== */
 #bodyAdministrador{
@@ -248,7 +394,7 @@ a:hover {
 /* ===================================LOGIN=================================== */
 #contenedorLogin {
   height: 100vh;
-  width: 30%;
+  width: 40%;
   /* background-size: cover; */
   background: rgba(255, 255, 255, 0.5); /* blanco al 50% */
   justify-content: center;
@@ -257,49 +403,27 @@ a:hover {
   right: 0;
   top: 0;
 }
-#formulario_login {
-  background: rgba(12, 12, 15, 0.445);
-  border-radius: 10px;
-}
-
-.inputs {
-  border-radius: 30px;
-  color: #ffffff;
-}
-
-.btn-login {
-  background: #ffd000;
-  border-radius: 30px;
-  color: #000000;
-}
-
-.btn-login:hover {
-  background: #ff9f03;
-  color: #000000;
+.formulario-login {
+  background: var(--color1);
+  border-radius: 8px;
+  box-shadow: 0 20px 45px rgba(19, 31, 51, 0.12);
 }
 
 .puntero {
+  font-size: 0.8rem;
   cursor: pointer;
+  transition: transform 0.2s ease;
+    display: inline-block;
 }
-
-.style-input {
-  border-radius: 30px;
-}
-
-.style-btn-afirmar {
-  background: var(--color3);
-  border-radius: 30px;
-  color: #ffffff;
-  padding-left: 40px;
-  padding-right: 40px;
-}
-
-.style-btn-afirmar:hover {
-  color: #ffd000;
+.puntero:hover{
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #003263;
+  transform: scale(1.12);
 }
 
 /* ===================================CONDUCTOR=================================== */
 
 #contenedorPrincipal {
-  background: #4dea0f;
+  
 }

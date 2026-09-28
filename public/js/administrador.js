@@ -42,8 +42,12 @@ btnMenuContactos.addEventListener('click', function(){
     
     contenedorReactivo.innerHTML = "";
 
-    templateContactos.querySelector('.mis-contactos').textContent = "Yo me reenderizo cuando haces clic en contactos";
+    templateContactos.querySelector('.mis-contactos').innerHTML = `<div> 
+                                <span type="button" class="btn btn-cancelar me-2" data-bs-dismiss="modal">Cancelar</span>
+                                <span id="actualizaPersona" class="btn btn-primario"><iclass="bi bi-check2 me-2"></i>Actualizar</span>
+                            </div>`;
    
+    
 
     const clone = templateContactos.cloneNode(true);
     fragmento.appendChild(clone);

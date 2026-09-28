@@ -16,30 +16,32 @@
               <div class="col-sm-12 col-md-6 col-lg-6">
                 <div id="contenedorLogin" class="row">
                   <div class="col-12 col-lg-6 col-md-8">
-                    <form id="formulario_login" action="" class="form-group p-4 shadow">
+                    <form action="" class=" formulario-login form-group p-4 shadow">
                       <div>
                         <div class="text-center mb-4">
                           <img id="logo" src="/img/logo.png" alt="" class="img-fluid logo" width="150px">
                         </div>
-                        <div>
-                          <input id="correoSesion" class="inputs form-control mb-3 text-black" type="text"
-                            placeholder="Correo del usuario">
+
+                        <div class="form-floating mb-2">
+                          <input id="correoSesion" type="text" class="form-control" placeholder="" required>
+                          <label for="correoSesion"><i class="bi bi-person me-1"></i>Correo</label>
                         </div>
-                        <div>
-                          <input id="passwordSesion" class="inputs form-control mb-3" type="password"
-                            placeholder="Contraseña">
+                        <div class="form-floating mb-4">
+                          <input id="passwordSesion" type="text" class="form-control" placeholder="" required>
+                          <label for="passwordSesion"><i class="bi bi-shield-check me-1"></i>Contraseña</label>
                         </div>
-                        <div>
-                          <a href="#"><span class="btn btn-login form-control mt-3 mb-5 fs-5"
-                              onclick="validarUsuario()">Ingresar</span></a>
+                        <div class="text-center mb-4">
+                          <button type="button" id="btn_login" class="btn btn-primario" onclick="validarUsuario()">
+                              <span>INGRESAR</span>
+                          </button>
                         </div>
                         <div class="row d-lg-flex justify-content-between">
                           <div class="col-auto">
-                            <span class="text-white my-3 border-bottom puntero" href="" data-bs-toggle="modal"
+                            <span class="my-3 border-bottom puntero" href="" data-bs-toggle="modal"
                               data-bs-target="#modalRecuperacion">Olvide Contraseña</span>
                           </div>
-                          <div class="col-auto text-lg-end">
-                            <span class="text-white my-3 border-bottom puntero" href="" data-bs-toggle="modal"
+                          <div class="col-auto">
+                            <span class="my-3 border-bottom puntero" href="" data-bs-toggle="modal"
                               data-bs-target="#modalRegistro">Registrarse</span>
                           </div>
                         </div>
@@ -58,8 +60,10 @@
                           </div>
                           <div class="modal-body modalData">
                             <div class="p-4">
-                              <label for="">&nbsp Nombres</label>
-                              <input id="nombres" class="form-control mb-3 style-input" type="text">
+                              <div class="form-floating mb-2">
+                                <input id="nombres" type="text" class="form-control" placeholder="" required>
+                                <label for="nombres"><i class="bi bi-person me-1"></i>Nombres</label>
+                              </div>
                               <label for="">&nbsp Alias</label>
                               <input id="nick" class="form-control mb-3 style-input" type="text">
                               <label for="">&nbsp Telefono</label>
