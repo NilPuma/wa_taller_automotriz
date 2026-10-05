@@ -1,33 +1,37 @@
 const express = require('express');
 const router =  express.Router();
 
-const controladorUsuarios= require('../controllers/controllerUsuarios');
+//Middlewares
+const {verificarToken,verificarVista} = require('../middleware/authMiddleware');
+const upload = require('../middleware/fileMiddleware');
 
-/* RUTAS DE APIS Y VISTAS INDEX */
+//Controllers
+const controladorAuth = require('../controllers/controllerAuth');
+const controladorPersona = require('../controllers/controllerPersona');
 
-// vistas de reenderizado
+/* vistas de reenderizado */
 router.get('/', (req, res) => {
     res.render('index');
 });
-/* router.get('/login', (req, res) => {
-    res.render('login');
-}); */
-router.get('/root', (req, res) => {
+router.get('/root', verificarVista, (req, res) => {
     res.render('root');
 });
-router.get('/admin', (req, res) => {
+router.get('/admin', verificarVista, (req, res) => {
     res.render('administrador');
 });
-router.get('/mecanico', (req, res) => {
+router.get('/mecanico', verificarVista, (req, res) => {
     res.render('mecanico');
 });
-router.get('/cliente', (req, res) => {
+router.get('/cliente', verificarVista, (req, res) => {
     res.render('cliente');
 });
 
 
-// end point backend
-router.get('/api/usuarios', controladorUsuarios.listarUsuarios);
+// end point de backend
+router.post('/api/login', controladorAuth.login);
+router.post('/api/logout', controladorAuth.logout);
+router.get('/api/listarPersonas', verificarToken, controladorPersona.listarPersonas);
+router.get('/api/listarUsuarios',verificarToken, controladorPersona.listarUsuarios);
 
 
 module.exports = router;

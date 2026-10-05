@@ -364,6 +364,112 @@ a:hover {
   width: 100px;
 }
 /* ===================================FIN MENU DE NAVEGACION=================================== */
+/* ============================TOASTS / ALERTAS PERSONALIZADAS================================= */
+.toast-container-custom {
+  position: fixed;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1080;
+  width: 100%;
+  max-width: 380px;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.toast-personalizado {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color2);
+  border: 1px solid var(--borde-suave);
+  border-left: 10px solid currentColor;
+  border-radius: 10px;
+  box-shadow: 0 15px 35px rgba(19, 31, 51, 0.18);
+  padding: 14px 16px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-16px);
+  transition: var(--transicion-larga);
+  pointer-events: none;
+  color: var(--color6);
+}
+
+.toast-personalizado.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.toast-personalizado.toast-exito {
+  color: #48d867;
+}
+
+.toast-personalizado.toast-error {
+  color: #ff3a5f;
+}
+
+.toast-personalizado.toast-info {
+  color: #3186f3;
+}
+
+.toast-personalizado.toast-advertencia {
+  color: #ffc023;
+}
+
+.toast-icono {
+  font-size: 1.3rem;
+  margin-top: 2px;
+  color: currentColor;
+}
+
+.toast-contenido {
+  flex: 1;
+}
+
+.toast-titulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #131F33;
+  letter-spacing: -0.01em;
+}
+
+.toast-mensaje {
+  font-size: 0.78rem;
+  color: #131F33;
+  line-height: 1.4;
+}
+
+.toast-cerrar {
+  background: transparent;
+  border: none;
+  color: #131F33;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 2px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toast-cerrar:hover {
+  color: var(--color5);
+}
+
+@media screen and (max-width: 480px) {
+  .toast-container-custom {
+    top: 5px;
+    max-width: calc(100% - 24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-personalizado {
+    transition: opacity 0.2s ease;
+    transform: none;
+  }
+}
 
 /* ===================================INICIO GLOBAL=================================== */
 

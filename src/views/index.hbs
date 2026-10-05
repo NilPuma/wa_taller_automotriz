@@ -132,6 +132,19 @@
       <a href="https://innovasistemas.pe/" class="text-center">© 2025 Innova Sistemas Integrales S.A.C.</a> --}}
     </div>
   </section>
+  <!-- Toast de notificaciones -->
+    <div id="toastContainer" class="toast-container-custom" aria-live="polite" aria-atomic="true">
+        <div id="toastCertificado" class="toast-personalizado" role="alert">
+        <i id="toastIcono" class="bi toast-icono"></i>
+        <div class="toast-contenido">
+            <p id="toastTitulo" class="toast-titulo mb-0"></p>
+            <p id="toastMensaje" class="toast-mensaje mb-0"></p>
+        </div>
+        <button type="button" id="toastCerrar" class="toast-cerrar" aria-label="Cerrar notificación">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        </div>
+    </div>
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

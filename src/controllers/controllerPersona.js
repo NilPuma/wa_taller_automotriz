@@ -1,4 +1,7 @@
-const model = require('../models/modelUsuarios')
+/* Controlador para persona */
+const bcrypt = require('bcryptjs');
+const model = require('../models/modelPersona');
+
 /* const app = require('../../app.js');
 const server = app.listen(app.get('port')); */
 //Websockets
@@ -16,19 +19,28 @@ const io = socketIO(server); */
     
 }); */
 
-// 1. RUTA PARA LA API (JSON)
+// RUTA PARA LA API (JSON)
+const listarPersonas = async (req, res) => {
+  try {
+    const personas = await model.listarPersonas();
+    res.json(personas); //Empaquetamos en formato json para enviar a router
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 const listarUsuarios = async (req, res) => {
   try {
     const usuarios = await model.listarUsuarios();
-    res.json(usuarios); //Empaquetamos en formato json para enviar a router
+    res.json(usuarios);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
+
 module.exports = {
-  listarUsuarios
+  listarPersonas,
+  listarUsuarios,
 };
-
-
