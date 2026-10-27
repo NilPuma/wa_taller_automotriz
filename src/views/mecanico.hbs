@@ -118,89 +118,68 @@
                     </div>
                 </div>
 
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6 col-xl-3">
-                        <div class="card shadow-sm border-0 h-100 panel-seccion">
-                            <div class="card-body p-3 panel-seccion__body">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <h6 class="mb-0 fw-bold text-muted small text-uppercase">Órdenes asignadas</h6>
-                                    <i class="bi bi-clipboard-check fs-5 text-primary"></i>
-                                </div>
-                                <div class="d-flex align-items-baseline gap-2 mb-3">
-                                    <strong class="fs-3 fw-bold" id="totalAsignadas">--</strong>
-                                    <span class="small text-muted">pendientes</span>
-                                </div>
-                                <a href="#" class="btn btn-primario btn-sm w-100" id="btnIrAsignadas">
-                                    Ir <i class="bi bi-arrow-right"></i>
-                                </a>
-                            </div>
+                {{!-- ESTADÍSTICAS estilo AGL --}}
+                <div class="dashboard-stats mb-4">
+                    <div class="stat-card stat-card--azul">
+                        <div class="stat-card__icono">
+                            <i class="bi bi-clipboard-check"></i>
+                        </div>
+                        <div class="stat-card__contenido">
+                            <h3 class="stat-card__numero" id="totalAsignadas">--</h3>
+                            <p class="stat-card__label">Órdenes asignadas</p>
+                            <span class="stat-card__sub">Pendientes por iniciar</span>
                         </div>
                     </div>
 
-                    <div class="col-md-6 col-xl-3">
-                        <div class="card shadow-sm border-0 h-100 panel-seccion">
-                            <div class="card-body p-3 panel-seccion__body">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <h6 class="mb-0 fw-bold text-muted small text-uppercase">Trabajos en proceso</h6>
-                                    <i class="bi bi-gear-wide-connected fs-5 text-success"></i>
-                                </div>
-                                <div class="d-flex align-items-baseline gap-2 mb-3">
-                                    <strong class="fs-3 fw-bold" id="totalEnProceso">--</strong>
-                                    <span class="small text-muted">en proceso</span>
-                                </div>
-                                <a href="#" class="btn btn-primario btn-sm w-100" id="btnIrEnProceso">
-                                    Ir <i class="bi bi-arrow-right"></i>
-                                </a>
-                            </div>
+                    <div class="stat-card stat-card--verde">
+                        <div class="stat-card__icono">
+                            <i class="bi bi-gear-wide-connected"></i>
+                        </div>
+                        <div class="stat-card__contenido">
+                            <h3 class="stat-card__numero" id="totalEnProceso">--</h3>
+                            <p class="stat-card__label">Trabajos en proceso</p>
+                            <span class="stat-card__sub">En taller actualmente</span>
                         </div>
                     </div>
 
-                    <div class="col-md-6 col-xl-3">
-                        <div class="card shadow-sm border-0 h-100 panel-seccion">
-                            <div class="card-body p-3 panel-seccion__body">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <h6 class="mb-0 fw-bold text-muted small text-uppercase">Finalizadas hoy</h6>
-                                    <i class="bi bi-check-circle fs-5 text-success"></i>
-                                </div>
-                                <div class="d-flex align-items-baseline gap-2 mb-3">
-                                    <strong class="fs-3 fw-bold" id="totalFinalizadasHoy">--</strong>
-                                    <span class="small text-muted">finalizadas</span>
-                                </div>
-                                <a href="#" class="btn btn-primario btn-sm w-100" id="btnIrFinalizadas">
-                                    Ir <i class="bi bi-arrow-right"></i>
-                                </a>
-                            </div>
+                    <div class="stat-card stat-card--naranja">
+                        <div class="stat-card__icono">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="stat-card__contenido">
+                            <h3 class="stat-card__numero" id="totalFinalizadasHoy">--</h3>
+                            <p class="stat-card__label">Finalizadas hoy</p>
+                            <span class="stat-card__sub">Órdenes completadas</span>
                         </div>
                     </div>
 
-                    <div class="col-md-6 col-xl-3">
-                        <div class="card shadow-sm border-0 h-100 panel-seccion">
-                            <div class="card-body p-3 panel-seccion__body">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <h6 class="mb-0 fw-bold text-muted small text-uppercase">Tiempo promedio</h6>
-                                    <i class="bi bi-clock-history fs-5 text-warning"></i>
-                                </div>
-                                <div class="d-flex align-items-baseline gap-2 mb-3">
-                                    <strong class="fs-3 fw-bold" id="tiempoPromedio">--</strong>
-                                    <span class="small text-muted">por orden</span>
-                                </div>
-                                <a href="#" class="btn btn-primario btn-sm w-100" id="btnIrTiempos">
-                                    Ir <i class="bi bi-arrow-right"></i>
-                                </a>
-                            </div>
+                    <div class="stat-card stat-card--rojo">
+                        <div class="stat-card__icono">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div class="stat-card__contenido">
+                            <h3 class="stat-card__numero" id="tiempoPromedio">--</h3>
+                            <p class="stat-card__label">Tiempo promedio</p>
+                            <span class="stat-card__sub">Por orden atendida</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 panel-seccion">
-                    <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between panel-seccion__header">
-                        <h5 class="mb-0 fw-bold"><i class="bi bi-list-task"></i> Órdenes pendientes</h5>
-                        <span class="badge bg-secondary" id="contadorOrdenesPendientes">0</span>
+                {{!-- TABLA DE ÓRDENES PENDIENTES estilo AGL --}}
+                <div class="panel-tabla">
+                    <div class="panel-tabla__header">
+                        <h5 class="panel-tabla__titulo">
+                            <i class="bi bi-list-task"></i>
+                            Órdenes pendientes
+                        </h5>
+                        <div class="panel-tabla__acciones">
+                            <span class="badge bg-secondary" id="contadorOrdenesPendientes">0</span>
+                        </div>
                     </div>
-                    <div class="card-body p-0 panel-seccion__body">
-                        <div class="table-responsive card-scroll">
-                            <table class="table table-hover align-middle mb-0" id="tablaOrdenesPendientes">
-                                <thead class="table-light">
+                    <div class="panel-tabla__body">
+                        <div class="panel-tabla__scroll">
+                            <table class="table tabla-sistema tabla-sistema--compact border-0 mb-0" id="tablaOrdenesPendientes">
+                                <thead>
                                     <tr>
                                         <th class="ps-3">N° DE ORDEN</th>
                                         <th>CLIENTE</th>
@@ -257,15 +236,17 @@
 
                     {{!-- LISTA LATERAL --}}
                     <div class="col-lg-3">
-                        <div class="card shadow-sm border-0 h-100 panel-seccion d-flex flex-column">
-                            <div class="card-header bg-white border-bottom panel-seccion__header">
-                                <h5 class="mb-0 fw-bold"><i class="bi bi-clipboard-check"></i> Órdenes</h5>
+                        <div class="panel-tabla panel-tabla--compact h-100">
+                            <div class="panel-tabla__header">
+                                <h5 class="panel-tabla__titulo">
+                                    <i class="bi bi-clipboard-check"></i> Órdenes
+                                </h5>
                             </div>
-                            <div class="card-body p-3 d-flex flex-column panel-seccion__body panel-seccion__body--flex">
-                                <div class="lista-ordenes-consumo flex-grow-1 card-scroll" id="contenedorListaOrdenes"></div>
+                            <div class="panel-tabla__body">
+                                <div class="lista-ordenes-consumo card-scroll" id="contenedorListaOrdenes"></div>
 
                                 {{! Paginador de órdenes }}
-                                <div class="paginador-wrap flex-shrink-0" id="contenedorPaginacionOrdenes">
+                                <div class="paginador-wrap flex-shrink-0 mt-2" id="contenedorPaginacionOrdenes">
                                     <div class="paginador-info" id="infoRangoOrdenes">0–0 de 0</div>
 
                                     <nav class="ordenes-paginacion">
@@ -308,121 +289,126 @@
 
                     {{!-- DETALLE --}}
                     <div class="col-lg-5">
-                        <div class="card shadow-sm border-0 h-100 panel-seccion d-flex flex-column">
-                            <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between panel-seccion__header">
-                                <h5 class="mb-0 fw-bold"><i class="bi bi-info-circle"></i> Detalle de Orden</h5>
-                                <div id="contenedorAccionesOrden" class="d-none">
+                        <div class="panel-tabla panel-tabla--compact h-100">
+                            <div class="panel-tabla__header">
+                                <h5 class="panel-tabla__titulo">
+                                    <i class="bi bi-info-circle"></i> Detalle de Orden
+                                </h5>
+                                <div class="panel-tabla__acciones" id="contenedorAccionesOrden" class="d-none">
                                     <button type="button" class="btn btn-sm btn-primario cambiar-estado-orden d-none" data-estado="EN PROCESO" title="Iniciar trabajo">
                                         <i class="bi bi-play-fill"></i> Iniciar
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-primario cambiar-estado-orden d-none" data-estado="FINALIZADA" title="Finalizar orden">
-                                        <i class="bi bi-check-lg"></i> Finalizar
-                                    </button>
                                 </div>
                             </div>
-                            <div class="card-body p-3 panel-seccion__body panel-seccion__body--flex card-scroll">
+                            <div class="panel-tabla__body">
+                                <div class="panel-tabla__scroll p-1">
 
-                                <div id="contenedorInfoOrden" class="small mb-3 d-none">
-                                    <div class="row g-2 mb-3">
-                                        <div class="col-6 col-md-4">
-                                            <span class="text-muted d-block small">N° ORDEN</span>
-                                            <strong id="consumoOrdenCodigo">--</strong>
-                                        </div>
-                                        <div class="col-6 col-md-4">
-                                            <span class="text-muted d-block small">ESTADO</span>
-                                            <span id="consumoOrdenEstado" class="badge bg-secondary">--</span>
-                                        </div>
-                                        <div class="col-6 col-md-4">
-                                            <span class="text-muted d-block small">FECHA</span>
-                                            <span id="consumoOrdenFecha">--</span>
-                                        </div>
-                                        <div class="col-6 col-md-6">
-                                            <span class="text-muted d-block small">CLIENTE</span>
-                                            <strong id="consumoOrdenCliente">--</strong>
-                                        </div>
-                                        <div class="col-6 col-md-6">
-                                            <span class="text-muted d-block small">DOCUMENTO</span>
-                                            <span id="consumoOrdenDocumento">--</span>
-                                        </div>
-                                        <div class="col-6 col-md-6">
-                                            <span class="text-muted d-block small">VEHÍCULO / PLACA</span>
-                                            <span id="consumoOrdenVehiculo">--</span>
-                                        </div>
-                                        <div class="col-6 col-md-6">
-                                            <span class="text-muted d-block small">MECÁNICO</span>
-                                            <span id="consumoOrdenMecanico">--</span>
-                                        </div>
-                                        <div class="col-12">
-                                            <span class="text-muted d-block small">SERVICIO</span>
-                                            <span id="consumoOrdenServicio">--</span>
-                                        </div>
-                                    </div>
-                                    <div class="mb-2">
-                                        <span class="text-muted d-block small">DESCRIPCIÓN</span>
-                                        <p id="consumoOrdenDescripcion" class="mb-0 small">--</p>
-                                    </div>
-                                </div>
-
-                                <div id="contenedorVacioOrden" class="text-center text-muted py-5">
-                                    <i class="bi bi-clipboard fs-3 d-block mb-2"></i>
-                                    <small>Seleccione una orden para ver su detalle y registrar los repuestos utilizados</small>
-                                </div>
-
-                                {{!-- EVIDENCIAS --}}
-                                <div id="contenedorEvidencias" class="d-none mt-3 pt-3 border-top">
-                                    <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <h6 class="fw-bold mb-0">
-                                            <i class="bi bi-images"></i> Evidencias
-                                            <span class="badge bg-secondary ms-1" id="contadorEvidencias">0</span>
-                                        </h6>
-                                        <button type="button" class="btn btn-primario btn-sm" id="btnSubirEvidencias"
-                                                title="Subir evidencias">
-                                            <i class="bi bi-cloud-arrow-up"></i> Subir
-                                        </button>
-                                        <input type="file" id="inputEvidencias" class="d-none" accept="image/*" multiple>
-                                    </div>
-
-                                    <div class="row g-2 mb-3">
-                                        <div class="col-12">
-                                            <div class="input-style">
-                                                <input type="text" class="form-control" id="inputTituloEvidencia" placeholder=" ">
-                                                <label for="inputTituloEvidencia"><i class="bi bi-card-heading"></i> Título</label>
+                                    <div id="contenedorInfoOrden" class="small mb-3 d-none">
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-6 col-md-4">
+                                                <span class="text-muted d-block small">N° ORDEN</span>
+                                                <strong id="consumoOrdenCodigo">--</strong>
+                                            </div>
+                                            <div class="col-6 col-md-4">
+                                                <span class="text-muted d-block small">ESTADO</span>
+                                                <span id="consumoOrdenEstado" class="badge bg-secondary">--</span>
+                                            </div>
+                                            <div class="col-6 col-md-4">
+                                                <span class="text-muted d-block small">FECHA</span>
+                                                <span id="consumoOrdenFecha">--</span>
+                                            </div>
+                                            <div class="col-6 col-md-6">
+                                                <span class="text-muted d-block small">CLIENTE</span>
+                                                <strong id="consumoOrdenCliente">--</strong>
+                                            </div>
+                                            <div class="col-6 col-md-6">
+                                                <span class="text-muted d-block small">DOCUMENTO</span>
+                                                <span id="consumoOrdenDocumento">--</span>
+                                            </div>
+                                            <div class="col-6 col-md-6">
+                                                <span class="text-muted d-block small">VEHÍCULO / PLACA</span>
+                                                <span id="consumoOrdenVehiculo">--</span>
+                                            </div>
+                                            <div class="col-6 col-md-6">
+                                                <span class="text-muted d-block small">MECÁNICO</span>
+                                                <span id="consumoOrdenMecanico">--</span>
+                                            </div>
+                                            <div class="col-12">
+                                                <span class="text-muted d-block small">SERVICIO</span>
+                                                <span id="consumoOrdenServicio">--</span>
                                             </div>
                                         </div>
-                                        <div class="col-12">
-                                            <div class="input-style">
-                                                <textarea class="form-control" id="textareaDescripcionEvidencia" rows="2" placeholder=" "></textarea>
-                                                <label for="textareaDescripcionEvidencia"><i class="bi bi-pencil-square"></i> Descripción</label>
-                                            </div>
+                                        <div class="mb-2">
+                                            <span class="text-muted d-block small">DESCRIPCIÓN</span>
+                                            <p id="consumoOrdenDescripcion" class="mb-0 small">--</p>
                                         </div>
                                     </div>
 
-                                    <div id="contenedorVacioEvidencias" class="text-center text-muted py-3">
-                                        <i class="bi bi-image fs-3 d-block mb-1"></i>
-                                        <small>Aún no hay evidencias registradas para esta orden</small>
+                                    <div id="contenedorVacioOrden" class="text-center text-muted py-5">
+                                        <i class="bi bi-clipboard fs-3 d-block mb-2"></i>
+                                        <small>Seleccione una orden para ver su detalle y registrar los repuestos utilizados</small>
                                     </div>
 
-                                    <div id="albumEvidencias" class="album-evidencias d-none"></div>
+                                    {{!-- EVIDENCIAS --}}
+                                    <div id="contenedorEvidencias" class="d-none mt-3 pt-3 border-top">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <h6 class="fw-bold mb-0">
+                                                <i class="bi bi-images"></i> Evidencias
+                                                <span class="badge bg-secondary ms-1" id="contadorEvidencias">0</span>
+                                            </h6>
+                                            <button type="button" class="btn btn-primario btn-sm" id="btnSubirEvidencias"
+                                                    title="Subir evidencias">
+                                                <i class="bi bi-cloud-arrow-up"></i> Subir
+                                            </button>
+                                            <input type="file" id="inputEvidencias" class="d-none" accept="image/*" multiple>
+                                        </div>
 
-                                    <div id="contenedorFooterEvidencias" class="d-none mt-3">
-                                        <button type="button" class="btn btn-primario w-100" id="btnGuardarEvidencias">
-                                            <i class="bi bi-save"></i> GUARDAR EVIDENCIAS
-                                        </button>
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-12">
+                                                <div class="input-style">
+                                                    <input type="text" class="form-control" id="inputTituloEvidencia" placeholder=" ">
+                                                    <label for="inputTituloEvidencia"><i class="bi bi-card-heading"></i> Título</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="input-style">
+                                                    <textarea class="form-control" id="textareaDescripcionEvidencia" rows="2" placeholder=" "></textarea>
+                                                    <label for="textareaDescripcionEvidencia"><i class="bi bi-pencil-square"></i> Descripción</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="contenedorVacioEvidencias" class="text-center text-muted py-3">
+                                            <i class="bi bi-image fs-3 d-block mb-1"></i>
+                                            <small>Aún no hay evidencias registradas para esta orden</small>
+                                        </div>
+
+                                        <div id="albumEvidencias" class="album-evidencias d-none"></div>
+
+                                        <div id="contenedorFooterEvidencias" class="d-none mt-3">
+                                            <button type="button" class="btn btn-primario w-100" id="btnGuardarEvidencias">
+                                                <i class="bi bi-save"></i> GUARDAR EVIDENCIAS
+                                            </button>
+                                        </div>
                                     </div>
+
                                 </div>
-
                             </div>
                         </div>
                     </div>
 
-                    {{!-- CONSUMO (IGUAL FORMATO A COTIZACIONES) --}}
+                    {{!-- CONSUMO --}}
                     <div class="col-lg-4">
-                        <div class="card shadow-sm border-0 h-100 panel-seccion d-flex flex-column">
-                            <div class="card-header bg-white border-bottom panel-seccion__header d-flex align-items-center justify-content-between">
-                                <h6 class="mb-0 fw-bold"><i class="bi bi-cart"></i> Consumo</h6>
-                                <span class="pill-contador" id="pillTotalConsumo">S/ 0.00</span>
+                        <div class="panel-tabla panel-tabla--compact h-100">
+                            <div class="panel-tabla__header">
+                                <h5 class="panel-tabla__titulo">
+                                    <i class="bi bi-cart"></i> Consumo
+                                </h5>
+                                <div class="panel-tabla__acciones">
+                                    <span class="pill-contador" id="pillTotalConsumo">S/ 0.00</span>
+                                </div>
                             </div>
-                            <div class="card-body p-3 d-flex flex-column panel-seccion__body panel-seccion__body--flex">
+                            <div class="panel-tabla__body">
 
                                 <div id="contenedorVacioConsumo" class="text-center text-muted py-5">
                                     <i class="bi bi-box fs-3 d-block mb-2"></i>
@@ -431,7 +417,7 @@
 
                                 <div id="contenedorConsumoActivo" class="d-none flex-grow-1 d-flex flex-column min-h-0">
 
-                                    {{!-- BLOQUE DE BÚSQUEDA (mismo formato que Cotizaciones) --}}
+                                    {{!-- BLOQUE DE BÚSQUEDA --}}
                                     <div id="contenedorListasDisponiblesOT" class="d-none flex-shrink-0">
                                         <div class="row g-2 mb-2 flex-shrink-0">
 
@@ -469,16 +455,14 @@
                                         <hr class="my-2 flex-shrink-0">
                                     </div>
 
-                                    {{!-- VACÍO (solo si no hay items) --}}
                                     <div id="contenedorVacioItemsConsumo" class="text-center text-muted py-3 flex-shrink-0">
                                         <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                         <small>No hay items agregados</small>
                                     </div>
 
-                                    {{!-- TABLA (oculta hasta que haya items) --}}
                                     <div id="contenedorTablaConsumo" class="d-none flex-grow-1 card-scroll card-scroll--flex border rounded">
-                                        <table class="table table-sm table-hover align-middle mb-0" id="tablaItemsConsumo">
-                                            <thead class="table-light sticky-top">
+                                        <table class="table tabla-sistema tabla-sistema--compact border-0 mb-0" id="tablaItemsConsumo">
+                                            <thead class="sticky-top">
                                                 <tr>
                                                     <th class="small">Tipo</th>
                                                     <th class="small">Descripción</th>
@@ -492,15 +476,15 @@
                                         </table>
                                     </div>
 
-                                    {{!-- FOOTER (oculto hasta que haya items) --}}
                                     <div id="contenedorFooterConsumo" class="d-none mt-2 pt-2 border-top flex-shrink-0">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <span class="fw-bold small">TOTAL</span>
                                             <span class="fw-bold small" id="contenedorTotalConsumo">S/ 0.00</span>
                                         </div>
-                                        <button type="button" class="btn btn-primario w-100" id="btnGuardarConsumo">
-                                            <i class="bi bi-save"></i> GUARDAR CONSUMO
+                                        <button type="button" class="btn btn-primario w-100 cambiar-estado-orden d-none" data-estado="FINALIZADA" id="btnFinalizarOrden" title="Finalizar orden">
+                                            <i class="bi bi-check-lg"></i> FINALIZAR ORDEN
                                         </button>
+                                        <small class="d-block text-muted text-center mt-1" id="indicadorAutoguardadoConsumo"></small>
                                     </div>
 
                                 </div>
@@ -530,11 +514,17 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 panel-seccion">
-                    <div class="card-body p-0 panel-seccion__body">
-                        <div class="table-responsive card-scroll card-scroll--flex">
-                            <table class="table table-bordered agenda-tabla mb-0">
-                                <thead class="table-light">
+                <div class="panel-tabla">
+                    <div class="panel-tabla__header">
+                        <h5 class="panel-tabla__titulo">
+                            <i class="bi bi-calendar-week"></i>
+                            Horario semanal
+                        </h5>
+                    </div>
+                    <div class="panel-tabla__body">
+                        <div class="panel-tabla__scroll">
+                            <table class="table tabla-sistema agenda-tabla border-0 mb-0">
+                                <thead>
                                     <tr>
                                         <th class="col-hora">HORA</th>
                                         <th><span>LUNES</span><a href="#" class="btn-editar-dia ms-1" data-dia="LUNES" title="Editar día">&#9998;</a></th>
@@ -579,11 +569,17 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 panel-seccion d-flex flex-column">
-                    <div class="card-body p-0 panel-seccion__body panel-seccion__body--flex">
-                        <div class="table-responsive card-scroll card-scroll--flex">
-                            <table class="table table-hover align-middle mb-0" id="tablaHistorial">
-                                <thead class="table-light">
+                <div class="panel-tabla vista-row-altura">
+                    <div class="panel-tabla__header">
+                        <h5 class="panel-tabla__titulo">
+                            <i class="bi bi-clock-history"></i>
+                            Órdenes finalizadas
+                        </h5>
+                    </div>
+                    <div class="panel-tabla__body">
+                        <div class="panel-tabla__scroll">
+                            <table class="table tabla-sistema tabla-sistema--center border-0 mb-0" id="tablaHistorial">
+                                <thead>
                                     <tr>
                                         <th class="ps-3">N° DE ORDEN</th>
                                         <th>FECHA</th>
@@ -597,44 +593,45 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                    <div class="panel-tabla__footer">
+                        <div class="paginador-wrap" id="contenedorPaginacionHistorial">
+                            <div class="paginador-info" id="infoRangoHistorial">0–0 de 0</div>
 
-                <div class="paginador-wrap" id="contenedorPaginacionHistorial">
-                    <div class="paginador-info" id="infoRangoHistorial">0–0 de 0</div>
+                            <nav class="historial-paginacion">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" id="liHistorialPrev">
+                                        <a class="page-link" href="#" id="btnHistorialPaginaAnterior" aria-label="Página anterior">&laquo;</a>
+                                    </li>
+                                    <li class="page-item active" id="liHistorialPaginaActual">
+                                        <a class="page-link" href="#" id="btnHistorialPaginaNumero">1</a>
+                                    </li>
+                                    <li class="page-item" id="liHistorialNext">
+                                        <a class="page-link" href="#" id="btnHistorialPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
 
-                    <nav class="historial-paginacion">
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item" id="liHistorialPrev">
-                                <a class="page-link" href="#" id="btnHistorialPaginaAnterior" aria-label="Página anterior">&laquo;</a>
-                            </li>
-                            <li class="page-item active" id="liHistorialPaginaActual">
-                                <a class="page-link" href="#" id="btnHistorialPaginaNumero">1</a>
-                            </li>
-                            <li class="page-item" id="liHistorialNext">
-                                <a class="page-link" href="#" id="btnHistorialPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
-                            </li>
-                        </ul>
-                    </nav>
+                            <div class="selector-por-pagina-wrap">
+                                <span class="input-group-text bg-white" title="Registros por página">
+                                    <i class="bi bi-list-ol"></i>
+                                </span>
+                                <select class="form-select form-select-sm selector-por-pagina"
+                                        data-vista="historial"
+                                        aria-label="Registros por página">
+                                    <option value="5" selected>5</option>
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
 
-                    <div class="selector-por-pagina-wrap">
-                        <span class="input-group-text bg-white" title="Registros por página">
-                            <i class="bi bi-list-ol"></i>
-                        </span>
-                        <select class="form-select form-select-sm selector-por-pagina"
-                                data-vista="historial"
-                                aria-label="Registros por página">
-                            <option value="5" selected>5</option>
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
+                            <label class="paginador-ir" for="inputIrPaginaHistorial">
+                                Ir a página
+                                <input type="number" id="inputIrPaginaHistorial" min="1" value="1" inputmode="numeric">
+                            </label>
+                        </div>
                     </div>
-
-                    <label class="paginador-ir" for="inputIrPaginaHistorial">
-                        Ir a página
-                        <input type="number" id="inputIrPaginaHistorial" min="1" value="1" inputmode="numeric">
-                    </label>
                 </div>
             </div>
         </template>
@@ -666,20 +663,24 @@
 
                     {{!-- COLUMNA IZQUIERDA --}}
                     <div class="col-lg-3">
-                        <div class="card shadow-sm border-0 h-100 panel-seccion d-flex flex-column">
-                            <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between panel-seccion__header">
-                                <h5 class="mb-0 fw-bold"><i class="bi bi-file-earmark-text"></i> Cotizaciones</h5>
-                                <span class="badge bg-secondary" id="contadorCotizaciones">0</span>
+                        <div class="panel-tabla panel-tabla--compact h-100">
+                            <div class="panel-tabla__header">
+                                <h5 class="panel-tabla__titulo">
+                                    <i class="bi bi-file-earmark-text"></i> Cotizaciones
+                                </h5>
+                                <div class="panel-tabla__acciones">
+                                    <span class="badge bg-secondary" id="contadorCotizaciones">0</span>
+                                </div>
                             </div>
-                            <div class="card-body p-3 d-flex flex-column panel-seccion__body panel-seccion__body--flex">
+                            <div class="panel-tabla__body">
                                 <div class="placa-activa mb-3 p-2 rounded text-center flex-shrink-0">
                                     <small class="text-muted d-block">Vehículo</small>
                                     <strong class="fs-5 text-uppercase" id="contenedorPlacaActiva">--</strong>
                                 </div>
 
-                                <div class="lista-cotizaciones flex-grow-1 card-scroll" id="contenedorListaCotizaciones"></div>
+                                <div class="lista-cotizaciones card-scroll flex-grow-1" id="contenedorListaCotizaciones"></div>
 
-                                <div class="paginador-wrap flex-shrink-0" id="contenedorPaginacionCotizaciones">
+                                <div class="paginador-wrap flex-shrink-0 mt-2" id="contenedorPaginacionCotizaciones">
                                     <div class="paginador-info" id="infoRangoCotizaciones">0–0 de 0</div>
 
                                     <nav class="cotizaciones-paginacion">
@@ -730,11 +731,13 @@
                         <div class="d-flex flex-column h-100 gap-3">
 
                             {{!-- CARD: Datos de cotización --}}
-                            <div class="card shadow-sm border-0 panel-seccion flex-shrink-0">
-                                <div class="card-header bg-white border-bottom py-2 panel-seccion__header">
-                                    <h6 class="mb-0 fw-bold"><i class="bi bi-person-vcard"></i> Datos de Cotización</h6>
+                            <div class="panel-tabla panel-tabla--compact flex-shrink-0">
+                                <div class="panel-tabla__header">
+                                    <h6 class="panel-tabla__titulo">
+                                        <i class="bi bi-person-vcard"></i> Datos de Cotización
+                                    </h6>
                                 </div>
-                                <div class="card-body p-3 panel-seccion__body">
+                                <div class="panel-tabla__body">
                                     <div class="row g-3">
                                         <div class="col-md-5">
                                             <div class="input-style">
@@ -813,12 +816,16 @@
                             </div>
 
                             {{!-- CARD: Servicios y Productos --}}
-                            <div class="card shadow-sm border-0 panel-seccion d-flex flex-column flex-grow-1 min-h-0">
-                                <div class="card-header bg-white border-bottom py-2 panel-seccion__header d-flex align-items-center justify-content-between">
-                                    <h6 class="mb-0 fw-bold"><i class="bi bi-cart"></i> Servicios y Productos</h6>
-                                    <span class="pill-contador" id="pillTotalCotizacion">S/ 0.00</span>
+                            <div class="panel-tabla panel-tabla--compact flex-grow-1 min-h-0">
+                                <div class="panel-tabla__header">
+                                    <h6 class="panel-tabla__titulo">
+                                        <i class="bi bi-cart"></i> Servicios y Productos
+                                    </h6>
+                                    <div class="panel-tabla__acciones">
+                                        <span class="pill-contador" id="pillTotalCotizacion">S/ 0.00</span>
+                                    </div>
                                 </div>
-                                <div class="card-body p-3 d-flex flex-column panel-seccion__body panel-seccion__body--flex">
+                                <div class="panel-tabla__body">
 
                                     <div class="row g-2 mb-2 flex-shrink-0">
                                         <div class="col-6">
@@ -858,9 +865,10 @@
                                         <small>No hay items agregados</small>
                                     </div>
 
-                                    <div class="tabla-items-container card-scroll card-scroll--flex border rounded flex-grow-1">
-                                        <table class="table table-sm table-hover align-middle mb-0" id="tablaItemsCotizacion">
-                                            <thead class="table-light sticky-top">
+                                    <div id="contenedorTablaItemsCotizacion"
+                                         class="tabla-items-container card-scroll card-scroll--flex border rounded flex-grow-1 d-none">
+                                        <table class="table tabla-sistema tabla-sistema--compact border-0 mb-0" id="tablaItemsCotizacion">
+                                            <thead class="sticky-top">
                                                 <tr>
                                                     <th class="small">Tipo</th>
                                                     <th class="small">Descripción</th>
@@ -887,64 +895,68 @@
 
                     {{!-- COLUMNA DERECHA: Resumen --}}
                     <div class="col-lg-3">
-                        <div class="card shadow-sm border-0 panel-seccion resumen-sticky h-100 d-flex flex-column">
-                            <div class="card-header bg-white border-bottom panel-seccion__header">
-                                <h5 class="mb-0 fw-bold"><i class="bi bi-clipboard-check"></i> Resumen</h5>
+                        <div class="panel-tabla panel-tabla--compact resumen-sticky h-100">
+                            <div class="panel-tabla__header">
+                                <h5 class="panel-tabla__titulo">
+                                    <i class="bi bi-clipboard-check"></i> Resumen
+                                </h5>
                             </div>
-                            <div class="card-body p-3 d-flex flex-column card-scroll panel-seccion__body panel-seccion__body--flex">
+                            <div class="panel-tabla__body">
+                                <div class="card-scroll">
 
-                                <div class="resumen-totales mb-3 flex-shrink-0">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="small text-muted">Subtotal:</span>
-                                        <span class="small fw-semibold" id="contenedorResumenSubtotal">S/ 0.00</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="small text-muted">IGV (18%):</span>
-                                        <span class="small fw-semibold" id="contenedorResumenIGV">S/ 0.00</span>
-                                    </div>
-                                </div>
-
-                                <div class="bg-success-subtle p-3 rounded mb-3 flex-shrink-0">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="fw-bold">TOTAL</span>
-                                        <span class="fw-bold fs-5 text-success" id="contenedorTotalFinalCotizacion">S/ 0.00</span>
-                                    </div>
-                                </div>
-
-                                <div class="row g-2 mb-3 flex-shrink-0">
-                                    <div class="col-6">
-                                        <div class="input-style">
-                                            <input type="date" class="form-control" id="inputFechaCotizacion" placeholder=" ">
-                                            <label for="inputFechaCotizacion"><i class="bi bi-calendar3"></i> Fecha</label>
+                                    <div class="resumen-totales mb-3 flex-shrink-0">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="small text-muted">Subtotal:</span>
+                                            <span class="small fw-semibold" id="contenedorResumenSubtotal">S/ 0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="small text-muted">IGV (18%):</span>
+                                            <span class="small fw-semibold" id="contenedorResumenIGV">S/ 0.00</span>
                                         </div>
                                     </div>
-                                    <div class="col-6">
-                                        <div class="input-style">
-                                            <select class="form-select" id="selectValidezCotizacion">
-                                                <option value="7" selected>7 días</option>
-                                                <option value="15">15 días</option>
-                                                <option value="30">30 días</option>
-                                                <option value="60">60 días</option>
-                                            </select>
-                                            <label for="selectValidezCotizacion"><i class="bi bi-clock-history"></i> Validez</label>
+
+                                    <div class="bg-success-subtle p-3 rounded mb-3 flex-shrink-0">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="fw-bold">TOTAL</span>
+                                            <span class="fw-bold fs-5 text-success" id="contenedorTotalFinalCotizacion">S/ 0.00</span>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="mb-3 flex-shrink-0">
-                                    <div class="input-style">
-                                        <textarea class="form-control" id="textareaObservacionesCotizacion" rows="4" placeholder=" "></textarea>
-                                        <label for="textareaObservacionesCotizacion"><i class="bi bi-pencil-square"></i> Observaciones / Detalles</label>
+                                    <div class="row g-2 mb-3 flex-shrink-0">
+                                        <div class="col-6">
+                                            <div class="input-style">
+                                                <input type="date" class="form-control" id="inputFechaCotizacion" placeholder=" ">
+                                                <label for="inputFechaCotizacion"><i class="bi bi-calendar3"></i> Fecha</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="input-style">
+                                                <select class="form-select" id="selectValidezCotizacion">
+                                                    <option value="7" selected>7 días</option>
+                                                    <option value="15">15 días</option>
+                                                    <option value="30">30 días</option>
+                                                    <option value="60">60 días</option>
+                                                </select>
+                                                <label for="selectValidezCotizacion"><i class="bi bi-clock-history"></i> Validez</label>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div class="mt-auto flex-shrink-0">
-                                    <button type="button" class="btn btn-primario w-100 mb-2" id="btnGenerarCotizacion">
-                                        <i class="bi bi-file-earmark-pdf"></i> GENERAR COTIZACIÓN
-                                    </button>
-                                    <button type="button" class="btn btn-cancelar w-100" id="btnLimpiarCotizacion">
-                                        <i class="bi bi-eraser"></i> Limpiar Todo
-                                    </button>
+                                    <div class="mb-3 flex-shrink-0">
+                                        <div class="input-style">
+                                            <textarea class="form-control" id="textareaObservacionesCotizacion" rows="4" placeholder=" "></textarea>
+                                            <label for="textareaObservacionesCotizacion"><i class="bi bi-pencil-square"></i> Observaciones / Detalles</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-auto flex-shrink-0">
+                                        <button type="button" class="btn btn-primario w-100 mb-2" id="btnGenerarCotizacion">
+                                            <i class="bi bi-file-earmark-pdf"></i> GENERAR COTIZACIÓN
+                                        </button>
+                                        <button type="button" class="btn btn-cancelar w-100" id="btnLimpiarCotizacion">
+                                            <i class="bi bi-eraser"></i> Limpiar Todo
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -980,10 +992,16 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 panel-seccion d-flex flex-column">
-                    <div class="card-body p-0 panel-seccion__body panel-seccion__body--flex">
-                        <div class="table-responsive card-scroll card-scroll--flex">
-                            <table class="table table-hover align-middle mb-0" id="tablaCitas">
+                <div class="panel-tabla vista-row-altura">
+                    <div class="panel-tabla__header">
+                        <h5 class="panel-tabla__titulo">
+                            <i class="bi bi-calendar-check"></i>
+                            Listado de Citas
+                        </h5>
+                    </div>
+                    <div class="panel-tabla__body">
+                        <div class="panel-tabla__scroll">
+                            <table class="table tabla-sistema tabla-sistema--center border-0 mb-0" id="tablaCitas">
                                 <thead>
                                     <tr>
                                         <th class="ps-3">ID</th>
@@ -1000,44 +1018,45 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                    <div class="panel-tabla__footer">
+                        <div class="paginador-wrap" id="contenedorPaginacionCitas">
+                            <div class="paginador-info" id="infoRangoCitas">0–0 de 0</div>
 
-                <div class="paginador-wrap" id="contenedorPaginacionCitas">
-                    <div class="paginador-info" id="infoRangoCitas">0–0 de 0</div>
+                            <nav class="citas-paginacion">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" id="liCitasPrev">
+                                        <a class="page-link" href="#" id="btnCitasPaginaAnterior" aria-label="Página anterior">&laquo;</a>
+                                    </li>
+                                    <li class="page-item active" id="liCitasPaginaActual">
+                                        <a class="page-link" href="#" id="btnCitasPaginaNumero">1</a>
+                                    </li>
+                                    <li class="page-item" id="liCitasNext">
+                                        <a class="page-link" href="#" id="btnCitasPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
 
-                    <nav class="citas-paginacion">
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item" id="liCitasPrev">
-                                <a class="page-link" href="#" id="btnCitasPaginaAnterior" aria-label="Página anterior">&laquo;</a>
-                            </li>
-                            <li class="page-item active" id="liCitasPaginaActual">
-                                <a class="page-link" href="#" id="btnCitasPaginaNumero">1</a>
-                            </li>
-                            <li class="page-item" id="liCitasNext">
-                                <a class="page-link" href="#" id="btnCitasPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
-                            </li>
-                        </ul>
-                    </nav>
+                            <div class="selector-por-pagina-wrap">
+                                <span class="input-group-text bg-white" title="Registros por página">
+                                    <i class="bi bi-list-ol"></i>
+                                </span>
+                                <select class="form-select form-select-sm selector-por-pagina"
+                                        data-vista="citas"
+                                        aria-label="Registros por página">
+                                    <option value="5" selected>5</option>
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
 
-                    <div class="selector-por-pagina-wrap">
-                        <span class="input-group-text bg-white" title="Registros por página">
-                            <i class="bi bi-list-ol"></i>
-                        </span>
-                        <select class="form-select form-select-sm selector-por-pagina"
-                                data-vista="citas"
-                                aria-label="Registros por página">
-                            <option value="5" selected>5</option>
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
+                            <label class="paginador-ir" for="inputIrPaginaCitas">
+                                Ir a página
+                                <input type="number" id="inputIrPaginaCitas" min="1" value="1" inputmode="numeric">
+                            </label>
+                        </div>
                     </div>
-
-                    <label class="paginador-ir" for="inputIrPaginaCitas">
-                        Ir a página
-                        <input type="number" id="inputIrPaginaCitas" min="1" value="1" inputmode="numeric">
-                    </label>
                 </div>
             </div>
         </template>
@@ -1072,11 +1091,17 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 panel-seccion d-flex flex-column">
-                    <div class="card-body p-0 panel-seccion__body panel-seccion__body--flex">
-                        <div class="table-responsive card-scroll card-scroll--flex">
-                            <table class="table table-hover align-middle mb-0" id="tablaClientes">
-                                <thead class="table-light">
+                <div class="panel-tabla vista-row-altura">
+                    <div class="panel-tabla__header">
+                        <h5 class="panel-tabla__titulo">
+                            <i class="bi bi-people"></i>
+                            Listado de Clientes
+                        </h5>
+                    </div>
+                    <div class="panel-tabla__body">
+                        <div class="panel-tabla__scroll">
+                            <table class="table tabla-sistema tabla-sistema--center border-0 mb-0" id="tablaClientes">
+                                <thead>
                                     <tr>
                                         <th class="ps-3">#</th>
                                         <th>DOCUMENTO</th>
@@ -1090,44 +1115,45 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                    <div class="panel-tabla__footer">
+                        <div class="paginador-wrap" id="contenedorPaginacionClientes">
+                            <div class="paginador-info" id="infoRangoClientes">0–0 de 0</div>
 
-                <div class="paginador-wrap" id="contenedorPaginacionClientes">
-                    <div class="paginador-info" id="infoRangoClientes">0–0 de 0</div>
+                            <nav class="clientes-paginacion">
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" id="liClientesPrev">
+                                        <a class="page-link" href="#" id="btnClientesPaginaAnterior" aria-label="Página anterior">&laquo;</a>
+                                    </li>
+                                    <li class="page-item active" id="liClientesPaginaActual">
+                                        <a class="page-link" href="#" id="btnClientesPaginaNumero">1</a>
+                                    </li>
+                                    <li class="page-item" id="liClientesNext">
+                                        <a class="page-link" href="#" id="btnClientesPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
 
-                    <nav class="clientes-paginacion">
-                        <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item" id="liClientesPrev">
-                                <a class="page-link" href="#" id="btnClientesPaginaAnterior" aria-label="Página anterior">&laquo;</a>
-                            </li>
-                            <li class="page-item active" id="liClientesPaginaActual">
-                                <a class="page-link" href="#" id="btnClientesPaginaNumero">1</a>
-                            </li>
-                            <li class="page-item" id="liClientesNext">
-                                <a class="page-link" href="#" id="btnClientesPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
-                            </li>
-                        </ul>
-                    </nav>
+                            <div class="selector-por-pagina-wrap">
+                                <span class="input-group-text bg-white" title="Registros por página">
+                                    <i class="bi bi-list-ol"></i>
+                                </span>
+                                <select class="form-select form-select-sm selector-por-pagina"
+                                        data-vista="clientes"
+                                        aria-label="Registros por página">
+                                    <option value="5" selected>5</option>
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
 
-                    <div class="selector-por-pagina-wrap">
-                        <span class="input-group-text bg-white" title="Registros por página">
-                            <i class="bi bi-list-ol"></i>
-                        </span>
-                        <select class="form-select form-select-sm selector-por-pagina"
-                                data-vista="clientes"
-                                aria-label="Registros por página">
-                            <option value="5" selected>5</option>
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
+                            <label class="paginador-ir" for="inputIrPaginaClientes">
+                                Ir a página
+                                <input type="number" id="inputIrPaginaClientes" min="1" value="1" inputmode="numeric">
+                            </label>
+                        </div>
                     </div>
-
-                    <label class="paginador-ir" for="inputIrPaginaClientes">
-                        Ir a página
-                        <input type="number" id="inputIrPaginaClientes" min="1" value="1" inputmode="numeric">
-                    </label>
                 </div>
             </div>
         </template>
@@ -1191,7 +1217,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="formNuevaOrden" class="btn btn-primario" id="btnGuardarOrden">
+                    <button type="button" form="formNuevaOrden" class="btn btn-primario" id="btnGuardarOrden">
                         <i class="bi bi-check-circle"></i> Guardar Orden
                     </button>
                 </div>
@@ -1289,8 +1315,8 @@
 
                     <h6 class="fw-bold mb-3"><i class="bi bi-box-seam"></i> Repuestos Consumidos</h6>
                     <div class="table-responsive">
-                        <table class="table table-sm table-hover align-middle mb-0" id="tablaVerHistorialConsumo">
-                            <thead class="table-light">
+                        <table class="table tabla-sistema tabla-sistema--compact border-0 mb-0" id="tablaVerHistorialConsumo">
+                            <thead>
                                 <tr>
                                     <th class="small">Repuesto</th>
                                     <th class="small text-center">Cant.</th>
@@ -1669,8 +1695,8 @@
                     </div>
 
                     <div class="table-responsive">
-                        <table class="table table-sm table-hover align-middle mb-0" id="tablaVehiculosCliente">
-                            <thead class="table-light">
+                        <table class="table tabla-sistema tabla-sistema--compact tabla-sistema--center border-0 mb-0" id="tablaVehiculosCliente">
+                            <thead>
                                 <tr>
                                     <th class="small">PLACA</th>
                                     <th class="small">MARCA / MODELO</th>
@@ -1771,7 +1797,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="formNuevoVehiculo" class="btn btn-primario" id="btnGuardarVehiculo">
+                    <button type="button" form="formNuevoVehiculo" class="btn btn-primario" id="btnGuardarVehiculo">
                         <i class="bi bi-check-circle"></i> Guardar Vehículo
                     </button>
                 </div>
@@ -1912,7 +1938,7 @@
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-restar-item" title="-">
                         <i class="bi bi-dash"></i>
                     </button>
-                    <input type="number" class="form-control form-control-sm text-center input-cantidad-item" value="1" min="1" style="max-width: 50px;">
+                    <input type="number" class="form-control form-control-sm text-center input-cantidad-item input-sin-flechas" value="1" min="1">
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-sumar-item" title="+">
                         <i class="bi bi-plus"></i>
                     </button>

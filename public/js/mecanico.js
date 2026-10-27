@@ -105,6 +105,11 @@ let _enviandoOrden      = false;
 let _enviandoConsumo    = false;
 let _enviandoEvidencias = false;
 
+// Autoguardado de consumo (debounce)
+let _autoguardadoConsumoTimer = null;
+let _autoguardadoConsumoPendiente = false;
+let _ultimoPayloadConsumo = null;
+
 // ============================================================
 // HELPERS: PAGINACION
 // ============================================================
@@ -1840,10 +1845,18 @@ function listarItemsCotizacion() {
     const templateFilaItem = document.querySelector('#templateFilaItemCotizacion').content;
     contenedor.innerHTML = "";
 
+    const hayItems = itemsCotizacion.length > 0;
+
     const vacio = document.querySelector('#contenedorVacioItemsCotizacion');
     if (vacio) {
-        if (itemsCotizacion.length === 0) vacio.classList.remove('d-none');
-        else vacio.classList.add('d-none');
+        if (hayItems) vacio.classList.add('d-none');
+        else vacio.classList.remove('d-none');
+    }
+
+    const tabla = document.querySelector('#contenedorTablaItemsCotizacion');
+    if (tabla) {
+        if (hayItems) tabla.classList.remove('d-none');
+        else tabla.classList.add('d-none');
     }
 
     itemsCotizacion.forEach((item, index) => {
@@ -2475,6 +2488,15 @@ function limpiarFormularioCotizacion() {
 // SECCION ORDENES DE TRABAJO
 // ============================================================
 function renderOrdenes() {
+    // Flush del autoguardado pendiente antes de salir de la vista
+    if (_autoguardadoConsumoPendiente) {
+        if (_autoguardadoConsumoTimer) {
+            clearTimeout(_autoguardadoConsumoTimer);
+            _autoguardadoConsumoTimer = null;
+        }
+        ejecutarAutoguardadoConsumo();
+    }
+
     contenedorReactivo.innerHTML = "";
     const clone = templateContenedorOrdenes.cloneNode(true);
     fragmento.appendChild(clone);
@@ -2579,6 +2601,8 @@ function limpiarDetalleOrden() {
 
     setTexto('#contadorEvidencias', '0');
     setTexto('#pillTotalConsumo', 'S/ 0.00');
+
+    setIndicadorAutoguardado('');
 }
 
 function listarOrdenes() {
@@ -2680,6 +2704,15 @@ async function cargarOrdenActual(idOrden) {
             subtotal: Number(it.subtotal)
         }));
 
+        // Sincronizar estado del autoguardado con la orden cargada
+        _ultimoPayloadConsumo = JSON.stringify(construirPayloadConsumo());
+        _autoguardadoConsumoPendiente = false;
+        if (_autoguardadoConsumoTimer) {
+            clearTimeout(_autoguardadoConsumoTimer);
+            _autoguardadoConsumoTimer = null;
+        }
+        setIndicadorAutoguardado('guardado');
+
         listarItemsOT();
         recalcularTotalesOT();
         pintarEvidenciasOT();
@@ -2733,9 +2766,6 @@ function aplicarReglasEstadoOrden(orden) {
         if (esEnProceso) formListas.classList.remove('d-none');
         else formListas.classList.add('d-none');
     }
-
-    const btnGuardarConsumo = document.querySelector('#btnGuardarConsumo');
-    if (btnGuardarConsumo) btnGuardarConsumo.disabled = !esEnProceso;
 
     const btnSubir = document.querySelector('#btnSubirEvidencias');
     if (btnSubir) btnSubir.disabled = !esEnProceso;
@@ -2882,9 +2912,10 @@ function listarItemsOT() {
         else tabla.classList.add('d-none');
     }
 
+    // Footer visible siempre que haya orden cargada (permite finalizar con consumo vacío)
     const footer = document.querySelector('#contenedorFooterConsumo');
     if (footer) {
-        if (hayItems) footer.classList.remove('d-none');
+        if (ordenActual) footer.classList.remove('d-none');
         else footer.classList.add('d-none');
     }
 
@@ -2928,6 +2959,117 @@ function recalcularTotalesOT() {
     const subtotal = itemsOT.reduce((acc, it) => acc + Number(it.subtotal || 0), 0);
     setTexto('#contenedorTotalConsumo', 'S/ ' + subtotal.toFixed(2));
     setTexto('#pillTotalConsumo', 'S/ ' + subtotal.toFixed(2));
+}
+
+// ============================================================
+// AUTOGUARDADO DE CONSUMO (debounce)
+// ============================================================
+function construirPayloadConsumo() {
+    return itemsOT.map(it => ({
+        id_producto: it.id_producto,
+        id_servicio: it.id_servicio,
+        cantidad: Number(it.cantidad),
+        precio_unitario: Number(it.precio_unitario),
+        subtotal: Number(it.subtotal),
+        observacion: null
+    }));
+}
+
+function setIndicadorAutoguardado(estado) {
+    const el = document.querySelector('#indicadorAutoguardadoConsumo');
+    if (!el) return;
+
+    switch (estado) {
+        case 'guardando':
+            el.textContent = 'Guardando…';
+            el.className = 'd-block text-muted text-center mt-1';
+            break;
+        case 'guardado':
+            el.textContent = 'Guardado ✓';
+            el.className = 'd-block text-success text-center mt-1';
+            break;
+        case 'pendiente':
+            el.textContent = 'Cambios sin guardar';
+            el.className = 'd-block text-warning text-center mt-1';
+            break;
+        case 'error':
+            el.textContent = 'No se pudo guardar';
+            el.className = 'd-block text-danger text-center mt-1';
+            break;
+        default:
+            el.textContent = '';
+            el.className = 'd-block text-muted text-center mt-1';
+    }
+}
+
+function programarAutoguardadoConsumo() {
+    if (!ordenActual || ordenActual.estado !== 'EN PROCESO') return;
+
+    _autoguardadoConsumoPendiente = true;
+    setIndicadorAutoguardado('pendiente');
+
+    if (_autoguardadoConsumoTimer) clearTimeout(_autoguardadoConsumoTimer);
+    _autoguardadoConsumoTimer = setTimeout(ejecutarAutoguardadoConsumo, 700);
+}
+
+async function ejecutarAutoguardadoConsumo() {
+    if (!_autoguardadoConsumoPendiente) return;
+    if (!ordenActual || ordenActual.estado !== 'EN PROCESO') {
+        _autoguardadoConsumoPendiente = false;
+        return;
+    }
+    if (_enviandoConsumo) return;
+
+    const itemsPayload = construirPayloadConsumo();
+    const serializado = JSON.stringify(itemsPayload);
+
+    if (serializado === _ultimoPayloadConsumo) {
+        _autoguardadoConsumoPendiente = false;
+        setIndicadorAutoguardado('guardado');
+        return;
+    }
+
+    _enviandoConsumo = true;
+    setIndicadorAutoguardado('guardando');
+
+    try {
+        const res = await axios.put(
+            '/api/ordenes/' + ordenActual.id_orden_trabajo + '/detalles',
+            { id_sucursal: ordenActual.id_sucursal, items: itemsPayload }
+        );
+
+        if (!res.data.ok) {
+            setIndicadorAutoguardado('error');
+            mostrarToast('error', 'No se pudo guardar', res.data.mensaje);
+            return;
+        }
+
+        _ultimoPayloadConsumo = serializado;
+        _autoguardadoConsumoPendiente = false;
+        setIndicadorAutoguardado('guardado');
+
+    } catch (error) {
+        console.error(error);
+        setIndicadorAutoguardado('error');
+        if (error.response) {
+            mostrarToast('error', 'No se pudo guardar', error.response.data.mensaje);
+        }
+    } finally {
+        _enviandoConsumo = false;
+        if (_autoguardadoConsumoPendiente) {
+            programarAutoguardadoConsumo();
+        }
+    }
+}
+
+async function flushAutoguardadoConsumo() {
+    if (_autoguardadoConsumoTimer) {
+        clearTimeout(_autoguardadoConsumoTimer);
+        _autoguardadoConsumoTimer = null;
+    }
+    if (_autoguardadoConsumoPendiente) {
+        await ejecutarAutoguardadoConsumo();
+    }
 }
 
 function pintarEvidenciasOT() {
@@ -3094,6 +3236,9 @@ document.addEventListener('click', async function (event) {
     const idOrden = item.dataset.id;
     if (!idOrden) return;
 
+    // Flush del consumo pendiente antes de cambiar de orden
+    await flushAutoguardadoConsumo();
+
     document.querySelectorAll('.item-orden').forEach(b => b.classList.remove('active'));
     item.classList.add('active');
 
@@ -3118,6 +3263,7 @@ document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.cambiar-estado-orden');
     if (!boton) return;
     if (!ordenActual) return;
+    if (boton.disabled) return;
 
     const nuevoEstado = boton.dataset.estado;
     if (!nuevoEstado) return;
@@ -3134,8 +3280,21 @@ document.addEventListener('click', async function (event) {
         return;
     }
 
-    const confirmar = confirm(`¿Cambiar el estado de la orden a "${nuevoEstado}"?`);
+    const mensaje = nuevoEstado === 'FINALIZADA'
+        ? '¿Finalizar esta orden? Ya no podrá modificar el consumo.'
+        : `¿Cambiar el estado de la orden a "${nuevoEstado}"?`;
+    const confirmar = confirm(mensaje);
     if (!confirmar) return;
+
+    // Si vamos a finalizar, asegurar que el consumo esté persistido
+    if (nuevoEstado === 'FINALIZADA') {
+        await flushAutoguardadoConsumo();
+        if (_autoguardadoConsumoPendiente) {
+            mostrarToast('advertencia', 'Guardado pendiente',
+                'No se pudo guardar el consumo. Revisa y reintenta antes de finalizar.');
+            return;
+        }
+    }
 
     try {
         const res = await axios.patch('/api/ordenes/' + ordenActual.id_orden_trabajo + '/estado', {
@@ -3305,6 +3464,7 @@ document.addEventListener('click', function (event) {
 
     listarItemsOT();
     recalcularTotalesOT();
+    programarAutoguardadoConsumo();
 });
 
 document.addEventListener('click', function (event) {
@@ -3332,6 +3492,7 @@ document.addEventListener('click', function (event) {
 
     listarItemsOT();
     recalcularTotalesOT();
+    programarAutoguardadoConsumo();
 });
 
 document.addEventListener('click', function (event) {
@@ -3350,6 +3511,7 @@ document.addEventListener('click', function (event) {
 
     listarItemsOT();
     recalcularTotalesOT();
+    programarAutoguardadoConsumo();
 });
 
 document.addEventListener('click', function (event) {
@@ -3369,6 +3531,7 @@ document.addEventListener('click', function (event) {
 
     listarItemsOT();
     recalcularTotalesOT();
+    programarAutoguardadoConsumo();
 });
 
 document.addEventListener('change', function (event) {
@@ -3390,6 +3553,7 @@ document.addEventListener('change', function (event) {
 
     listarItemsOT();
     recalcularTotalesOT();
+    programarAutoguardadoConsumo();
 });
 
 document.addEventListener('click', function (event) {
@@ -3404,53 +3568,7 @@ document.addEventListener('click', function (event) {
 
     listarItemsOT();
     recalcularTotalesOT();
-});
-
-document.addEventListener('click', async function (event) {
-    const boton = event.target.closest('#btnGuardarConsumo');
-    if (!boton) return;
-    if (!ordenActual) return;
-
-    if (ordenActual.estado !== 'EN PROCESO') {
-        mostrarToast('advertencia', 'No permitido', 'Solo puede modificar el consumo cuando la orden está EN PROCESO');
-        return;
-    }
-
-    if (_enviandoConsumo) return;
-    _enviandoConsumo = true;
-
-    try {
-        const itemsPayload = itemsOT.map(it => ({
-            id_producto: it.id_producto,
-            id_servicio: it.id_servicio,
-            cantidad: Number(it.cantidad),
-            precio_unitario: Number(it.precio_unitario),
-            subtotal: Number(it.subtotal),
-            observacion: null
-        }));
-
-        const res = await axios.put('/api/ordenes/' + ordenActual.id_orden_trabajo + '/detalles', {
-            id_sucursal: ordenActual.id_sucursal,
-            items: itemsPayload
-        });
-
-        if (!res.data.ok) {
-            mostrarToast('error', 'Error', res.data.mensaje);
-            return;
-        }
-
-        mostrarToast('exito', 'Correcto', 'Consumo guardado correctamente');
-
-        await cargarOrdenActual(ordenActual.id_orden_trabajo);
-
-    } catch (error) {
-        console.error(error);
-        if (error.response) {
-            mostrarToast('error', 'Error', error.response.data.mensaje);
-        }
-    } finally {
-        _enviandoConsumo = false;
-    }
+    programarAutoguardadoConsumo();
 });
 
 document.addEventListener('click', function (event) {

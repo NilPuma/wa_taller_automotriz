@@ -35,6 +35,10 @@
   --sombra-md: 0 6px 18px color-mix(in srgb, var(--color3) 10%, transparent 90%);
   --sombra-lg: 0 15px 35px color-mix(in srgb, var(--color3) 18%, transparent 82%);
 
+  /* Sombra estilo AGL para cards */
+  --sombra-card: 0 4px 20px rgba(40, 68, 115, 0.06);
+  --sombra-card-hover: 0 8px 24px rgba(40, 68, 115, 0.10);
+
   --width: 250px;
   --padding: 10px;
   --width-collapsed: 50px;
@@ -826,40 +830,6 @@ a:hover {
   border-color: #284473;
 }
 
-/* Cabeceras de tablas — gris azulado original del mecánico */
-#tablaOrdenesPendientes thead th,
-#tablaHistorial thead th,
-#tablaCitas thead th,
-#tablaClientes thead th,
-#tablaItemsCotizacion thead th,
-#tablaItemsConsumo thead th {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #4B5A6E;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--borde-suave);
-  white-space: nowrap;
-  background: #E8EBF0;
-}
-
-#tablaOrdenesPendientes tbody td,
-#tablaHistorial tbody td,
-#tablaCitas tbody td,
-#tablaClientes tbody td,
-#tablaItemsCotizacion tbody td,
-#tablaItemsConsumo tbody td {
-  font-size: 0.82rem;
-  vertical-align: middle;
-}
-
-#tablaOrdenesPendientes tbody tr:hover,
-#tablaHistorial tbody tr:hover,
-#tablaCitas tbody tr:hover,
-#tablaClientes tbody tr:hover {
-  background: #E8EBF0;
-}
-
 .nav-pills .nav-link {
   font-size: 0.78rem;
   padding: 6px 12px;
@@ -879,28 +849,301 @@ a:hover {
 }
 
 /* ============================================================
-   8. DASHBOARD
+   7.1. SISTEMA ÚNICO DE TABLAS — .tabla-sistema (HÍBRIDO AGL)
    ============================================================ */
-#dashboard .panel-seccion {
-  transition: var(--transicion-larga);
-}
-
-#dashboard .panel-seccion:hover {
-  box-shadow: var(--sombra-md);
-  border-color: rgba(40, 68, 115, 0.35);
-  transform: translateY(-2px);
-}
-
-#dashboard .panel-seccion__body strong {
+.tabla-sistema {
+  width: 100%;
+  margin-bottom: 0;
+  font-size: 0.82rem;
   color: var(--texto-principal);
+  vertical-align: middle;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: transparent;
+}
+
+/* Cabecera — estilo AGL: sin uppercase, sin letter-spacing, sin border-bottom */
+.tabla-sistema thead th {
+  background: #E8EBF0;
+  color: #4B5A6E;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  padding: 11px 9px;
+  border: none;
+  text-align: left;
+  vertical-align: middle;
+}
+
+/* Cuerpo */
+.tabla-sistema tbody td {
+  padding: 11px 9px;
+  color: #40516b;
+  border: none;
+  border-bottom: 1px solid #EDF0F5;
+  vertical-align: middle;
+  background: transparent;
+}
+
+/* Hover de fila */
+.tabla-sistema tbody tr:hover {
+  background: #E8EBF0;
+}
+
+/* Última fila sin borde inferior */
+.tabla-sistema tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Utilidad: truncar texto */
+.tabla-sistema .texto-corto {
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Variante compacta (dashboards y tablas densas) */
+.tabla-sistema--compact {
+  font-size: 0.72rem;
+}
+.tabla-sistema--compact thead th,
+.tabla-sistema--compact tbody td {
+  padding: 8px 8px;
+}
+
+/* Variante centrada (listados del admin y del mecánico) */
+.tabla-sistema--center thead th,
+.tabla-sistema--center tbody td {
+  text-align: center;
+}
+.tabla-sistema--center thead th:first-child,
+.tabla-sistema--center tbody td:first-child {
+  text-align: left;
+}
+
+/* ============================================================
+   7.2. PANEL TABLA — Card estilo AGL con scroll interno
+   ============================================================ */
+.panel-tabla {
+  background: var(--color1);
+  border-radius: 14px;
+  box-shadow: var(--sombra-card);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  transition: box-shadow var(--transicion-media);
+}
+
+.panel-tabla:hover {
+  box-shadow: var(--sombra-card-hover);
+}
+
+.panel-tabla__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.panel-tabla__titulo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--texto-principal);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.panel-tabla__titulo i {
+  font-size: 1.05rem;
+  color: #284473;
+  flex-shrink: 0;
+}
+
+.panel-tabla__acciones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.panel-tabla__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-tabla__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #284473 transparent;
+}
+
+.panel-tabla__scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.panel-tabla__scroll::-webkit-scrollbar-thumb {
+  background: #284473;
+  border-radius: 6px;
+}
+
+.panel-tabla__scroll::-webkit-scrollbar-thumb:hover {
+  background: #131F33;
+}
+
+.panel-tabla__footer {
+  flex-shrink: 0;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--borde-suave);
+}
+
+/* Panel tabla compacto (para listas internas) */
+.panel-tabla--compact {
+  padding: 14px;
+  border-radius: 12px;
+}
+.panel-tabla--compact .panel-tabla__header {
+  margin-bottom: 10px;
+}
+.panel-tabla--compact .panel-tabla__titulo {
+  font-size: 0.85rem;
+}
+
+/* ============================================================
+   7.3. TARJETAS ESTADÍSTICAS — estilo AGL (colores neutros)
+   ============================================================ */
+.stat-card {
+  background: var(--color1);
+  border-radius: 14px;
+  padding: 20px 18px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: var(--sombra-card);
+  min-width: 0;
+  transition: transform var(--transicion-media), box-shadow var(--transicion-media);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-card-hover);
+}
+
+.stat-card__icono {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.4rem;
+}
+
+/* Colores neutros integrados al sistema (grises base + acento del color) */
+.stat-card--azul .stat-card__icono {
+  background: #E8EBF0;
+  color: #284473;
+}
+.stat-card--verde .stat-card__icono {
+  background: #E5F5E5;
+  color: #02A302;
+}
+.stat-card--naranja .stat-card__icono {
+  background: #F0F2F5;
+  color: #f99303;
+}
+.stat-card--rojo .stat-card__icono {
+  background: #F0F2F5;
+  color: #CC0000;
+}
+
+.stat-card__contenido {
+  min-width: 0;
+  flex: 1;
+}
+
+.stat-card__numero {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--texto-principal);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.stat-card__label {
+  font-size: 0.8rem;
+  color: #425775;
+  margin: 3px 0 4px;
+}
+
+.stat-card__sub {
+  font-size: 0.7rem;
+  color: #7b899d;
+  display: block;
+}
+
+/* ============================================================
+   8. DASHBOARD — solo stats + tabla (sin acciones rápidas)
+   ============================================================ */
+#dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Grid de estadísticas */
+#dashboard .dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+}
+
+/* Panel tabla del dashboard */
+#dashboard .panel-tabla {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 #dashboard #tablaOrdenesPendientes {
-  background: var(--color1);
+  background: transparent;
 }
 
-#dashboard #tablaOrdenesPendientes tbody tr:hover {
-  background: #E8EBF0;
+/* Responsive */
+@media (max-width: 1250px) {
+  #dashboard .dashboard-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  #dashboard .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ============================================================
@@ -1022,10 +1265,7 @@ a:hover {
 
 /* ============================================================
    9.1. BOTONES COMPACTOS — LISTAS DE SERVICIOS/PRODUCTOS
-   (Órdenes y Cotizaciones)
    ============================================================ */
-
-/* Lista de servicios/productos disponibles */
 .item-disponible-servicio,
 .item-disponible-producto {
   padding: 6px 8px !important;
@@ -1052,7 +1292,6 @@ a:hover {
   line-height: 1.1;
 }
 
-/* Botón "+" compacto y estético */
 .btn-agregar-servicio-lista,
 .btn-agregar-producto-lista,
 .btn-agregar-servicio-ot,
@@ -1104,20 +1343,7 @@ a:hover {
    10. AGENDA
    ============================================================ */
 #agenda .agenda-tabla {
-  background: var(--color1);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-#agenda .agenda-tabla thead th {
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #4B5A6E;
-  padding: 10px 8px;
-  white-space: nowrap;
-  background: #E8EBF0;
+  background: transparent;
 }
 
 #agenda .agenda-tabla .col-hora {
@@ -1136,17 +1362,6 @@ a:hover {
   transform: scale(1.1);
 }
 
-#agenda .agenda-tabla tbody td {
-  padding: 8px;
-  font-size: 0.78rem;
-  vertical-align: middle;
-  transition: var(--transicion-media);
-}
-
-#agenda .agenda-tabla tbody tr:hover td {
-  background: #F0F2F5;
-}
-
 #agenda .agenda-tabla .hora-agenda {
   background: #F0F2F5;
   font-weight: 600;
@@ -1159,9 +1374,7 @@ a:hover {
 /* ============================================================
    11. HISTORIAL
    ============================================================ */
-#historial #tablaHistorial tbody tr:hover {
-  background: #E8EBF0;
-}
+/* Los estilos de tabla se heredan de .tabla-sistema */
 
 /* ============================================================
    12. COTIZACIONES
@@ -1533,10 +1746,8 @@ a:hover {
 .w-80 { width: 80px; }
 
 /* ============================================================
-   19. SECCIÓN MECÁNICO — SISTEMA .input-style Y BOTONES EXTRA
-   (cada selector es explícito, sin cascada)
+   19. SECCIÓN MECÁNICO — SISTEMA .input-style (MÁS ALTO)
    ============================================================ */
-
 .input-style {
   position: relative;
   width: 100%;
@@ -1544,7 +1755,7 @@ a:hover {
 
 .input-style input {
   width: 100%;
-  height: 40px;
+  height: 44px;                        /* antes 40px */
   font-family: "Roboto", sans-serif;
   font-size: 0.82rem;
   font-weight: 500;
@@ -1552,7 +1763,7 @@ a:hover {
   background: #F0F2F5;
   border: 1.5px solid #284473;
   border-radius: 8px;
-  padding: 16px 12px 4px 12px;
+  padding: 18px 12px 4px 12px;         /* antes 16px top */
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   display: block;
@@ -1560,8 +1771,8 @@ a:hover {
 
 .input-style textarea {
   width: 100%;
-  height: 80px;
-  min-height: 80px;
+  height: 86px;                        /* antes 80px */
+  min-height: 86px;
   font-family: "Roboto", sans-serif;
   font-size: 0.82rem;
   font-weight: 500;
@@ -1569,7 +1780,7 @@ a:hover {
   background: #F0F2F5;
   border: 1.5px solid #284473;
   border-radius: 8px;
-  padding: 20px 12px 4px 12px;
+  padding: 22px 12px 4px 12px;         /* antes 20px top */
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   display: block;
@@ -1579,7 +1790,7 @@ a:hover {
 
 .input-style select {
   width: 100%;
-  height: 40px;
+  height: 44px;                        /* antes 40px */
   font-family: "Roboto", sans-serif;
   font-size: 0.82rem;
   font-weight: 500;
@@ -1587,7 +1798,7 @@ a:hover {
   background: #F0F2F5;
   border: 1.5px solid #284473;
   border-radius: 8px;
-  padding: 16px 30px 4px 12px;
+  padding: 18px 30px 4px 12px;         /* antes 16px top */
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
   display: block;
@@ -1662,33 +1873,37 @@ a:hover {
   transition: opacity 0.2s ease;
 }
 
+/* Textarea: label arriba fijo */
 .input-style textarea ~ label {
-  top: 13px;
+  top: 15px;                           /* antes 13px */
   transform: none;
   transform-origin: left center;
 }
 
+/* Select: label flotante siempre */
 .input-style select ~ label {
   top: 50%;
-  transform: translateY(-50%) translateY(-8px) scale(0.75);
+  transform: translateY(-50%) translateY(-10px) scale(0.75);  /* antes -8px */
   color: #142dbb;
   font-weight: 500;
 }
 
+/* Inputs: label flotante al focus o con contenido */
 .input-style input:focus ~ label {
-  transform: translateY(-50%) translateY(-8px) scale(0.75);
+  transform: translateY(-50%) translateY(-10px) scale(0.75);
   color: #142dbb;
   font-weight: 500;
 }
 
 .input-style input:not(:placeholder-shown) ~ label {
-  transform: translateY(-50%) translateY(-8px) scale(0.75);
+  transform: translateY(-50%) translateY(-10px) scale(0.75);
   color: #142dbb;
   font-weight: 500;
 }
 
+/* Textarea: label flotante arriba */
 .input-style textarea:focus ~ label {
-  top: 13px;
+  top: 15px;
   transform: scale(0.75);
   transform-origin: left center;
   color: #142dbb;
@@ -1696,38 +1911,19 @@ a:hover {
 }
 
 .input-style textarea:not(:placeholder-shown) ~ label {
-  top: 13px;
+  top: 15px;
   transform: scale(0.75);
   transform-origin: left center;
   color: #142dbb;
   font-weight: 500;
 }
 
-.input-style input:focus ~ label i {
-  opacity: 1;
-  color: #142dbb;
-}
-
-.input-style input:not(:placeholder-shown) ~ label i {
-  opacity: 1;
-  color: #142dbb;
-}
-
-.input-style textarea:focus ~ label i {
-  opacity: 1;
-  color: #142dbb;
-}
-
-.input-style textarea:not(:placeholder-shown) ~ label i {
-  opacity: 1;
-  color: #142dbb;
-}
-
-.input-style select:focus ~ label i {
-  opacity: 1;
-  color: #142dbb;
-}
-
+/* Iconos activos */
+.input-style input:focus ~ label i,
+.input-style input:not(:placeholder-shown) ~ label i,
+.input-style textarea:focus ~ label i,
+.input-style textarea:not(:placeholder-shown) ~ label i,
+.input-style select:focus ~ label i,
 .input-style select ~ label i {
   opacity: 1;
   color: #142dbb;
@@ -1776,6 +1972,7 @@ a:hover {
   display: block;
 }
 
+/* Responsive: mantenemos altos nuevos */
 @media screen and (max-width: 480px) {
   .input-style label {
     font-size: 0.78rem;
@@ -1787,8 +1984,8 @@ a:hover {
 
   .input-style textarea {
     font-size: 0.78rem;
-    height: 90px;
-    min-height: 90px;
+    height: 96px;
+    min-height: 96px;
   }
 
   .input-style select {
