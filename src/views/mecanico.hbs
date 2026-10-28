@@ -119,7 +119,7 @@
                 </div>
 
                 {{!-- ESTADÍSTICAS estilo AGL --}}
-                <div class="dashboard-stats mb-4">
+                <div class="dashboard-stats">
                     <div class="stat-card stat-card--azul">
                         <div class="stat-card__icono">
                             <i class="bi bi-clipboard-check"></i>
@@ -225,8 +225,7 @@
                                    placeholder="Buscar por orden, placa o cliente...">
                         </div>
 
-                        <button type="button" class="btn btn-primario btn-sm" id="btnAbrirModalOrden"
-                                data-bs-toggle="modal" data-bs-target="#modalNuevaOrden">
+                        <button type="button" class="btn btn-primario btn-sm" id="btnAbrirModalOrden">
                             <i class="bi bi-plus-circle"></i> Nueva orden
                         </button>
                     </div>
@@ -294,7 +293,7 @@
                                 <h5 class="panel-tabla__titulo">
                                     <i class="bi bi-info-circle"></i> Detalle de Orden
                                 </h5>
-                                <div class="panel-tabla__acciones" id="contenedorAccionesOrden" class="d-none">
+                                <div class="panel-tabla__acciones d-none" id="contenedorAccionesOrden">
                                     <button type="button" class="btn btn-sm btn-primario cambiar-estado-orden d-none" data-estado="EN PROCESO" title="Iniciar trabajo">
                                         <i class="bi bi-play-fill"></i> Iniciar
                                     </button>
@@ -514,7 +513,7 @@
                     </div>
                 </div>
 
-                <div class="panel-tabla">
+                <div class="panel-tabla vista-row-altura">
                     <div class="panel-tabla__header">
                         <h5 class="panel-tabla__titulo">
                             <i class="bi bi-calendar-week"></i>
@@ -738,77 +737,79 @@
                                     </h6>
                                 </div>
                                 <div class="panel-tabla__body">
-                                    <div class="row g-3">
-                                        <div class="col-md-5">
-                                            <div class="input-style">
-                                                <input type="text" class="form-control text-uppercase" id="inputPlacaCotizacion" placeholder=" ">
-                                                <label for="inputPlacaCotizacion"><i class="bi bi-car-front"></i> Placa del Vehículo</label>
-                                            </div>
-                                            <button class="btn btn-primario btn-sm w-100 mt-2" type="button" id="btnBuscarPlaca" title="Buscar vehículo">
-                                                <i class="bi bi-search"></i> Buscar vehículo
-                                            </button>
-
-                                            <div id="contenedorInfoClienteCotizacion" class="small d-none mt-3">
-                                                <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-person"></i> CLIENTE</h6>
-                                                <div class="row g-2">
-                                                    <div class="col-12">
-                                                        <span class="text-muted d-block small">NOMBRE</span>
-                                                        <strong id="clienteNombre">--</strong>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <span class="text-muted d-block small">TELÉFONO</span>
-                                                        <span id="clienteTelefono">--</span>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <span class="text-muted d-block small">EMAIL</span>
-                                                        <span id="clienteEmail" class="text-primary">--</span>
-                                                    </div>
+                                    <div class="panel-tabla__scroll">
+                                        <div class="row g-3">
+                                            <div class="col-md-5">
+                                                <div class="input-style">
+                                                    <input type="text" class="form-control text-uppercase" id="inputPlacaCotizacion" placeholder=" ">
+                                                    <label for="inputPlacaCotizacion"><i class="bi bi-car-front"></i> Placa del Vehículo</label>
                                                 </div>
-                                            </div>
-                                        </div>
+                                                <button class="btn btn-primario btn-sm w-100 mt-2" type="button" id="btnBuscarPlaca" title="Buscar vehículo">
+                                                    <i class="bi bi-search"></i> Buscar vehículo
+                                                </button>
 
-                                        <div class="col-md-7">
-                                            <div id="contenedorInfoVehiculoCotizacion" class="small d-none">
-                                                <h6 class="fw-bold small text-success mb-2"><i class="bi bi-car-front"></i> VEHÍCULO</h6>
-                                                <div class="row g-2">
-                                                    <div class="col-6 col-md-4">
-                                                        <span class="text-muted d-block small">PLACA</span>
-                                                        <strong id="vehiculoPlaca" class="text-uppercase">--</strong>
-                                                    </div>
-                                                    <div class="col-6 col-md-8">
-                                                        <span class="text-muted d-block small">MARCA / MODELO</span>
-                                                        <span id="vehiculoMarcaModelo">--</span>
-                                                    </div>
-                                                    <div class="col-6 col-md-3">
-                                                        <span class="text-muted d-block small">AÑO</span>
-                                                        <span id="vehiculoAnio">--</span>
-                                                    </div>
-                                                    <div class="col-6 col-md-3">
-                                                        <span class="text-muted d-block small">COLOR</span>
-                                                        <span id="vehiculoColor">--</span>
-                                                    </div>
-                                                    <div class="col-12 col-md-6">
-                                                        <span class="text-muted d-block small">VIN</span>
-                                                        <span id="vehiculoVin">--</span>
-                                                    </div>
-                                                    <div class="col-12 col-md-6">
-                                                        <span class="text-muted d-block small">N° MOTOR</span>
-                                                        <span id="vehiculoMotor">--</span>
-                                                    </div>
-                                                    <div class="col-12 col-md-6">
-                                                        <span class="text-muted d-block small">N° CHASIS</span>
-                                                        <span id="vehiculoChasis">--</span>
-                                                    </div>
-                                                    <div class="col-12">
-                                                        <span class="text-muted d-block small">OBSERVACIONES</span>
-                                                        <span id="vehiculoObservaciones">--</span>
+                                                <div id="contenedorInfoClienteCotizacion" class="small d-none mt-3">
+                                                    <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-person"></i> CLIENTE</h6>
+                                                    <div class="row g-2">
+                                                        <div class="col-12">
+                                                            <span class="text-muted d-block small">NOMBRE</span>
+                                                            <strong id="clienteNombre">--</strong>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <span class="text-muted d-block small">TELÉFONO</span>
+                                                            <span id="clienteTelefono">--</span>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <span class="text-muted d-block small">EMAIL</span>
+                                                            <span id="clienteEmail" class="text-primary">--</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div id="contenedorVacioCliente" class="text-center text-muted py-2">
-                                                <i class="bi bi-search fs-4 d-block mb-1"></i>
-                                                <small>Busque una placa o seleccione una cotización</small>
+                                            <div class="col-md-7">
+                                                <div id="contenedorInfoVehiculoCotizacion" class="small d-none">
+                                                    <h6 class="fw-bold small text-success mb-2"><i class="bi bi-car-front"></i> VEHÍCULO</h6>
+                                                    <div class="row g-2">
+                                                        <div class="col-6 col-md-4">
+                                                            <span class="text-muted d-block small">PLACA</span>
+                                                            <strong id="vehiculoPlaca" class="text-uppercase">--</strong>
+                                                        </div>
+                                                        <div class="col-6 col-md-8">
+                                                            <span class="text-muted d-block small">MARCA / MODELO</span>
+                                                            <span id="vehiculoMarcaModelo">--</span>
+                                                        </div>
+                                                        <div class="col-6 col-md-3">
+                                                            <span class="text-muted d-block small">AÑO</span>
+                                                            <span id="vehiculoAnio">--</span>
+                                                        </div>
+                                                        <div class="col-6 col-md-3">
+                                                            <span class="text-muted d-block small">COLOR</span>
+                                                            <span id="vehiculoColor">--</span>
+                                                        </div>
+                                                        <div class="col-12 col-md-6">
+                                                            <span class="text-muted d-block small">VIN</span>
+                                                            <span id="vehiculoVin">--</span>
+                                                        </div>
+                                                        <div class="col-12 col-md-6">
+                                                            <span class="text-muted d-block small">N° MOTOR</span>
+                                                            <span id="vehiculoMotor">--</span>
+                                                        </div>
+                                                        <div class="col-12 col-md-6">
+                                                            <span class="text-muted d-block small">N° CHASIS</span>
+                                                            <span id="vehiculoChasis">--</span>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <span class="text-muted d-block small">OBSERVACIONES</span>
+                                                            <span id="vehiculoObservaciones">--</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div id="contenedorVacioCliente" class="text-center text-muted py-2">
+                                                    <i class="bi bi-search fs-4 d-block mb-1"></i>
+                                                    <small>Busque una placa o seleccione una cotización</small>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

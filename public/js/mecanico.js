@@ -1323,7 +1323,7 @@ function listarCitas(filtradas) {
         badge.textContent = cita.estado;
         badge.className = 'estado-cita badge ' + claseBadgeEstado(cita.estado);
 
-        const btnVer      = clone.querySelector('.btn-ver-cita');
+ const btnVer      = clone.querySelector('.btn-ver-cita');
         const btnTomar    = clone.querySelector('.btn-tomar-cita');
         const btnCancelar = clone.querySelector('.btn-cancelar-cita');
         const btnEliminar = clone.querySelector('.btn-eliminar-cita');
@@ -1335,31 +1335,32 @@ function listarCitas(filtradas) {
 
         const estado = cita.estado || '';
 
+        // 1) Ver: siempre visible (único botón que NUNCA se oculta)
+        btnVer.classList.remove('d-none');
         btnVer.disabled = false;
-        btnVer.classList.remove('disabled');
 
+        // 2) Tomar: solo si PENDIENTE y sin orden asociada
         if (estado === 'PENDIENTE' && !tieneOrden) {
+            btnTomar.classList.remove('d-none');
             btnTomar.disabled = false;
-            btnTomar.classList.remove('disabled');
         } else {
-            btnTomar.disabled = true;
-            btnTomar.classList.add('disabled');
+            btnTomar.classList.add('d-none');
         }
 
+        // 3) Cancelar: solo si PENDIENTE o CONFIRMADA y sin orden asociada
         if ((estado === 'PENDIENTE' || estado === 'CONFIRMADA') && !tieneOrden) {
+            btnCancelar.classList.remove('d-none');
             btnCancelar.disabled = false;
-            btnCancelar.classList.remove('disabled');
         } else {
-            btnCancelar.disabled = true;
-            btnCancelar.classList.add('disabled');
+            btnCancelar.classList.add('d-none');
         }
 
+        // 4) Eliminar: solo si NO ATENDIDA y sin orden asociada
         if (estado !== 'ATENDIDA' && !tieneOrden) {
+            btnEliminar.classList.remove('d-none');
             btnEliminar.disabled = false;
-            btnEliminar.classList.remove('disabled');
         } else {
-            btnEliminar.disabled = true;
-            btnEliminar.classList.add('disabled');
+            btnEliminar.classList.add('d-none');
         }
 
         contenedorTablaCitas.appendChild(clone);
