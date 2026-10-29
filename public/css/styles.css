@@ -174,39 +174,44 @@ a:hover {
 }
 
 /* ============================================================
-   4. BOTONES — COLORES ORIGINALES DEL MECÁNICO
+   4. BOTONES
    ============================================================ */
-.btn {
+
+/* ------------------------------------------------------------
+   4.1. BOTÓN PRIMARIO
+   ------------------------------------------------------------ */
+.btn-primario {
+  /* Layout */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+
+  /* Tipografía */
   font-family: "Roboto", sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
   letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+
+  /* Caja */
   padding: 12px 28px;
   border-radius: 6px;
-  cursor: pointer;
-  transition: var(--transicion-media);
-  border: 1px solid transparent;
-  background: transparent;
-  text-decoration: none;
-  white-space: nowrap;
-  line-height: 1;
-}
+  border: 1px solid #284473;
 
-.btn:hover  { transform: translateY(-1px); }
-.btn:active { transform: translateY(0); }
-
-/* --- Primario (azul explícito del mecánico) --- */
-.btn-primario {
+  /* Colores */
   background: #284473;
   color: #FFFFFF;
-  border-color: #284473;
+
+  /* Comportamiento */
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-primario:hover {
+  transform: translateY(-1px);
   background: #131F33;
   border-color: #131F33;
   color: #FFFFFF;
@@ -214,25 +219,54 @@ a:hover {
 }
 
 .btn-primario:active {
+  transform: translateY(0);
   box-shadow: 0 2px 8px rgba(40, 68, 115, 0.4);
 }
 
-/* --- Cancelar --- */
+/* ------------------------------------------------------------
+   4.2. BOTÓN CANCELAR
+   ------------------------------------------------------------ */
 .btn-cancelar {
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  /* Tipografía */
+  font-family: "Roboto", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+
+  /* Caja */
+  padding: 12px 28px;
+  border-radius: 6px;
+  border: 1px solid #CC0000;
+
+  /* Colores (rojo outline) */
   background: transparent;
-  color: #131F33;
-  border-color: #131F33;
+  color: #CC0000;
+
+  /* Comportamiento */
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-cancelar:hover {
-  background: #131F33;
+  transform: translateY(-1px);
+  background: #CC0000;
+  border-color: #CC0000;
   color: #FFFFFF;
-  border-color: #131F33;
-  box-shadow: 0 4px 12px rgba(19, 31, 51, 0.4);
+  box-shadow: 0 4px 12px rgba(204, 0, 0, 0.4);
 }
 
 .btn-cancelar:active {
-  box-shadow: 0 2px 6px rgba(19, 31, 51, 0.4);
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(204, 0, 0, 0.4);
 }
 
 /* ============================================================
@@ -849,7 +883,7 @@ a:hover {
   background: transparent;
 }
 
-/* Cabecera — estilo AGL: sin uppercase, sin letter-spacing, sin border-bottom */
+/* Cabecera */
 .tabla-sistema thead th {
   background: #E8EBF0;
   color: #4B5A6E;
@@ -1479,6 +1513,48 @@ a:hover {
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+/* ============================================================
+   12.1. DATOS DE COTIZACIÓN
+   ============================================================ */
+/* Etiquetas (NOMBRE, TELÉFONO, PLACA, MARCA/MODELO, AÑO, VIN, …) */
+#cotizaciones #contenedorInfoClienteCotizacion .small.text-muted {
+  font-size: 0.66rem !important;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  margin-bottom: 1px;
+}
+
+/* Valores (nombre, teléfono, placa, marca, año, vin, motor, chasis, obs.) */
+#cotizaciones #contenedorInfoClienteCotizacion strong,
+#cotizaciones #contenedorInfoClienteCotizacion span:not(.small) {
+  font-size: 0.74rem !important;
+  line-height: 1.2;
+}
+
+/* Subtítulos de bloque "CLIENTE" y "VEHÍCULO" */
+#cotizaciones #contenedorInfoClienteCotizacion > div > h6,
+#cotizaciones #contenedorInfoVehiculoCotizacion > h6 {
+  font-size: 0.7rem !important;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px !important;
+}
+
+/* Reducir el espaciado vertical de las filas del grid */
+#cotizaciones #contenedorInfoClienteCotizacion .row.g-2 {
+  --bs-gutter-y: 0.4rem;
+}
+
+/* Ajustar el texto del estado vacío para que no se vea "grande" */
+#cotizaciones #contenedorVacioCliente small {
+  font-size: 0.72rem !important;
+  line-height: 1.3;
+}
+
+/* Separar un poco más el <hr> respecto al bloque cliente/vehículo */
+#cotizaciones #contenedorInfoClienteCotizacion {
+  padding-top: 2px;
 }
 
 /* ============================================================

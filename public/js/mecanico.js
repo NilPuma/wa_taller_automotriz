@@ -1323,7 +1323,7 @@ function listarCitas(filtradas) {
         badge.textContent = cita.estado;
         badge.className = 'estado-cita badge ' + claseBadgeEstado(cita.estado);
 
- const btnVer      = clone.querySelector('.btn-ver-cita');
+        const btnVer      = clone.querySelector('.btn-ver-cita');
         const btnTomar    = clone.querySelector('.btn-tomar-cita');
         const btnCancelar = clone.querySelector('.btn-cancelar-cita');
         const btnEliminar = clone.querySelector('.btn-eliminar-cita');
@@ -1889,19 +1889,35 @@ function poblarListasDisponiblesCotizacion() {
 function poblarListaServiciosDisponibles() {
     let contenedor = document.querySelector('#listaServiciosDisponibles');
     if (!contenedor) return;
-    const templateServicio = document.querySelector('#templateItemServicioDisponible').content;
-    contenedor.innerHTML = "";
 
-    const q = busquedaServicioCotizacion.toLowerCase();
-    const servicios = q
-        ? listadoGeneralServicios.filter(s => (s.nombre || '').toLowerCase().includes(q))
-        : listadoGeneralServicios;
-
+    const wrap = document.querySelector('#contenedorResultadosServiciosCotizacion');
     const vacio = document.querySelector('#contenedorVacioServiciosDisponibles');
-    if (vacio) {
-        if (servicios.length === 0) vacio.classList.remove('d-none');
-        else vacio.classList.add('d-none');
+    if (!wrap || !vacio) return;
+
+    const q = busquedaServicioCotizacion.toLowerCase().trim();
+
+    // Sin búsqueda → ocultar todo
+    if (!q) {
+        wrap.classList.add('d-none');
+        contenedor.innerHTML = '';
+        vacio.classList.add('d-none');
+        return;
     }
+
+    // Con búsqueda → mostrar contenedor y pintar coincidencias
+    wrap.classList.remove('d-none');
+    contenedor.innerHTML = '';
+
+    const templateServicio = document.querySelector('#templateItemServicioDisponible').content;
+    const servicios = listadoGeneralServicios.filter(s =>
+        (s.nombre || '').toLowerCase().includes(q)
+    );
+
+    if (servicios.length === 0) {
+        vacio.classList.remove('d-none');
+        return;
+    }
+    vacio.classList.add('d-none');
 
     servicios.forEach(serv => {
         const precio = Number(serv.precio_regular || serv.precio_base || 0);
@@ -1918,23 +1934,35 @@ function poblarListaServiciosDisponibles() {
 function poblarListaProductosDisponibles() {
     let contenedor = document.querySelector('#listaProductosDisponibles');
     if (!contenedor) return;
-    const templateProducto = document.querySelector('#templateItemProductoDisponible').content;
-    contenedor.innerHTML = "";
 
-    const q = busquedaProductoCotizacion.toLowerCase();
-    const productos = q
-        ? listadoGeneralProductos.filter(p =>
-            (p.nombre || '').toLowerCase().includes(q) ||
-            (p.marca || '').toLowerCase().includes(q) ||
-            (p.codigo || '').toLowerCase().includes(q)
-        )
-        : listadoGeneralProductos;
-
+    const wrap = document.querySelector('#contenedorResultadosProductosCotizacion');
     const vacio = document.querySelector('#contenedorVacioProductosDisponibles');
-    if (vacio) {
-        if (productos.length === 0) vacio.classList.remove('d-none');
-        else vacio.classList.add('d-none');
+    if (!wrap || !vacio) return;
+
+    const q = busquedaProductoCotizacion.toLowerCase().trim();
+
+    if (!q) {
+        wrap.classList.add('d-none');
+        contenedor.innerHTML = '';
+        vacio.classList.add('d-none');
+        return;
     }
+
+    wrap.classList.remove('d-none');
+    contenedor.innerHTML = '';
+
+    const templateProducto = document.querySelector('#templateItemProductoDisponible').content;
+    const productos = listadoGeneralProductos.filter(p =>
+        (p.nombre || '').toLowerCase().includes(q) ||
+        (p.marca || '').toLowerCase().includes(q) ||
+        (p.codigo || '').toLowerCase().includes(q)
+    );
+
+    if (productos.length === 0) {
+        vacio.classList.remove('d-none');
+        return;
+    }
+    vacio.classList.add('d-none');
 
     productos.forEach(prod => {
         const precio = Number(prod.precio_venta || 0);
@@ -2024,18 +2052,32 @@ document.addEventListener('click', function (event) {
 
     const precio = Number(servicio.precio_regular || servicio.precio_base || 0);
 
-    itemsCotizacion.push({
-        id_producto: null,
-        id_servicio: Number(idServicio),
-        tipo: 'SERVICIO',
-        descripcion: servicio.nombre,
-        cantidad: 1,
-        precio_unitario: precio,
-        subtotal: precio
-    });
+    // Si ya existe el servicio en la lista → solo incrementar cantidad
+    const existente = itemsCotizacion.find(it => it.id_servicio == idServicio);
+
+    if (existente) {
+        existente.cantidad = Number(existente.cantidad) + 1;
+        existente.subtotal = Number(existente.precio_unitario) * existente.cantidad;
+    } else {
+        itemsCotizacion.push({
+            id_producto: null,
+            id_servicio: Number(idServicio),
+            tipo: 'SERVICIO',
+            descripcion: servicio.nombre,
+            cantidad: 1,
+            precio_unitario: precio,
+            subtotal: precio
+        });
+    }
 
     listarItemsCotizacion();
     recalcularTotalesCotizacion();
+
+    // Reset búsqueda servicios
+    busquedaServicioCotizacion = '';
+    const inp = document.querySelector('#inputBuscarServicioCotizacion');
+    if (inp) inp.value = '';
+    poblarListaServiciosDisponibles();
 });
 
 document.addEventListener('click', function (event) {
@@ -2050,18 +2092,32 @@ document.addEventListener('click', function (event) {
 
     const precio = Number(producto.precio_venta || 0);
 
-    itemsCotizacion.push({
-        id_producto: Number(idProducto),
-        id_servicio: null,
-        tipo: 'PRODUCTO',
-        descripcion: producto.nombre,
-        cantidad: 1,
-        precio_unitario: precio,
-        subtotal: precio
-    });
+    // Si ya existe el producto en la lista → solo incrementar cantidad
+    const existente = itemsCotizacion.find(it => it.id_producto == idProducto);
+
+    if (existente) {
+        existente.cantidad = Number(existente.cantidad) + 1;
+        existente.subtotal = Number(existente.precio_unitario) * existente.cantidad;
+    } else {
+        itemsCotizacion.push({
+            id_producto: Number(idProducto),
+            id_servicio: null,
+            tipo: 'PRODUCTO',
+            descripcion: producto.nombre,
+            cantidad: 1,
+            precio_unitario: precio,
+            subtotal: precio
+        });
+    }
 
     listarItemsCotizacion();
     recalcularTotalesCotizacion();
+
+    // Reset búsqueda productos
+    busquedaProductoCotizacion = '';
+    const inp = document.querySelector('#inputBuscarProductoCotizacion');
+    if (inp) inp.value = '';
+    poblarListaProductosDisponibles();
 });
 
 document.addEventListener('click', function (event) {
@@ -2413,14 +2469,12 @@ function mostrarInfoClienteCotizacion(persona, vehiculo) {
 
     document.querySelector('#clienteNombre').textContent =
         `${persona.nombres || ''} ${persona.apellidos || ''}`.trim() || '—';
-    document.querySelector('#clienteEmail').textContent = persona.correo || '—';
     document.querySelector('#clienteTelefono').textContent = persona.telefono || '—';
 
     document.querySelector('#vehiculoPlaca').textContent = vehiculo.placa || '—';
     document.querySelector('#vehiculoMarcaModelo').textContent =
         `${vehiculo.marca || ''} ${vehiculo.modelo || ''}`.trim() || '—';
     document.querySelector('#vehiculoAnio').textContent = vehiculo.anio || '—';
-    document.querySelector('#vehiculoColor').textContent = vehiculo.color || '—';
     document.querySelector('#vehiculoVin').textContent = vehiculo.vin || '—';
     document.querySelector('#vehiculoMotor').textContent = vehiculo.numero_motor || '—';
     document.querySelector('#vehiculoChasis').textContent = vehiculo.numero_chasis || '—';
@@ -2438,13 +2492,11 @@ function limpiarInfoClienteCotizacion() {
     vacio.classList.remove('d-none');
 
     document.querySelector('#clienteNombre').textContent = '--';
-    document.querySelector('#clienteEmail').textContent = '--';
     document.querySelector('#clienteTelefono').textContent = '--';
 
     document.querySelector('#vehiculoPlaca').textContent = '--';
     document.querySelector('#vehiculoMarcaModelo').textContent = '--';
     document.querySelector('#vehiculoAnio').textContent = '--';
-    document.querySelector('#vehiculoColor').textContent = '--';
     document.querySelector('#vehiculoVin').textContent = '--';
     document.querySelector('#vehiculoMotor').textContent = '--';
     document.querySelector('#vehiculoChasis').textContent = '--';
@@ -2826,19 +2878,33 @@ function poblarListasOT() {
 function poblarListaServiciosOT() {
     let contenedor = document.querySelector('#listaServiciosOT');
     if (!contenedor) return;
-    const templateServicio = document.querySelector('#templateItemServicioDisponible').content;
-    contenedor.innerHTML = "";
 
-    const q = busquedaServicioOT.toLowerCase();
-    const servicios = q
-        ? listadoGeneralServicios.filter(s => (s.nombre || '').toLowerCase().includes(q))
-        : listadoGeneralServicios;
-
+    const wrap = document.querySelector('#contenedorResultadosServiciosOT');
     const vacio = document.querySelector('#contenedorVacioServiciosOT');
-    if (vacio) {
-        if (servicios.length === 0) vacio.classList.remove('d-none');
-        else vacio.classList.add('d-none');
+    if (!wrap || !vacio) return;
+
+    const q = busquedaServicioOT.toLowerCase().trim();
+
+    if (!q) {
+        wrap.classList.add('d-none');
+        contenedor.innerHTML = '';
+        vacio.classList.add('d-none');
+        return;
     }
+
+    wrap.classList.remove('d-none');
+    contenedor.innerHTML = '';
+
+    const templateServicio = document.querySelector('#templateItemServicioDisponible').content;
+    const servicios = listadoGeneralServicios.filter(s =>
+        (s.nombre || '').toLowerCase().includes(q)
+    );
+
+    if (servicios.length === 0) {
+        vacio.classList.remove('d-none');
+        return;
+    }
+    vacio.classList.add('d-none');
 
     servicios.forEach(serv => {
         const precio = Number(serv.precio_regular || serv.precio_base || 0);
@@ -2859,23 +2925,35 @@ function poblarListaServiciosOT() {
 function poblarListaProductosOT() {
     let contenedor = document.querySelector('#listaProductosOT');
     if (!contenedor) return;
-    const templateProducto = document.querySelector('#templateItemProductoDisponible').content;
-    contenedor.innerHTML = "";
 
-    const q = busquedaProductoOT.toLowerCase();
-    const productos = q
-        ? listadoGeneralProductos.filter(p =>
-            (p.nombre || '').toLowerCase().includes(q) ||
-            (p.marca || '').toLowerCase().includes(q) ||
-            (p.codigo || '').toLowerCase().includes(q)
-        )
-        : listadoGeneralProductos;
-
+    const wrap = document.querySelector('#contenedorResultadosProductosOT');
     const vacio = document.querySelector('#contenedorVacioProductosOT');
-    if (vacio) {
-        if (productos.length === 0) vacio.classList.remove('d-none');
-        else vacio.classList.add('d-none');
+    if (!wrap || !vacio) return;
+
+    const q = busquedaProductoOT.toLowerCase().trim();
+
+    if (!q) {
+        wrap.classList.add('d-none');
+        contenedor.innerHTML = '';
+        vacio.classList.add('d-none');
+        return;
     }
+
+    wrap.classList.remove('d-none');
+    contenedor.innerHTML = '';
+
+    const templateProducto = document.querySelector('#templateItemProductoDisponible').content;
+    const productos = listadoGeneralProductos.filter(p =>
+        (p.nombre || '').toLowerCase().includes(q) ||
+        (p.marca || '').toLowerCase().includes(q) ||
+        (p.codigo || '').toLowerCase().includes(q)
+    );
+
+    if (productos.length === 0) {
+        vacio.classList.remove('d-none');
+        return;
+    }
+    vacio.classList.add('d-none');
 
     productos.forEach(prod => {
         const precio = Number(prod.precio_venta || 0);
@@ -3163,9 +3241,11 @@ async function poblarSelectCotizacionesOrden() {
 
     await cargarCotizacionesAprobadas();
 
+    const disponibles = listadoCotizacionesAprobadas.filter(cot => !cot.tiene_ot);
+
     const templateOption = document.querySelector('#templateOptionCotizacion').content;
 
-    listadoCotizacionesAprobadas.forEach(cot => {
+    disponibles.forEach(cot => {
         const clone = templateOption.cloneNode(true);
         const option = clone.querySelector('option');
         option.value = cot.id_cotizacion;
@@ -3453,19 +3533,33 @@ document.addEventListener('click', function (event) {
 
     const precio = Number(servicio.precio_regular || servicio.precio_base || 0);
 
-    itemsOT.push({
-        id_producto: null,
-        id_servicio: Number(idServicio),
-        tipo: 'SERVICIO',
-        descripcion: servicio.nombre,
-        cantidad: 1,
-        precio_unitario: precio,
-        subtotal: precio
-    });
+    // Si ya existe el servicio en la lista → solo incrementar cantidad
+    const existente = itemsOT.find(it => it.id_servicio == idServicio);
+
+    if (existente) {
+        existente.cantidad = Number(existente.cantidad) + 1;
+        existente.subtotal = Number(existente.precio_unitario) * existente.cantidad;
+    } else {
+        itemsOT.push({
+            id_producto: null,
+            id_servicio: Number(idServicio),
+            tipo: 'SERVICIO',
+            descripcion: servicio.nombre,
+            cantidad: 1,
+            precio_unitario: precio,
+            subtotal: precio
+        });
+    }
 
     listarItemsOT();
     recalcularTotalesOT();
     programarAutoguardadoConsumo();
+
+    // Reset búsqueda servicios OT
+    busquedaServicioOT = '';
+    const inp = document.querySelector('#inputBuscarServicioOT');
+    if (inp) inp.value = '';
+    poblarListaServiciosOT();
 });
 
 document.addEventListener('click', function (event) {
@@ -3481,19 +3575,33 @@ document.addEventListener('click', function (event) {
 
     const precio = Number(producto.precio_venta || 0);
 
-    itemsOT.push({
-        id_producto: Number(idProducto),
-        id_servicio: null,
-        tipo: 'PRODUCTO',
-        descripcion: producto.nombre,
-        cantidad: 1,
-        precio_unitario: precio,
-        subtotal: precio
-    });
+    // Si ya existe el producto en la lista → solo incrementar cantidad
+    const existente = itemsOT.find(it => it.id_producto == idProducto);
+
+    if (existente) {
+        existente.cantidad = Number(existente.cantidad) + 1;
+        existente.subtotal = Number(existente.precio_unitario) * existente.cantidad;
+    } else {
+        itemsOT.push({
+            id_producto: Number(idProducto),
+            id_servicio: null,
+            tipo: 'PRODUCTO',
+            descripcion: producto.nombre,
+            cantidad: 1,
+            precio_unitario: precio,
+            subtotal: precio
+        });
+    }
 
     listarItemsOT();
     recalcularTotalesOT();
     programarAutoguardadoConsumo();
+
+    // Reset búsqueda productos OT
+    busquedaProductoOT = '';
+    const inp = document.querySelector('#inputBuscarProductoOT');
+    if (inp) inp.value = '';
+    poblarListaProductosOT();
 });
 
 document.addEventListener('click', function (event) {
