@@ -1,8 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Monda&display=swap");
 
-/* ============================================================
-   1. VARIABLES GLOBALES
-   ============================================================ */
 :root {
   --color1: #FFFFFF;
   --color2: #F0F2F5;
@@ -13,199 +10,201 @@
   --color7: #f99303;
 
   --borde-boton: 10px;
-  --borde-suave: rgba(19, 31, 51, 0.12);
-  --borde-fuerte: color-mix(in srgb, var(--color3) 30%, transparent 70%);
-  --transicion-larga: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  --transicion-media: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Superficies derivadas */
-  --superficie: var(--color1);
-  --superficie-alt: var(--color2);
-  --superficie-hover: color-mix(in srgb, var(--color2) 70%, var(--color1) 30%);
-  --superficie-activa: color-mix(in srgb, var(--color2) 50%, var(--color1) 50%);
-
-  /* Texto derivado */
-  --texto-principal: var(--color3);
-  --texto-secundario: color-mix(in srgb, var(--color3) 60%, var(--color1) 40%);
-  --texto-tenue: color-mix(in srgb, var(--color3) 45%, var(--color1) 55%);
-
-  /* Sombras */
-  --sombra-xs: 0 1px 2px color-mix(in srgb, var(--color3) 6%, transparent 94%);
-  --sombra-sm: 0 2px 6px color-mix(in srgb, var(--color3) 8%, transparent 92%);
-  --sombra-md: 0 6px 18px color-mix(in srgb, var(--color3) 10%, transparent 90%);
-  --sombra-lg: 0 15px 35px color-mix(in srgb, var(--color3) 18%, transparent 82%);
-
-  /* Sombra estilo AGL para cards */
-  --sombra-card: 0 4px 20px rgba(40, 68, 115, 0.06);
-  --sombra-card-hover: 0 8px 24px rgba(40, 68, 115, 0.10);
-
+  /* ESTILOS PARA MENU DE NAVEGACIÓN */
   --width: 250px;
   --padding: 10px;
   --width-collapsed: 50px;
+
 }
 
-/* ============================================================
-   2. ESTILOS BASE
-   ============================================================ */
-html,
-body {
-  height: 100%;
-  max-height: 100%;
-  overflow: hidden;
-}
-
+/* ====================================ESTILOS BASE PERSONALIZADOS========================*/
 body {
   padding: 0;
   margin: 0;
-  font-family: "Roboto", "Monda", sans-serif;
+  font-family: "Roboto", sans-serif;
   background-color: var(--color2);
-  color: var(--texto-principal);
-  -webkit-font-smoothing: antialiased;
+  color: var(--color3);
+  overflow-x: hidden;
+  /* margin-left: var(--width-collapsed); */
 }
 
 a {
   text-decoration: none;
-  color: var(--texto-principal);
-  transition: color var(--transicion-media);
+  color: #000000;
 }
 
 a:hover {
-  color: #131F33;
+  color: #565353;
 }
 
 #header {
   background: var(--color1);
-  color: var(--texto-principal);
-  border-bottom: 1px solid var(--borde-suave);
-  flex-shrink: 0;
-}
-
-.contenedor-header {
-  height: 60px;
-}
-
-/* ============================================================
-   3. FORMULARIOS (Bootstrap .form-floating)
-   ============================================================ */
-.form-floating > .form-control {
-  background: var(--color2);
-  border: 1.5px solid color-mix(in srgb, var(--color3) 20%, transparent 80%);
-  border-radius: 8px;
-  padding: 16px 12px 4px 12px;
-  font-size: 0.82rem;
-  color: var(--texto-principal);
-  height: 40px;
-  transition: var(--transicion-media);
-}
-
-.form-floating > .form-control:focus {
-  background: var(--color1);
-  border-color: var(--color7);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color7) 12%, transparent 88%);
-}
-
-.form-floating > .form-control::placeholder {
-  color: transparent;
-}
-
-.form-floating > label {
-  display: flex;
-  align-items: center;
-  padding: 11px 12px;
-  font-size: 0.82rem;
-  color: color-mix(in srgb, var(--color3) 50%, var(--color1) 50%);
-  transition: var(--transicion-media);
-  font-weight: 400;
-  pointer-events: none;
-  border: none;
-  height: 40px;
-}
-
-.form-floating > label i {
-  font-size: 0.9rem;
-  opacity: 0.7;
-  transition: opacity var(--transicion-media);
-}
-
-.form-floating > .form-control:focus ~ label,
-.form-floating > .form-control:not(:placeholder-shown) ~ label {
-  transform: scale(0.75) translateY(-8px);
-  color: color-mix(in srgb, var(--color3) 50%, var(--color1) 50%);
-  opacity: 0.8;
-  height: auto;
-}
-
-.form-floating > .form-control:focus ~ label i,
-.form-floating > .form-control:not(:placeholder-shown) ~ label i {
-  opacity: 1;
   color: var(--color3);
 }
 
-.form-floating > textarea.form-control {
+.contenedor-header{
+  height: 60px;
+}
+
+/* ===========================================================================Formularios */
+.input-style {
+  position: relative;
+  width: 100%;
+}
+
+/* ---------- Input base ---------- */
+.espacio-margin-input{
+  margin-bottom: 12px;
+}
+.input-style input {
+  width: 100%;
+  height: 40px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #16202E;
+  background: #f7f8fa;
+  border: 1.5px solid rgba(22, 32, 46, 0.2);
+  border-radius: 10px;
+  padding: 16px 12px 4px 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  display: block;
+}
+
+/* ---------- Textarea base ---------- */
+.input-style textarea {
+  width: 100%;
   height: 80px;
   min-height: 80px;
-  padding-top: 20px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #16202E;
+  background: #f7f8fa;
+  border: 1.5px solid rgba(22, 32, 46, 0.2);
+  border-radius: 10px;
+  padding: 20px 12px 4px 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  display: block;
   resize: vertical;
   line-height: 1.5;
 }
 
-.form-floating > textarea.form-control ~ label {
-  padding-top: 13px;
-  height: 80px;
-  align-items: flex-start;
+/* ---------- Placeholder invisible ---------- */
+.input-style input::placeholder,
+.input-style textarea::placeholder {
+  color: transparent;
 }
 
-.form-floating > .form-control.is-invalid {
-  border-color: var(--color5) !important;
-  background: color-mix(in srgb, var(--color5) 5%, var(--color1) 95%) !important;
-  animation: shake 0.5s ease-in-out;
+/* ---------- Focus ---------- */
+.input-style input:focus,
+.input-style textarea:focus {
+  background: #FFFFFF;
+  border-color: #003263;
+  box-shadow: 0 0 0 3px rgba(0, 75, 204, 0.08);
 }
 
-.form-floating > .invalid-feedback {
-  margin-left: 12px;
-  font-size: 0.72rem;
-  margin-top: 4px;
+/* ---------- Label en reposo ---------- */
+.input-style label {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%) scale(1);
+  transform-origin: left center;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: rgba(22, 32, 46, 0.6);
+  pointer-events: none;
+  transition: all 0.2s ease;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
+.input-style label i {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
 }
 
-/* ============================================================
-   4. BOTONES
-   ============================================================ */
+/* ---------- Label en textarea (arriba, no centrado) ---------- */
+.input-style textarea ~ label {
+  top: 13px;
+  transform: none;
+  transform-origin: left center;
+}
 
-/* ------------------------------------------------------------
-   4.1. BOTÓN PRIMARIO
-   ------------------------------------------------------------ */
+/* ---------- Label flotante — inputs activos ---------- */
+.input-style input:focus ~ label,
+.input-style input:not(:placeholder-shown) ~ label {
+  transform: translateY(-50%) translateY(-8px) scale(0.75);
+  color: #003263;
+  font-weight: 500;
+}
+
+/* ---------- Label flotante — textarea activa ---------- */
+.input-style textarea:focus ~ label,
+.input-style textarea:not(:placeholder-shown) ~ label {
+  top: 13px;
+  transform: scale(0.75);
+  transform-origin: left center;
+  color: #303B6E;
+  font-weight: 500;
+}
+
+/* ---------- Icono activo ---------- */
+.input-style input:focus ~ label i,
+.input-style input:not(:placeholder-shown) ~ label i,
+.input-style textarea:focus ~ label i,
+.input-style textarea:not(:placeholder-shown) ~ label i {
+  opacity: 1;
+  color: #003263;
+}
+
+/* ---------- Responsive ---------- */
+@media screen and (max-width: 480px) {
+  .input-style label {
+    font-size: 0.78rem;
+  }
+
+  .input-style input,
+  .input-style textarea {
+    font-size: 0.78rem;
+  }
+
+  .input-style textarea {
+    height: 90px;
+    min-height: 90px;
+  }
+}
+
+
+/* =======================================================Botones */
+.espacio-margin-btn{
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
 .btn-primario {
-  /* Layout */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-
-  /* Tipografía */
-  font-family: "Roboto", sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
   letter-spacing: 0.02em;
   line-height: 1;
   white-space: nowrap;
   text-decoration: none;
-
-  /* Caja */
   padding: 12px 28px;
-  border-radius: 6px;
+  border-radius: 10px;
   border: 1px solid #284473;
-
-  /* Colores */
   background: #284473;
   color: #FFFFFF;
-
-  /* Comportamiento */
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -213,7 +212,7 @@ a:hover {
 .btn-primario:hover {
   transform: translateY(-1px);
   background: #131F33;
-  border-color: #131F33;
+  border-color: #1f1333;
   color: #FFFFFF;
   box-shadow: 0 4px 15px rgba(40, 68, 115, 0.4);
 }
@@ -223,35 +222,22 @@ a:hover {
   box-shadow: 0 2px 8px rgba(40, 68, 115, 0.4);
 }
 
-/* ------------------------------------------------------------
-   4.2. BOTÓN CANCELAR
-   ------------------------------------------------------------ */
 .btn-cancelar {
-  /* Layout */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-
-  /* Tipografía */
-  font-family: "Roboto", sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
   letter-spacing: 0.02em;
   line-height: 1;
   white-space: nowrap;
   text-decoration: none;
-
-  /* Caja */
   padding: 12px 28px;
-  border-radius: 6px;
+  border-radius: 10px;
   border: 1px solid #CC0000;
-
-  /* Colores (rojo outline) */
   background: transparent;
   color: #CC0000;
-
-  /* Comportamiento */
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -269,12 +255,79 @@ a:hover {
   box-shadow: 0 2px 6px rgba(204, 0, 0, 0.4);
 }
 
+/* ====================================Estilos Globales para Modales */
+.modal-personalizado .modal-body {
+  font-size: 1rem;
+  font-weight: 700;
+  /* color: var(--color5); */
+  letter-spacing: -0.01em;
+  padding: 35px;
+}
+
+.modal-backdrop ~ .modal-backdrop {
+  display: none !important;
+}
+/* Fin de Estilos Globales para Modales */
+
+
+/* =============================================== Estilos para card de tablas */
+.card-tabla {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(20, 50, 90, .04);
+}
+
+.seccion-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+.seccion-busqueda{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.card-titulo h5 {
+    color: #285a9b;
+    font-size: 18px;
+}
+
+/* Area de tabla */
+.style-tabla {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.style-tabla thead th {
+    /* background: #f2f5f9; */
+    background: #e1e8f2;
+    color: #203658;
+    font-weight: 700;
+    padding: 11px 9px;
+    white-space: nowrap;
+    border: none;
+}
+
+.style-tabla tbody td {
+    padding: 11px 9px;
+    color: #40516b;
+    border-color: #edf0f5;
+}
+
 /* ============================================================
-   5. MENÚ LATERAL
+   MENÚ LATERAL Y DESPLAZAMIENTO DEL CONTENIDO
    ============================================================ */
 #bodyAdministrador {
-  margin-left: var(--width-collapsed);
   height: 100vh;
+  min-width: 0;
+  margin-left: var(--width-collapsed);
   overflow: hidden;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -284,21 +337,32 @@ a:hover {
 }
 
 #sideMenu {
-  background-color: var(--color1);
-  text-decoration: none;
-  color: var(--color3);
   position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 1030;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: var(--width-collapsed);
   height: 100vh;
-  left: 0;
-  top: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
+  background: var(--color1);
+  color: var(--color3);
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#sideMenu.menu-expandido {
+  width: var(--width);
+}
+
+#sideMenu.menu-colapsado {
+  width: var(--width-collapsed);
 }
 
 #sideMenu #cabecera {
   box-sizing: border-box;
-  border-bottom: solid 1px var(--color2);
+  flex: 0 0 auto;
+  border-bottom: 1px solid var(--color2);
 }
 
 #sideMenu #cabecera #titulo {
@@ -314,169 +378,377 @@ a:hover {
 
 #sideMenu #cabecera #menuBtn {
   display: inline-block;
-  cursor: pointer;
-  padding: 10px;
-  width: var(--width-collapsed);
   box-sizing: border-box;
+  width: var(--width-collapsed);
+  padding: 10px;
+  cursor: pointer;
 }
 
 #sideMenu #cabecera #menuBtn:hover {
-  background-color: var(--color2);
+  background: var(--color2);
 }
 
 #sideMenu #cabecera #menuBtn .btn-hamburger {
-  background-color: var(--color3);
   width: 100%;
   height: 3px;
   margin: 7px 0;
+  background: var(--color3);
 }
 
 #sideMenu #perfil {
-  border-bottom: solid 1px color-mix(in srgb, var(--color3) 15%, var(--color1) 85%);
+  flex: 0 0 auto;
   padding: var(--padding) 0;
+  border-bottom: 1px solid #D1D6DD;
   text-align: center;
 }
 
 #sideMenu #perfil #foto {
   box-sizing: border-box;
-  padding: var(--padding);
   margin: 0 auto;
+  padding: var(--padding);
 }
 
 #sideMenu #perfil #foto img {
-  border-radius: 50%;
   width: 50%;
+  border-radius: 50%;
 }
 
 #sideMenu #perfil #foto,
 #sideMenu #perfil #nombre {
+  padding: var(--padding) 0;
+  overflow: hidden;
   font-size: 24px;
-  padding: var(--padding) 0;
-  overflow: hidden;
 }
 
-#sideMenu #menuItems {
-  overflow: hidden;
-}
-
-#sideMenu #menuItems .item {
-  width: var(--width);
-}
-
-#sideMenu #menuItems .item .icono {
+#sideMenu.menu-expandido #cabecera #titulo {
   display: inline-block;
-}
-
-#sideMenu #menuItems .item .icono,
-#sideMenu #menuItems .item .titulo {
-  font-size: 15px;
-  vertical-align: middle;
-  overflow: hidden;
-  display: inline-block;
-}
-
-#sideMenu #menuItems .item a {
-  display: block;
-}
-
-#sideMenu #menuItems .item a:hover {
-  background-color: var(--color2);
-}
-
-#sideMenu #menuItems .item .icono {
-  box-sizing: border-box;
-  padding: var(--padding);
-  width: var(--width-collapsed);
-}
-
-#sideMenu #menuItems .item .icono img {
-  width: 100%;
-}
-
-#sideMenu #menuItems .item .titulo {
-  padding: var(--padding) 0;
-  margin-left: 10px;
-  margin-right: 30px;
-}
-
-#sideMenu #menuItems .item-separator {
-  height: 1px;
-  border-bottom: solid 1px var(--color2);
-}
-
-.menu-expandido {
-  width: var(--width);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--color3) 50%, transparent 50%);
-}
-
-.menu-expandido #cabecera #titulo {
-  display: inline-block;
-  width: calc(100% - 50px);
+  width: calc(100% - var(--width-collapsed));
   margin-right: -5px;
   padding: var(--padding);
 }
 
-.menu-expandido #cabecera #titulo span {
+#sideMenu.menu-expandido #cabecera #titulo span {
+  display: inline-block;
   width: calc(var(--width) - var(--width-collapsed) - 5px);
   overflow: hidden;
-  display: inline-block;
 }
 
-.menu-expandido #perfil #foto {
+#sideMenu.menu-expandido #perfil #foto {
   width: 200px;
 }
 
-.menu-expandido #perfil #nombre {
+#sideMenu.menu-expandido #perfil #nombre {
   width: 100%;
 }
 
-.menu-colapsado {
-  width: var(--width-collapsed);
-}
-
-.menu-colapsado #cabecera #titulo {
+#sideMenu.menu-colapsado #cabecera #titulo {
   width: 0;
   height: 0;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
-.menu-colapsado #perfil #nombre {
+#sideMenu.menu-colapsado #perfil #nombre {
   display: none;
 }
 
-.menu-colapsado .item {
-  width: 100px;
+#sideMenu #menuItems {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#sideMenu #menuItems .item {
+  width: 100%;
+}
+
+#sideMenu #menuItems .item a {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 46px;
+  white-space: nowrap;
+}
+
+#sideMenu #menuItems .item a:hover {
+  background: var(--color2);
+}
+
+#sideMenu #menuItems .item .icono {
+  display: inline-flex;
+  flex: 0 0 var(--width-collapsed);
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--width-collapsed);
+  padding: var(--padding);
+}
+
+#sideMenu #menuItems .item .icono img {
+  display: block;
+  width: 100%;
+  height: 25px;
+  object-fit: contain;
+}
+
+#sideMenu #menuItems .item .icono i {
+  width: 100%;
+  font-size: 25px;
+}
+
+#sideMenu #menuItems .item .titulo {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 12px 0 5px;
+  padding: var(--padding) 0;
+  overflow: hidden;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#sideMenu.menu-colapsado #menuItems .item .titulo {
+  display: none;
+}
+
+#sideMenu #menuItems .item-separator {
+  height: 1px;
+  border-bottom: 1px solid #F0F2F5;
+}
+/* ============================TOASTS / ALERTAS PERSONALIZADAS================================= */
+.toast-container-custom {
+  position: fixed;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1080;
+  width: 100%;
+  max-width: 380px;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.toast-personalizado {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color2);
+  border: 1px solid var(--borde-suave);
+  border-left: 10px solid currentColor;
+  border-radius: 10px;
+  box-shadow: 0 15px 35px rgba(19, 31, 51, 0.18);
+  padding: 14px 16px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-16px);
+  transition: var(--transicion-larga);
+  pointer-events: none;
+  color: var(--color6);
+}
+
+.toast-personalizado.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.toast-personalizado.toast-exito {
+  color: #48d867;
+}
+
+.toast-personalizado.toast-error {
+  color: #ff3a5f;
+}
+
+.toast-personalizado.toast-info {
+  color: #3186f3;
+}
+
+.toast-personalizado.toast-advertencia {
+  color: #ffc023;
+}
+
+.toast-icono {
+  font-size: 1.3rem;
+  margin-top: 2px;
+  color: currentColor;
+}
+
+.toast-contenido {
+  flex: 1;
+}
+
+.toast-titulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #131F33;
+  letter-spacing: -0.01em;
+}
+
+.toast-mensaje {
+  font-size: 0.78rem;
+  color: #131F33;
+  line-height: 1.4;
+}
+
+.toast-cerrar {
+  background: transparent;
+  border: none;
+  color: #131F33;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 2px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toast-cerrar:hover {
+  color: var(--color5);
+}
+
+@media screen and (max-width: 480px) {
+  .toast-container-custom {
+    top: 5px;
+    max-width: calc(100% - 24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-personalizado {
+    transition: opacity 0.2s ease;
+    transform: none;
+  }
+}
+
+/* ===================================INICIO GLOBAL=================================== */
+
+#inicio {
+  background:
+    linear-gradient(rgba(5, 7, 12, 0.2), rgba(5, 7, 12, 0.9)),
+    url(/img/portada_taller.jpg) no-repeat;
+  background-size: cover;
+  height: 100vh;
+  justify-content: center;
+  align-content: center;
+  position: relative;
+}
+
+.overlay-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #eff1f5;
+  /* max-width: 40%; */
+}
+
+.enfasis {
+  font-weight: bold;
+  color: var(--color5);
+}
+
+/* ===================================LOGIN=================================== */
+#contenedorLogin {
+  height: 100vh;
+  /* background-size: cover; */
+  background: rgba(255, 255, 255, 0.5); /* blanco al 50% */
+  /* justify-content: center; */
+  justify-items: center;
+  align-content: center;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.formulario-login {
+  background: var(--color1);
+  border-radius: 8px;
+  box-shadow: 0 20px 45px rgba(19, 31, 51, 0.12);
+  width: 350px;
+}
+
+.puntero {
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+    display: inline-block;
+}
+.puntero:hover{
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #003263;
+  transform: scale(1.12);
+}
+
+
+
+/* ===================================MECANICO=================================== */
+
+
+/* Variables compartidas que necesitan los componentes de la vista mecánico. */
+:root {
+  --borde-suave: rgba(19, 31, 51, 0.12);
+  --borde-fuerte: color-mix(in srgb, var(--color3) 30%, transparent 70%);
+  --transicion-larga: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transicion-media: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --superficie: var(--color1);
+  --superficie-alt: var(--color2);
+  --superficie-hover: color-mix(in srgb, var(--color2) 70%, var(--color1) 30%);
+  --superficie-activa: color-mix(in srgb, var(--color2) 50%, var(--color1) 50%);
+  --texto-principal: var(--color3);
+  --texto-secundario: color-mix(in srgb, var(--color3) 60%, var(--color1) 40%);
+  --texto-tenue: color-mix(in srgb, var(--color3) 45%, var(--color1) 55%);
+  --sombra-xs: 0 1px 2px color-mix(in srgb, var(--color3) 6%, transparent 94%);
+  --sombra-sm: 0 2px 6px color-mix(in srgb, var(--color3) 8%, transparent 92%);
+  --sombra-md: 0 6px 18px color-mix(in srgb, var(--color3) 10%, transparent 90%);
+  --sombra-lg: 0 15px 35px color-mix(in srgb, var(--color3) 18%, transparent 82%);
+  --sombra-card: 0 4px 20px rgba(40, 68, 115, 0.06);
+  --sombra-card-hover: 0 8px 24px rgba(40, 68, 115, 0.10);
 }
 
 /* ============================================================
-   5.1. APP SHELL — con scroll interno (body NO scrollea)
+   APP SHELL — documento fijo y scroll dentro de las vistas
    ============================================================ */
+html,
+body {
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
 #contenedorPrincipal {
-  height: 100vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  min-width: 0;
   overflow: hidden;
   background: var(--color2);
 }
 
+#contenedorPrincipal > #header {
+  flex: 0 0 auto;
+}
+
 .main-scroll-wrapper {
-  flex: 1 1 auto;
-  min-height: 0;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
+  min-height: 0;
   overflow: hidden;
   padding: 0;
 }
 
 #contenedorReactivo {
-  flex: 1 1 auto;
-  min-height: 0;
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
+  min-height: 0;
   overflow: hidden;
 }
-
 /* Vistas: ya NO scrollean, solo contienen */
 #dashboard,
 #ordenes,
@@ -1582,43 +1854,10 @@ a:hover {
 }
 
 /* ============================================================
-   15. TOASTS
+   15. TOASTS — ajustes visuales de mecánico
    ============================================================ */
-.toast-container-custom {
-  position: fixed;
-  top: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1080;
-  width: 100%;
-  max-width: 380px;
-  padding: 0 16px;
-  pointer-events: none;
-}
-
 .toast-personalizado {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: var(--color2);
-  border: 1px solid var(--borde-suave);
-  border-left: 10px solid currentColor;
-  border-radius: 10px;
   box-shadow: var(--sombra-lg);
-  padding: 14px 16px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-16px);
-  transition: var(--transicion-larga);
-  pointer-events: none;
-  color: var(--color6);
-}
-
-.toast-personalizado.is-visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  pointer-events: auto;
 }
 
 .toast-personalizado.toast-exito       { color: #02A302; }
@@ -1626,57 +1865,9 @@ a:hover {
 .toast-personalizado.toast-info        { color: #284473; }
 .toast-personalizado.toast-advertencia { color: #bb7514; }
 
-.toast-icono {
-  font-size: 1.3rem;
-  margin-top: 2px;
-  color: currentColor;
-}
-
-.toast-contenido { flex: 1; }
-
-.toast-titulo {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #131F33;
-  letter-spacing: -0.01em;
-}
-
-.toast-mensaje {
-  font-size: 0.78rem;
-  color: #131F33;
-  line-height: 1.4;
-}
-
-.toast-cerrar {
-  background: transparent;
-  border: none;
-  color: #131F33;
-  font-size: 0.85rem;
-  line-height: 1;
-  padding: 2px;
-  cursor: pointer;
-  transition: color 0.2s ease;
-  flex-shrink: 0;
-}
-
 .toast-cerrar:hover {
   color: #CC0000;
 }
-
-@media screen and (max-width: 480px) {
-  .toast-container-custom {
-    top: 5px;
-    max-width: calc(100% - 24px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .toast-personalizado {
-    transition: opacity 0.2s ease;
-    transform: none;
-  }
-}
-
 /* ============================================================
    16. INICIO Y LOGIN
    ============================================================ */
@@ -1854,62 +2045,43 @@ a:hover {
 .w-80 { width: 80px; }
 
 /* ============================================================
-   19. SECCIÓN MECÁNICO — SISTEMA .input-style (MÁS ALTO)
+   19. FORMULARIOS DE MECÁNICO
    ============================================================ */
-.input-style {
-  position: relative;
+.input-style input,
+.input-style textarea,
+.input-style select {
   width: 100%;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #00162B;
+  background: #F0F2F5;
+  border: 1.5px solid #284473;
+  border-radius: 8px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  display: block;
+}
+
+.input-style input,
+.input-style select {
+  height: 44px;
 }
 
 .input-style input {
-  width: 100%;
-  height: 44px;
-  font-family: "Roboto", sans-serif;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #00162B;
-  background: #F0F2F5;
-  border: 1.5px solid #284473;
-  border-radius: 8px;
-  padding: 18px 12px 4px 12px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  outline: none;
-  display: block;
+  padding: 18px 12px 4px;
 }
 
 .input-style textarea {
-  width: 100%;
   height: 86px;
   min-height: 86px;
-  font-family: "Roboto", sans-serif;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #00162B;
-  background: #F0F2F5;
-  border: 1.5px solid #284473;
-  border-radius: 8px;
-  padding: 22px 12px 4px 12px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  outline: none;
-  display: block;
+  padding: 22px 12px 4px;
   resize: vertical;
   line-height: 1.5;
 }
 
 .input-style select {
-  width: 100%;
-  height: 44px;
-  font-family: "Roboto", sans-serif;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #00162B;
-  background: #F0F2F5;
-  border: 1.5px solid #284473;
-  border-radius: 8px;
   padding: 18px 30px 4px 12px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  outline: none;
-  display: block;
   appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, #4B5A6E 50%),
                     linear-gradient(135deg, #4B5A6E 50%, transparent 50%);
@@ -1919,38 +2091,14 @@ a:hover {
   cursor: pointer;
 }
 
-.input-style input::placeholder {
-  color: transparent;
-}
-
-.input-style textarea::placeholder {
-  color: transparent;
-}
-
-.input-style input:hover {
-  border-color: #131F33;
-}
-
-.input-style textarea:hover {
-  border-color: #131F33;
-}
-
+.input-style input:hover,
+.input-style textarea:hover,
 .input-style select:hover {
   border-color: #131F33;
 }
 
-.input-style input:focus {
-  background: #FFFFFF;
-  border-color: #142dbb;
-  box-shadow: 0 0 0 3px rgba(187, 117, 20, 0.15);
-}
-
-.input-style textarea:focus {
-  background: #FFFFFF;
-  border-color: #142dbb;
-  box-shadow: 0 0 0 3px rgba(187, 117, 20, 0.15);
-}
-
+.input-style input:focus,
+.input-style textarea:focus,
 .input-style select:focus {
   background: #FFFFFF;
   border-color: #142dbb;
@@ -1961,18 +2109,18 @@ a:hover {
   position: absolute;
   top: 50%;
   left: 12px;
-  transform: translateY(-50%) scale(1);
-  transform-origin: left center;
-  font-size: 0.82rem;
-  font-weight: 400;
-  color: #4B5A6E;
-  pointer-events: none;
-  transition: all 0.2s ease;
-  margin: 0;
-  line-height: 1;
   display: flex;
   align-items: center;
   gap: 4px;
+  margin: 0;
+  color: #4B5A6E;
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1;
+  pointer-events: none;
+  transform: translateY(-50%) scale(1);
+  transform-origin: left center;
+  transition: all 0.2s ease;
 }
 
 .input-style label i {
@@ -1981,62 +2129,46 @@ a:hover {
   transition: opacity 0.2s ease;
 }
 
-/* Textarea: label arriba fijo */
+/* Textarea: etiqueta fija arriba. */
 .input-style textarea ~ label {
   top: 15px;
   transform: none;
-  transform-origin: left center;
 }
 
-/* Select: label flotante siempre */
+/* Select: etiqueta flotante permanente. */
 .input-style select ~ label {
   top: 50%;
-  transform: translateY(-50%) translateY(-10px) scale(0.75);
   color: #142dbb;
   font-weight: 500;
-}
-
-/* Inputs: label flotante al focus o con contenido */
-.input-style input:focus ~ label {
   transform: translateY(-50%) translateY(-10px) scale(0.75);
-  color: #142dbb;
-  font-weight: 500;
 }
 
+/* Inputs: etiqueta flotante cuando tienen foco o contenido. */
+.input-style input:focus ~ label,
 .input-style input:not(:placeholder-shown) ~ label {
+  color: #142dbb;
+  font-weight: 500;
   transform: translateY(-50%) translateY(-10px) scale(0.75);
-  color: #142dbb;
-  font-weight: 500;
 }
 
-/* Textarea: label flotante arriba */
-.input-style textarea:focus ~ label {
-  top: 15px;
-  transform: scale(0.75);
-  transform-origin: left center;
-  color: #142dbb;
-  font-weight: 500;
-}
-
+.input-style textarea:focus ~ label,
 .input-style textarea:not(:placeholder-shown) ~ label {
   top: 15px;
-  transform: scale(0.75);
-  transform-origin: left center;
   color: #142dbb;
   font-weight: 500;
+  transform: scale(0.75);
+  transform-origin: left center;
 }
 
-/* Iconos activos */
 .input-style input:focus ~ label i,
 .input-style input:not(:placeholder-shown) ~ label i,
 .input-style textarea:focus ~ label i,
 .input-style textarea:not(:placeholder-shown) ~ label i,
 .input-style select:focus ~ label i,
 .input-style select ~ label i {
-  opacity: 1;
   color: #142dbb;
+  opacity: 1;
 }
-
 .input-style-error {
   display: none;
   font-size: 0.72rem;
@@ -2046,32 +2178,16 @@ a:hover {
   margin-top: 0.25rem;
 }
 
-.input-style.is-invalid input {
-  border-color: #CC0000;
-  background: #FFF5F5;
-  animation: shake 0.5s ease-in-out;
-}
-
-.input-style.is-invalid textarea {
-  border-color: #CC0000;
-  background: #FFF5F5;
-  animation: shake 0.5s ease-in-out;
-}
-
+.input-style.is-invalid input,
+.input-style.is-invalid textarea,
 .input-style.is-invalid select {
   border-color: #CC0000;
   background: #FFF5F5;
   animation: shake 0.5s ease-in-out;
 }
 
-.input-style.is-invalid input:focus {
-  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.15);
-}
-
-.input-style.is-invalid textarea:focus {
-  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.15);
-}
-
+.input-style.is-invalid input:focus,
+.input-style.is-invalid textarea:focus,
 .input-style.is-invalid select:focus {
   box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.15);
 }
@@ -2080,25 +2196,6 @@ a:hover {
   display: block;
 }
 
-@media screen and (max-width: 480px) {
-  .input-style label {
-    font-size: 0.78rem;
-  }
-
-  .input-style input {
-    font-size: 0.78rem;
-  }
-
-  .input-style textarea {
-    font-size: 0.78rem;
-    height: 96px;
-    min-height: 96px;
-  }
-
-  .input-style select {
-    font-size: 0.78rem;
-  }
-}
 
 .btn-header {
   font-size: 0.82rem;
@@ -2413,13 +2510,10 @@ a:hover {
     padding: 6px 8px;
   }
 
-  /* 21.13 Tabs de días en modal Horario: scroll horizontal */
+  /* En pantallas pequeñas los tabs se distribuyen en una fila. */
   .modal-tabs .tab-dias {
     display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
     gap: 4px;
-    padding-bottom: 4px;
     scrollbar-width: thin;
   }
 
@@ -2474,4 +2568,18 @@ a:hover {
     font-size: 0.74rem;
     padding: 18px 10px 3px 10px;
   }
+}
+
+/* ============================================================
+   OCULTAR FLECHAS (spinners) DE INPUTS NUMÉRICOS
+   ============================================================ */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
