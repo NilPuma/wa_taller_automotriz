@@ -22,7 +22,7 @@
 
 }
 
-/* =================ESTILOS BASE PERSONALIZADOS========================*/
+/* ====================================ESTILOS BASE PERSONALIZADOS========================*/
 body {
   padding: 0;
   margin: 0;
@@ -51,152 +51,279 @@ a:hover {
   height: 60px;
 }
 
-/* Formularios */
-.form-floating > .form-control {
-  background: var(--color2);
-  border: 1.5px solid color-mix(in srgb, var(--color3) 20%, transparent 80%);
-  border-radius: 8px;
-  padding: 16px 12px 4px 12px;
-  font-size: 0.82rem;
-  color: var(--color3);
+/* ===========================================================================Formularios */
+.input-style {
+  position: relative;
+  width: 100%;
+}
+
+/* ---------- Input base ---------- */
+.espacio-margin-input{
+  margin-bottom: 12px;
+}
+.input-style input {
+  width: 100%;
   height: 40px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #16202E;
+  background: #f7f8fa;
+  border: 1.5px solid rgba(22, 32, 46, 0.2);
+  border-radius: 10px;
+  padding: 16px 12px 4px 12px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  display: block;
 }
 
-.form-floating > .form-control:focus {
-  background: var(--color1);
-  border-color: var(--color7);
-  box-shadow: 0 0 0 3px rgba(187, 117, 20, 0.08);
+/* ---------- Textarea base ---------- */
+.input-style textarea {
+  width: 100%;
+  height: 80px;
+  min-height: 80px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #16202E;
+  background: #f7f8fa;
+  border: 1.5px solid rgba(22, 32, 46, 0.2);
+  border-radius: 10px;
+  padding: 20px 12px 4px 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  display: block;
+  resize: vertical;
+  line-height: 1.5;
 }
 
-.form-floating > .form-control::placeholder {
+/* ---------- Placeholder invisible ---------- */
+.input-style input::placeholder,
+.input-style textarea::placeholder {
   color: transparent;
 }
 
-/* Paceholder */
-.form-floating > label {
-  display: flex;
-  align-items: center;
-  padding: 11px 12px;
-  font-size: 0.82rem;
-  color: color-mix(in srgb, var(--color3) 50%, var(--color1) 50%);
-  transition: all 0.2s ease;
-  font-weight: 400;
-  pointer-events: none;
-  border: none;
-  height: 40px;
+/* ---------- Focus ---------- */
+.input-style input:focus,
+.input-style textarea:focus {
+  background: #FFFFFF;
+  border-color: #003263;
+  box-shadow: 0 0 0 3px rgba(0, 75, 204, 0.08);
 }
 
-.form-floating > label i {
+/* ---------- Label en reposo ---------- */
+.input-style label {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%) scale(1);
+  transform-origin: left center;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: rgba(22, 32, 46, 0.6);
+  pointer-events: none;
+  transition: all 0.2s ease;
+  margin: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.input-style label i {
   font-size: 0.9rem;
   opacity: 0.7;
   transition: opacity 0.2s ease;
 }
 
-.form-floating > .form-control:focus ~ label,
-.form-floating > .form-control:not(:placeholder-shown) ~ label {
-  transform: scale(0.75) translateY(-8px);
-  color: color-mix(in srgb, var(--color3) 50%, var(--color1) 50%);
-  opacity: 80%;
-  height: auto;
+/* ---------- Label en textarea (arriba, no centrado) ---------- */
+.input-style textarea ~ label {
+  top: 13px;
+  transform: none;
+  transform-origin: left center;
 }
 
-.form-floating > .form-control:focus ~ label i,
-.form-floating > .form-control:not(:placeholder-shown) ~ label i {
+/* ---------- Label flotante — inputs activos ---------- */
+.input-style input:focus ~ label,
+.input-style input:not(:placeholder-shown) ~ label {
+  transform: translateY(-50%) translateY(-8px) scale(0.75);
+  color: #003263;
+  font-weight: 500;
+}
+
+/* ---------- Label flotante — textarea activa ---------- */
+.input-style textarea:focus ~ label,
+.input-style textarea:not(:placeholder-shown) ~ label {
+  top: 13px;
+  transform: scale(0.75);
+  transform-origin: left center;
+  color: #303B6E;
+  font-weight: 500;
+}
+
+/* ---------- Icono activo ---------- */
+.input-style input:focus ~ label i,
+.input-style input:not(:placeholder-shown) ~ label i,
+.input-style textarea:focus ~ label i,
+.input-style textarea:not(:placeholder-shown) ~ label i {
   opacity: 1;
-  color: var(--color3);
+  color: #003263;
 }
 
-.form-floating > textarea.form-control {
-  height: 80px;
-  min-height: 80px;
-  padding-top: 20px;
-  resize: vertical;
-  line-height: 1.5;
+/* ---------- Responsive ---------- */
+@media screen and (max-width: 480px) {
+  .input-style label {
+    font-size: 0.78rem;
+  }
+
+  .input-style input,
+  .input-style textarea {
+    font-size: 0.78rem;
+  }
+
+  .input-style textarea {
+    height: 90px;
+    min-height: 90px;
+  }
 }
 
-.form-floating > textarea.form-control ~ label {
-  padding-top: 13px;
-  height: 80px;
-  align-items: flex-start;
+
+/* =======================================================Botones */
+.espacio-margin-btn{
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
-
-.form-floating > .form-control .is-invalid {
-  border-color: var(--color5) !important;
-  background: #fff5f5 !important;
-  animation: shake 0.5s ease-in-out;
-}
-
-.form-floating > .invalid-feedback {
-  margin-left: 12px;
-  font-size: 0.72rem;
-  margin-top: 4px;
-}
-
-/* Botones */
-
-.btn {
+.btn-primario {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-family: 'Roboto', sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
   letter-spacing: 0.02em;
-  padding: 12px 28px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid transparent;
-  background: transparent;
-  text-decoration: none;
-  white-space: nowrap;
   line-height: 1;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn-primario {
-  background: var(--color3);
-  color: var(--color2);
-  /* border-color: var(--color7); */
+  white-space: nowrap;
+  text-decoration: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: 1px solid #284473;
+  background: #284473;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-primario:hover {
-  background: #003263;
-  border-color: var(--color7);
-  color: var(--color2);
+  transform: translateY(-1px);
+  background: #131F33;
+  border-color: #1f1333;
+  color: #FFFFFF;
   box-shadow: 0 4px 15px rgba(40, 68, 115, 0.4);
 }
 
 .btn-primario:active {
+  transform: translateY(0);
   box-shadow: 0 2px 8px rgba(40, 68, 115, 0.4);
 }
 
 .btn-cancelar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  border: 1px solid #CC0000;
   background: transparent;
-  color: var(--color6);
-  border-color: var(--color6);
+  color: #CC0000;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-cancelar:hover {
-  background: var(--color6);
-  color: var(--color4);
-  border-color: var(--color6);
-  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+  transform: translateY(-1px);
+  background: #CC0000;
+  border-color: #CC0000;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(204, 0, 0, 0.4);
 }
 
 .btn-cancelar:active {
-  box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(204, 0, 0, 0.4);
 }
 
+/* ====================================Estilos Globales para Modales */
+.modal-personalizado .modal-body {
+  font-size: 1rem;
+  font-weight: 700;
+  /* color: var(--color5); */
+  letter-spacing: -0.01em;
+  padding: 35px;
+}
+
+.modal-backdrop ~ .modal-backdrop {
+  display: none !important;
+}
+/* Fin de Estilos Globales para Modales */
+
+
+/* =============================================== Estilos para card de tablas */
+.card-tabla {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(20, 50, 90, .04);
+}
+
+.seccion-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+.seccion-busqueda{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.card-titulo h5 {
+    color: #285a9b;
+    font-size: 18px;
+}
+
+/* Area de tabla */
+.style-tabla {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.style-tabla thead th {
+    /* background: #f2f5f9; */
+    background: #e1e8f2;
+    color: #203658;
+    font-weight: 700;
+    padding: 11px 9px;
+    white-space: nowrap;
+    border: none;
+}
+
+.style-tabla tbody td {
+    padding: 11px 9px;
+    color: #40516b;
+    border-color: #edf0f5;
+}
 
 /* =============================ESTILOS  PARA MENU DE NAVEGACIÓN=========================== */
 #bodyAdministrador{
@@ -308,23 +435,26 @@ a:hover {
   padding: var(--padding);
   width: var(--width-collapsed);
 }
-#sideMenu #menuItems .item .icono img{
+#sideMenu #menuItems .item .icono i{
   width: 100%;
+  font-size: 25px;
+
 }
 #sideMenu #menuItems .item .titulo{
   padding: var(--padding) 0;
-  margin-left: 10px;
+  margin-left: 5px;
   margin-right: 30px;
 }
 #sideMenu #menuItems .item-separator{
   height: 1px;
-  border-bottom: solid 1px var(--color2);
+  border-bottom: solid 1px #F0F2F5;
   /* margin: 15px 0; */
 }
 
 .menu-expandido{
   width: var(--width);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border-right : solid 1px #F0F2F5;
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); */
 }
 .menu-expandido #cabecera #titulo{
   display: inline-block;
@@ -348,6 +478,7 @@ a:hover {
 
 .menu-colapsado{
   width: var(--width-collapsed);
+  border-right : solid 1px #F0F2F5;
 }
 .menu-colapsado #cabecera #titulo{
   width: 0;
@@ -500,10 +631,10 @@ a:hover {
 /* ===================================LOGIN=================================== */
 #contenedorLogin {
   height: 100vh;
-  width: 40%;
   /* background-size: cover; */
   background: rgba(255, 255, 255, 0.5); /* blanco al 50% */
-  justify-content: center;
+  /* justify-content: center; */
+  justify-items: center;
   align-content: center;
   position: absolute;
   right: 0;
@@ -513,6 +644,7 @@ a:hover {
   background: var(--color1);
   border-radius: 8px;
   box-shadow: 0 20px 45px rgba(19, 31, 51, 0.12);
+  width: 350px;
 }
 
 .puntero {
@@ -527,6 +659,8 @@ a:hover {
   color: #003263;
   transform: scale(1.12);
 }
+
+
 
 /* ===================================CONDUCTOR=================================== */
 

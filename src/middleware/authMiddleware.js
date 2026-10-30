@@ -35,7 +35,7 @@ const verificarVista = (req, res, next) => {
         const token = req.cookies.token;
         if (!token) {
 
-            return res.redirect('/index');
+            return res.redirect('/');
         }
 
         const usuario = jwt.verify(token, process.env.JWT_SECRET);
@@ -44,7 +44,7 @@ const verificarVista = (req, res, next) => {
         next();
     } catch (error) {
 
-        return res.redirect('/index');
+        return res.redirect('/');
     }
 };
 

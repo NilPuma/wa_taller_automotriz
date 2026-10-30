@@ -1,5 +1,5 @@
 <div id="bodyAdministrador">
-    
+
     <div id="sideMenu" class="menu-colapsado">
         {{!-- Header --}}
         <div id="cabecera">
@@ -12,62 +12,78 @@
         </div>
         {{!-- Perfil --}}
         <div id="perfil">
-            <div id="foto"><img src="/img/perfil.png" alt="" ></div>
+            <div id="foto"><img src="/img/perfil.png" alt=""></div>
             <div id="nombre"><span>ADMINISTRADOR</span></div>
         </div>
         {{!-- Items --}}
         <div id="menuItems">
             <div class="item">
                 <a href="#" id="btnMenuInicio">
-                    <div class="icono"><img src="/icons/home.svg" alt="" ></div>
-                    <div class="titulo"><span>Inicio</span></div>
+                    <div class="icono"><i class="bi bi-house-gear"></i></div>
+                    <div class="titulo"><span>INICIO</span></div>
                 </a>
             </div>
             <div class="item-separator">
             </div>
             <div class="item">
-                <a href="#" id="btnMenuContactos">
-                    <div class="icono"><img src="/icons/personas.svg" alt="" ></div>
-                    <div class="titulo"><span>Contactos</span></div>
+                <a href="#" id="btnMenuClientes">
+                    <div class="icono"><i class="bi bi-person-badge"></i></div>
+                    <div class="titulo"><span>CLIENTES</span></div>
                 </a>
             </div>
             <div class="item-separator">
             </div>
             <div class="item">
-                <a href="#" id="btnMenuGaleria">
-                    <div class="icono"><img src="/icons/home.svg" alt="" ></div>
-                    <div class="titulo"><span>Menu-Opcional</span></div>
+                <a href="#" id="btnMenuVehiculos">
+                    <div class="icono"><i class="bi bi-car-front"></i></div>
+                    <div class="titulo"><span>VEHICULOS</span></div>
                 </a>
             </div>
             <div class="item-separator">
             </div>
             <div class="item">
-                <a href="#" id="btnMenuAlbum">
-                    <div class="icono"><img src="/icons/home.svg" alt="" ></div>
-                    <div class="titulo"><span>Menu-Opcional</span></div>
+                <a href="#" id="btnMenulogistica">
+                    <div class="icono"><i class="bi bi-building-gear"></i></div>
+                    <div class="titulo"><span>LOGISTICA</span></div>
                 </a>
             </div>
             <div class="item-separator">
             </div>
             <div class="item">
-                <a href="#" id="btnMenuNotificacion">
-                    <div class="icono"><img src="/icons/notificacion.svg" alt="" ></div>
-                    <div class="titulo"><span>Notificación</span></div>
+                <a href="#" id="btnMenuOperaciones">
+                    <div class="icono"><i class="bi bi-calendar2-check"></i></div>
+                    <div class="titulo"><span>OPERACIONES</span></div>
+                </a>
+            </div>
+            <div class="item-separator">
+            </div>
+            <div class="item">
+                <a href="#" id="btnMenuVentas">
+                    <div class="icono"><i class="bi bi-cart-plus"></i></div>
+                    <div class="titulo"><span>VENTAS</span></div>
+                </a>
+            </div>
+            <div class="item-separator">
+            </div>
+            <div class="item">
+                <a href="#" id="btnMenuReportes">
+                    <div class="icono"><i class="bi bi-clipboard2-data"></i></div>
+                    <div class="titulo"><span>REPORTES</span></div>
                 </a>
             </div>
             <div class="item-separator">
             </div>
             <div class="item">
                 <a href="#" id="btnMenuConfiguracion">
-                    <div class="icono"><img src="/icons/configuracion.svg" alt="" ></div>
-                    <div class="titulo"><span>Configuración</span></div>
+                    <div class="icono"><i class="bi bi-gear"></i></div>
+                    <div class="titulo"><span>CONFIGURACION</span></div>
                 </a>
             </div>
             <div class="item-separator">
             </div>
             <div class="item">
                 <a href="#" id="btnMenuCerrar">
-                    <div class="icono"><img src="/icons/turn-off.svg" alt="" ></div>
+                    <div class="icono"><i class="bi bi-box-arrow-right"></i></div>
                     <div class="titulo"><span>Cerrar Sesion</span></div>
                 </a>
             </div>
@@ -85,37 +101,179 @@
                     </div>
                 </div> --}}
                 <div class="col">
-                    <span>Perfil administrador</span>
+                    {{!-- <span>Perfil administrador</span> --}}
                 </div>
-                <div class="col text-end">
+                {{!-- <div class="col text-end">
                     <span><a href="/" class="btn-salir"><i class="bi bi-geo-alt-fill"></i>&nbsp Interval</a></span>
-                </div>
+                </div> --}}
             </div>
         </div>
 
-        {{!-- Area reactiva administrador  --}}
+        {{!-- Area reactiva administrador --}}
         <div class="row">
             <div class="col">
-                <div id="contenedorReactivo">
-                    {{!-- Aqui se reenderiza todo  --}}
-                    <span>Yo me despliego cuando incias sesion </span>
+                <div id="contenedorReactivo" class="flex-colum text-center">
+                    {{!-- Aqui se reenderiza todo --}}
                 </div>
 
-                {{!-- Templates  --}}
-                <template id="templateContactos">
-                    <div class="">
-                        <div class="mis-contactos">
+                {{!-- Templates --}}
+                <template id="templateContenedorClientes">
+                    <div id="clientesAdmin" class="p-4 container">
+                        {{!-- Card de Clientes --}}
+                        <div class="card-tabla">
+                            <div class="card-body p-0">
+                                {{!-- Título y buscador dentro de la card --}}
+                                <div class="seccion-titulo">
+                                    <div class="d-flex justify-content-start align-items-center flex-wrap gap-3">
+                                        <h5 class="fw-bold mb-0"><i
+                                                class="bi bi-file-earmark-text me-2 text-primary"></i>PERSONAS/EMPRESAS
+                                        </h5>
+                                    </div>
+                                    <div class="seccion-busqueda">
+                                        <div class="input-group input-group-sm" style="max-width: 320px;">
+                                            <span class="input-group-text bg-white">
+                                                <i class="bi bi-search"></i>
+                                            </span>
+                                            <input type="text" class="form-control form-control-sm"
+                                                id="inputBuscarCertificado" placeholder="Buscar por código o nombre...">
+                                        </div>
+                                        <div>
+                                            <span type="button" class="btn btn-primario btn-guardar-registro" data-bs-toggle="modal" data-bs-target="#modalRegistro">
+                                                AñadirPersona/Empresa
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-hover style-tabla">
+                                        <thead>
+                                            <tr>
+                                                <th class="ps-3">ID</th>
+                                                <th class="">DOCUMENTO</th>
+                                                <th class="">NOMBRES</th>
+                                                <th class="">TELEFONO</th>
+                                                {{!-- <th class="">ESTADO</th> --}}
+                                                <th class="">OPCIONES</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="contenedorTablaCliente" class="text-center">
+                                            {{!-- Aqui se reendiriza los datos dinamicamente --}}
+                                        </tbody>
+
+                                        <template id="templateTablaClientes">
+                                            <tr>
+                                                <td class="id-persona"></td>
+                                                <td class="documento-persona"></td>
+                                                <td class="nombres-persona"></td>
+                                                <td class="telefono-persona"></td>
+                                                {{!-- <td id="contenedorEstadoListar" class="text-center"></td> --}}
+                                                <td>
+                                                    <div class="d-flex justify-content-center">
+                                                        <span id="verVehiculo" class="bi bi-car-front-fill text-danger"
+                                                            title="Ver certificados del cliente"></span>
+                                                        <span id="editarPersona"
+                                                            class="bi bi-pen-fill me-3 ms-3 text-secondary"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalEditarPersona"></span>
+                                                        <span id="eliminarPersona"
+                                                            class="bi bi-trash3-fill text-danger"></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </table>
+                                </div>
+
+                                {{!-- Info, Selector de registros y Paginación --}}
+                                <div class="p-3 border-top">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                                            <div class="small text-muted" id="infoPaginacion">
+                                                {{!-- Se llena dinámicamente --}}
+                                            </div>
+
+                                            <div class="d-flex align-items-center gap-2">
+                                                <label class="small text-muted mb-0">Mostrar:</label>
+                                                <select id="selectRegistrosPorPagina"
+                                                    class="form-select form-select-sm">
+                                                    <option value="3">3</option>
+                                                    <option value="5" selected>5</option>
+                                                    <option value="10">10</option>
+                                                    <option value="20">20</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <nav aria-label="Paginación de clientes">
+                                            <ul class="pagination pagination-sm mb-0" id="paginacionClientes">
+                                                {{!-- Se llena dinámicamente con JavaScript --}}
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </template>
-                <template id="templateGaleria">
-                    <div class="bg-danger">
-                        <span class="mi-galeria"></span>
+                <template id="templateVehiculos">
+                    <div class="">
+                        <span class="Vehiculos"></span>
                     </div>
                 </template>
             </div>
         </div>
     </section>
+    {{!-- ==================== Modal Registrar Persona/Empresa ==================== --}}
+    <div class="modal fade modal-personalizado" id="modalRegistro" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalRegistroLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header border-0 pb-0">
+                    <div>
+                        <h5 class="modal-title" id="modalRegistroLabel">Registrar nuevo Cliente</h5>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="input-style mb-3">
+                        <input id="documento" class="input-style-error" type="number" placeholder=" ">
+                        <label for="documento">
+                            <i class="bi bi-window-dock me-2"></i>N° Documento
+                        </label>
+                    </div>
+                    <div class="input-style mb-3">
+                        <input id="nombres" class="input-style-error" type="text" placeholder=" ">
+                        <label for="nombres">
+                            <i class="bi bi-person me-2"></i>Nombres
+                        </label>
+                    </div>
+                    <div class="input-style mb-3">
+                        <input id="apellidos" class="input-style-error" type="text" placeholder=" ">
+                        <label for="apellidos">
+                            <i class="bi bi-person me-2"></i>Apellidos
+                        </label>
+                    </div>
+
+                    <div class="input-style mb-3">
+                        <input id="telefono" class="input-style-error" type="number" placeholder=" ">
+                        <label for="telefono">
+                            <i class="bi bi-telephone me-2"></i>Teléfono
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <span type="button" class="btn btn-cancelar me-2" data-bs-dismiss="modal">Cancelar</span>
+                    <span id="btnAñadirCliente" type="button" class="btn btn-primario btn-guardar-registro"><i
+                            class="bi bi-check2 me-2"></i>Registrar</span>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="/js/administrador.js"></script>

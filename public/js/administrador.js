@@ -1,14 +1,22 @@
-/* Scrip para frontend */
-/* const socket = io('/administrador'); */
+document.addEventListener('DOMContentLoaded', async () => {
+    await cargarClientes();
+    /* await cargarMensajes();
+    inicializarToastCerrar();
+    mostrarDashboard() */
+
+    /* setInterval(cargarPersonas, 5000); //aca podemos hacer polling cada 5Segundos*/
+});
 
 // Creación de fragmento para optimizar manipulaciones del DOM
 const fragmento = document.createDocumentFragment();
 
 /* Invocamos a los botones */
-let btnMenuContactos = document.querySelector('#btnMenuContactos');
-let btnMenuGaleria = document.querySelector('#btnMenuGaleria');
-let btnMenuAlbum = document.querySelector('#btnMenuAlbum');
-let btnMenuNotificacion = document.querySelector('#btnMenuNotificacion');
+let btnMenuClientes = document.querySelector('#btnMenuClientes');
+let btnMenuVehiculos = document.querySelector('#btnMenuVehiculos');
+let btnMenulogistica = document.querySelector('#btnMenulogistica');
+let btnMenuOperaciones = document.querySelector('#btnMenuOperaciones');
+let btnMenuVentas = document.querySelector('#btnMenuVentas');
+let btnMenuReportes = document.querySelector('#btnMenuReportes');
 let btnMenuConfiguracion = document.querySelector('#btnMenuConfiguracion');
 let btnMenuCerrar = document.querySelector('#btnMenuCerrar');
 
@@ -16,46 +24,67 @@ let btnMenuCerrar = document.querySelector('#btnMenuCerrar');
 let contenedorReactivo = document.querySelector('#contenedorReactivo');
 
 // Capturar los templates de las secciones
-const templateContactos = document.querySelector('#templateContactos').content;
-const templateGaleria = document.querySelector('#templateGaleria').content;
+const templateContenedorClientes = document.querySelector('#templateContenedorClientes').content;
+const templateVehiculos = document.querySelector('#templateVehiculos').content;
 /* const templateAlbum = document.querySelector('#templateAlbum').content;
 const templateNotificacion = document.querySelector('#templateNotificacion').content;
 const templateConfiguracion = document.querySelector('#templateConfiguracion').content; */
 
 
 /* Variables globales */
-let listadoGeneralContactos = {};
+let listadoGeneralClientes = [];
 
+async function cargarClientes() {
+    try {
 
+        const response = await axios.get("/api/listarPersonas");
+        listadoGeneralClientes = [...response.data];
 
-/* Sockets de escucha */
-/* socket.on('/index/listarUsuarios', (data)=>{
-    listadoGeneralContactos = data;  
-    console.log(listadoGeneralContactos);
-    
-}) */
+    } catch (error) {
 
-/* Funciones de los botones para reenderizar elDOM */
+        console.error(error);
+    }
+}
 
-
-btnMenuContactos.addEventListener('click', function(){
-    
+btnMenuClientes.addEventListener('click', function(){
     contenedorReactivo.innerHTML = "";
-
-    templateContactos.querySelector('.mis-contactos').innerHTML = `<div> 
-                                <span type="button" class="btn btn-cancelar me-2" data-bs-dismiss="modal">Cancelar</span>
-                                <span id="actualizaPersona" class="btn btn-primario"><iclass="bi bi-check2 me-2"></i>Actualizar</span>
-                            </div>`;
-   
-    
-
-    const clone = templateContactos.cloneNode(true);
+    const clone = templateContenedorClientes.cloneNode(true);
     fragmento.appendChild(clone);
-
     contenedorReactivo.appendChild(fragmento);
+    listarClientes();
 });
 
-btnMenuGaleria.addEventListener('click', function(){
+function listarClientes() {
+    let contenedorTablaCliente = document.querySelector('#contenedorTablaCliente');
+    const templateTablaClientes = document.querySelector('#templateTablaClientes').content;
+    contenedorTablaCliente.innerHTML = "";
+
+    listadoGeneralClientes.forEach(persona => {
+        templateTablaClientes.querySelector('.id-persona').textContent = persona.id_persona;
+        templateTablaClientes.querySelector('.documento-persona').textContent = persona.documento;
+        templateTablaClientes.querySelector('.nombres-persona').textContent = persona.nombres;
+        templateTablaClientes.querySelector('.telefono-persona').textContent = persona.telefono;
+        /* if (persona.estado == 'activo') {
+            templateTablaClientes.querySelector('#contenedorEstadoListar').innerHTML = innerHTML = `<span class="rounded bg-success p-1 text-white">Activo</span>`;
+        }
+        if (persona.estado == 'inactivo') {
+            templateTablaClientes.querySelector('#contenedorEstadoListar').innerHTML = innerHTML = `<span class="rounded bg-danger p-1 text-white">Inactivo</span>`;
+        } */
+        templateTablaClientes.querySelector('#verVehiculo').dataset.id = persona.id_persona;
+        templateTablaClientes.querySelector('#editarPersona').dataset.id = persona.id_persona;
+        templateTablaClientes.querySelector('#eliminarPersona').dataset.id = persona.id_persona;
+        
+        const clone = templateTablaClientes.cloneNode(true);
+        fragmento.appendChild(clone);
+    });
+
+    contenedorTablaCliente.appendChild(fragmento);
+}
+
+
+
+
+/* btnMenuGaleria.addEventListener('click', function(){
     contenedorReactivo.innerHTML = "";
 
     templateGaleria.querySelector('.mi-galeria').textContent = "Yo me reenderizo cuando haces clic en galeria";
@@ -64,4 +93,4 @@ btnMenuGaleria.addEventListener('click', function(){
     fragmento.appendChild(clone);
 
     contenedorReactivo.appendChild(fragmento);
-});
+}); */

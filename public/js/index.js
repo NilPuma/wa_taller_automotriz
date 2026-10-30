@@ -71,9 +71,7 @@ function validarUsuario() {
   })
   .then((res) => {
     if (res.data.ok) { 
-        
         let usuario = res.data.usuario
-      console.log(usuario.rol);
       
       // Redirige al template administrador
       if (usuario.rol == 1) {

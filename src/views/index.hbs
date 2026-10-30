@@ -14,23 +14,23 @@
 
               {{!-- Seccion de login --}}
               <div class="col-sm-12 col-md-6 col-lg-6">
-                <div id="contenedorLogin" class="row">
-                  <div class="col-12 col-lg-6 col-md-8">
-                    <form action="" class=" formulario-login form-group p-4 shadow">
+                <div  class="row">
+                  <div id="contenedorLogin" class="col-12 col-lg-4 col-md-8">
+                    <form class="formulario-login form-group p-4 shadow">
                       <div>
                         <div class="text-center mb-4">
                           <img id="logo" src="/img/logo.png" alt="" class="img-fluid logo" width="150px">
                         </div>
 
-                        <div class="form-floating mb-2">
-                          <input id="correoSesion" type="text" class="form-control" placeholder="" required>
-                          <label for="correoSesion"><i class="bi bi-person me-1"></i>Correo</label>
+                        <div class="input-style espacio-margin-input">
+                          <input id="correoSesion" type="text" id="miInput" placeholder=" " autocomplete="off">
+                          <label for="miInput"><i class="bi bi-person  me-1"></i> Correo</label>
                         </div>
-                        <div class="form-floating mb-4">
-                          <input id="passwordSesion" type="text" class="form-control" placeholder="" required>
-                          <label for="passwordSesion"><i class="bi bi-shield-check me-1"></i>Contraseña</label>
+                        <div class="input-style">
+                          <input id="passwordSesion" type="password" id="miInput" placeholder=" " autocomplete="off">
+                          <label for="miInput"><i class="bi bi-person  bi bi-shield-check me-1"></i> Contraseña</label>
                         </div>
-                        <div class="text-center mb-4">
+                        <div class="text-center espacio-margin-btn">
                           <button type="button" id="btn_login" class="btn btn-primario" onclick="validarUsuario()">
                               <span>INGRESAR</span>
                           </button>
@@ -48,7 +48,7 @@
                       </div>
 
                     </form>
-
+                  
                     <!-- Modal de registro de Usuario -->
                     <div class="modal fade" id="modalRegistro" data-bs-backdrop="static" data-bs-keyboard="false"
                       tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
