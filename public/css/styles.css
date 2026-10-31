@@ -918,6 +918,13 @@ body {
   max-width: 320px;
 }
 
+
+
+.seccion-cabecera__acciones .cotizacion-buscar-vehiculo {
+  flex: 1 1 220px;
+  min-width: 180px;
+  max-width: 320px;
+}
 .pill-contador {
   display: inline-flex;
   align-items: center;
@@ -955,6 +962,7 @@ body {
   .seccion-cabecera__buscar {
     max-width: none;
   }
+
 }
 
 /* ============================================================
@@ -1157,8 +1165,8 @@ body {
 
 /* Cabecera */
 .tabla-sistema thead th {
-  background: #E8EBF0;
-  color: #4B5A6E;
+  background: #E1E8F2;
+  color: #203658;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: normal;
@@ -1461,6 +1469,7 @@ body {
   border-radius: 8px;
   border: 1px solid var(--borde-suave);
   background: var(--color1);
+  color: var(--texto-principal);
   text-align: left;
   transition: var(--transicion-media);
 }
@@ -1468,17 +1477,30 @@ body {
 #ordenes .item-orden:hover {
   background: #E8EBF0;
   border-color: rgba(40, 68, 115, 0.35);
+  color: var(--texto-principal);
   transform: translateX(2px);
 }
 
-#ordenes .item-orden.active {
+#ordenes .item-orden.active,
+#ordenes .item-orden.active:hover,
+#ordenes .item-orden:focus,
+#ordenes .item-orden:active {
   border-color: #284473;
   background: #DDE2EA;
   box-shadow: inset 3px 0 0 #284473;
+  color: var(--texto-principal);
 }
 
 #ordenes .item-orden .codigo-orden {
   color: var(--texto-principal);
+}
+
+#ordenes .item-orden .cliente-orden {
+  color: var(--texto-secundario);
+}
+
+#ordenes .item-orden .placa-orden {
+  color: var(--texto-secundario) !important;
 }
 
 #ordenes .item-orden .estado-orden {
@@ -1926,113 +1948,6 @@ body {
 }
 
 /* ============================================================
-   17. MODALES
-   ============================================================ */
-.modal-tabs {
-  border-bottom: 1px solid var(--borde-suave);
-}
-
-.modal-tabs .tab-mecanico {
-  color: var(--texto-principal);
-  font-size: 0.85rem;
-}
-
-.modal-tabs .tab-separador {
-  color: var(--texto-principal);
-  margin: 0 6px;
-}
-
-.modal-tabs .tab-dia {
-  font-size: 0.75rem;
-  color: var(--texto-secundario);
-  text-decoration: none;
-  padding: 2px 6px;
-  border-radius: 4px;
-  transition: var(--transicion-media);
-}
-
-.modal-tabs .tab-dia:hover {
-  background: var(--color2);
-  color: var(--texto-principal);
-}
-
-.modal-tabs .tab-dia.active {
-  background: #284473;
-  color: #FFFFFF;
-}
-
-.fila-agregar-horario .form-select {
-  flex: 1;
-  min-width: 90px;
-}
-
-.bloque-ocupado {
-  padding: 8px 12px;
-  background: var(--color2);
-  border-radius: 6px;
-  border-left: 3px solid #CC0000;
-  transition: var(--transicion-media);
-}
-
-.bloque-ocupado:hover {
-  background: #E8EBF0;
-}
-
-.badge-ocupado-modal {
-  font-size: 0.6rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #CC0000;
-  color: #FFFFFF;
-  letter-spacing: 0.04em;
-}
-
-.bloque-horario {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--texto-principal);
-}
-
-.btn-eliminar-bloque {
-  font-size: 0.85rem;
-  color: #CC0000;
-  text-decoration: none;
-  transition: var(--transicion-media);
-}
-
-.btn-eliminar-bloque:hover {
-  color: #284473;
-  
-  transform: scale(1.1);
-}
-
-.modal-subtitulo-cerrar {
-  font-size: 0.82rem;
-  color: #284473;
-}
-
-.modal-icono-cerrar {
-  font-size: 2.5rem;
-  color: #CC0000;
-}
-
-.modal-content {
-  border: 1px solid var(--borde-suave);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.modal-header.bg-dark {
-  background: #284473 !important;
-}
-
-.modal-footer {
-  border-top: 1px solid var(--borde-suave);
-  background: var(--color1);
-}
-
-/* ============================================================
    18. UTILIDADES
    ============================================================ */
 .max-w-320 { max-width: 320px; }
@@ -2043,159 +1958,6 @@ body {
 .w-50 { width: 50px; }
 .w-60 { width: 60px; }
 .w-80 { width: 80px; }
-
-/* ============================================================
-   19. FORMULARIOS DE MECÁNICO
-   ============================================================ */
-.input-style input,
-.input-style textarea,
-.input-style select {
-  width: 100%;
-  font-family: "Roboto", sans-serif;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #00162B;
-  background: #F0F2F5;
-  border: 1.5px solid #284473;
-  border-radius: 8px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  outline: none;
-  display: block;
-}
-
-.input-style input,
-.input-style select {
-  height: 44px;
-}
-
-.input-style input {
-  padding: 18px 12px 4px;
-}
-
-.input-style textarea {
-  height: 86px;
-  min-height: 86px;
-  padding: 22px 12px 4px;
-  resize: vertical;
-  line-height: 1.5;
-}
-
-.input-style select {
-  padding: 18px 30px 4px 12px;
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, #4B5A6E 50%),
-                    linear-gradient(135deg, #4B5A6E 50%, transparent 50%);
-  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
-  background-size: 5px 5px, 5px 5px;
-  background-repeat: no-repeat;
-  cursor: pointer;
-}
-
-.input-style input:hover,
-.input-style textarea:hover,
-.input-style select:hover {
-  border-color: #131F33;
-}
-
-.input-style input:focus,
-.input-style textarea:focus,
-.input-style select:focus {
-  background: #FFFFFF;
-  border-color: #142dbb;
-  box-shadow: 0 0 0 3px rgba(187, 117, 20, 0.15);
-}
-
-.input-style label {
-  position: absolute;
-  top: 50%;
-  left: 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin: 0;
-  color: #4B5A6E;
-  font-size: 0.82rem;
-  font-weight: 400;
-  line-height: 1;
-  pointer-events: none;
-  transform: translateY(-50%) scale(1);
-  transform-origin: left center;
-  transition: all 0.2s ease;
-}
-
-.input-style label i {
-  font-size: 0.9rem;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-/* Textarea: etiqueta fija arriba. */
-.input-style textarea ~ label {
-  top: 15px;
-  transform: none;
-}
-
-/* Select: etiqueta flotante permanente. */
-.input-style select ~ label {
-  top: 50%;
-  color: #142dbb;
-  font-weight: 500;
-  transform: translateY(-50%) translateY(-10px) scale(0.75);
-}
-
-/* Inputs: etiqueta flotante cuando tienen foco o contenido. */
-.input-style input:focus ~ label,
-.input-style input:not(:placeholder-shown) ~ label {
-  color: #142dbb;
-  font-weight: 500;
-  transform: translateY(-50%) translateY(-10px) scale(0.75);
-}
-
-.input-style textarea:focus ~ label,
-.input-style textarea:not(:placeholder-shown) ~ label {
-  top: 15px;
-  color: #142dbb;
-  font-weight: 500;
-  transform: scale(0.75);
-  transform-origin: left center;
-}
-
-.input-style input:focus ~ label i,
-.input-style input:not(:placeholder-shown) ~ label i,
-.input-style textarea:focus ~ label i,
-.input-style textarea:not(:placeholder-shown) ~ label i,
-.input-style select:focus ~ label i,
-.input-style select ~ label i {
-  color: #142dbb;
-  opacity: 1;
-}
-.input-style-error {
-  display: none;
-  font-size: 0.72rem;
-  color: #CC0000;
-  padding-left: 0.25rem;
-  font-weight: 500;
-  margin-top: 0.25rem;
-}
-
-.input-style.is-invalid input,
-.input-style.is-invalid textarea,
-.input-style.is-invalid select {
-  border-color: #CC0000;
-  background: #FFF5F5;
-  animation: shake 0.5s ease-in-out;
-}
-
-.input-style.is-invalid input:focus,
-.input-style.is-invalid textarea:focus,
-.input-style.is-invalid select:focus {
-  box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.15);
-}
-
-.input-style.is-invalid .input-style-error {
-  display: block;
-}
-
 
 .btn-header {
   font-size: 0.82rem;
@@ -2377,12 +2139,6 @@ body {
     padding: 14px;
   }
 
-  /* 20.8 Modal tabs en móvil: permitir scroll horizontal si no caben */
-  .modal-tabs .tab-dias {
-    overflow-x: auto;
-    white-space: nowrap;
-    padding-bottom: 4px;
-  }
 }
 
 /* ============================================================
@@ -2455,16 +2211,7 @@ body {
   }
 
   /* 21.6 Botón "Buscar vehículo" en Cotizaciones: full width en móvil */
-  #btnBuscarPlaca {
-    width: 100%;
-    margin-top: 8px;
-  }
 
-  /* 21.7 Botón "AGREGAR" en modal Horario: full width en móvil */
-  .fila-agregar-horario .btn {
-    width: 100%;
-    margin-top: 8px;
-  }
 
   /* 21.8 Footer del consumo: botón FINALIZAR visible y tocable */
   #btnFinalizarOrden {
@@ -2477,25 +2224,6 @@ body {
     position: static;
   }
 
-  /* 21.10 Input-style en móvil: un poco más chico */
-  .input-style input,
-  .input-style select {
-    height: 40px;
-    font-size: 0.78rem;
-    padding: 15px 10px 4px 10px;
-  }
-
-  .input-style label {
-    font-size: 0.78rem;
-    left: 10px;
-  }
-
-  .input-style textarea {
-    height: 76px;
-    min-height: 76px;
-    font-size: 0.78rem;
-    padding: 20px 10px 4px 10px;
-  }
 
   /* 21.11 Input-group de búsqueda: más compacto */
   #cotizaciones .input-group-sm > .input-group-text,
@@ -2510,17 +2238,6 @@ body {
     padding: 6px 8px;
   }
 
-  /* En pantallas pequeñas los tabs se distribuyen en una fila. */
-  .modal-tabs .tab-dias {
-    display: flex;
-    gap: 4px;
-    scrollbar-width: thin;
-  }
-
-  .modal-tabs .tab-dia {
-    flex-shrink: 0;
-    padding: 4px 8px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -2582,4 +2299,241 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+/* ============================================================
+   AJUSTES VISUALES EXCLUSIVOS DE MECÁNICO
+   ============================================================ */
+
+/* Modal de cliente: conserva el aspecto y la animación global de .input-style. */
+#modalNuevoCliente .modal-content,
+#modalVerCliente .modal-content {
+  border: 0;
+  border-radius: 14px;
+  box-shadow: var(--sombra-lg);
+}
+
+#modalNuevoCliente .modal-header,
+#modalVerCliente .modal-header {
+  padding: 20px 24px 6px;
+}
+
+#modalNuevoCliente .modal-title,
+#modalVerCliente .modal-title {
+  color: var(--texto-principal);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+#modalNuevoCliente .modal-body,
+#modalVerCliente .modal-body {
+  padding: 18px 24px 22px;
+  color: var(--texto-principal);
+  font-size: 0.88rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.4;
+}
+
+#modalNuevoCliente #formNuevoCliente > h6,
+#modalNuevoCliente #seccionVehiculoNuevo > h6,
+#modalVerCliente .modal-body > h6 {
+  margin: 0 0 12px !important;
+  padding: 0;
+  border: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+#modalNuevoCliente #formNuevoCliente > .row,
+#modalNuevoCliente #seccionVehiculoNuevo .row {
+  --bs-gutter-x: 1rem;
+  --bs-gutter-y: 0.8rem;
+}
+
+/* Tipo de documento y número conservan el mismo ancho y alineación. */
+#modalNuevoCliente #formNuevoCliente > .row.g-3.mb-3 > .col-md-4:nth-child(1),
+#modalNuevoCliente #formNuevoCliente > .row.g-3.mb-3 > .col-md-4:nth-child(2) {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+/* El selector comparte el patrón y la animación flotante de .input-style. */
+#modalNuevoCliente .input-style select {
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  padding: 16px 34px 4px 12px;
+  color: #16202E;
+  background-color: #f7f8fa;
+  border: 1.5px solid rgba(22, 32, 46, 0.2);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.82rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#modalNuevoCliente .input-style select:focus {
+  background-color: #FFFFFF;
+  border-color: #003263;
+  box-shadow: 0 0 0 3px rgba(0, 75, 204, 0.08);
+  outline: none;
+}
+
+#modalNuevoCliente .input-style select:focus ~ label,
+#modalNuevoCliente .input-style select:valid ~ label {
+  transform: translateY(-50%) translateY(-8px) scale(0.75);
+  color: #003263;
+  font-weight: 500;
+}
+
+#modalNuevoCliente .input-style select:focus ~ label i,
+#modalNuevoCliente .input-style select:valid ~ label i {
+  opacity: 1;
+  color: #003263;
+}
+
+#modalNuevoCliente .form-check {
+  margin-bottom: 12px !important;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+#modalNuevoCliente .form-check-label {
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+#modalNuevoCliente hr,
+#modalVerCliente hr {
+  margin: 14px 0;
+  color: var(--borde-suave);
+  opacity: 1;
+}
+
+#modalNuevoCliente .modal-footer,
+#modalVerCliente .modal-footer {
+  gap: 8px;
+  padding: 10px 24px 20px;
+}
+
+/* Datos de cliente en formato tabular, igual al listado de vehículos. */
+#modalVerCliente #tablaDatosCliente {
+  table-layout: fixed;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#modalVerCliente #tablaDatosCliente tbody th {
+  width: 16%;
+  padding: 8px 10px;
+  background: #E1E8F2;
+  color: #203658;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+}
+
+#modalVerCliente #tablaDatosCliente tbody td {
+  width: 34%;
+  padding: 8px 10px;
+  color: var(--texto-principal);
+  font-size: 0.78rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+#modalVerCliente #tablaDatosCliente strong,
+#modalVerCliente #tablaDatosCliente span:not(.badge) {
+  font-size: inherit;
+  font-weight: 500;
+}
+
+#modalVerCliente #tablaDatosCliente #verClienteNombre,
+#modalVerCliente #tablaDatosCliente #verClienteDocumento {
+  font-weight: 600;
+}
+
+#modalVerCliente #tablaDatosCliente #verClienteCorreo {
+  color: #284473 !important;
+}
+
+#modalVerCliente #tablaDatosCliente #verClienteEstado {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+/* Miniaturas del historial, con el tamaño del álbum de Órdenes. */
+#modalVerHistorial #albumEvidenciasHistorial.album-evidencias {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 96px);
+  gap: 0.5rem;
+  justify-content: start;
+}
+
+#modalVerHistorial #albumEvidenciasHistorial .evidencia-card {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  overflow: hidden;
+  border: 1px solid var(--borde-suave);
+  border-radius: 0.5rem;
+  background: var(--color1);
+  box-shadow: var(--sombra-xs);
+}
+
+#modalVerHistorial #albumEvidenciasHistorial .evidencia-card__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#modalVerHistorial #albumEvidenciasHistorial .evidencia-card__overlay {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0.25rem 0.4rem;
+  background: linear-gradient(to top, rgba(19, 31, 51, 0.78), transparent);
+  color: #FFFFFF;
+  font-size: 0.68rem;
+  pointer-events: none;
+}
+
+@media (max-width: 767.98px) {
+  #modalNuevoCliente .modal-header,
+  #modalVerCliente .modal-header {
+    padding: 18px 18px 6px;
+  }
+
+  #modalNuevoCliente .modal-body,
+  #modalVerCliente .modal-body {
+    padding: 16px 18px 20px;
+  }
+
+  #modalNuevoCliente .modal-footer,
+  #modalVerCliente .modal-footer {
+    padding: 10px 18px 18px;
+  }
+
+
+}
+
+@media (max-width: 575.98px) {
+  #modalVerCliente .modal-body > .row.g-3.mb-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 10px;
+    padding: 8px;
+  }
+
+  #modalVerCliente .modal-body > .row.g-3.mb-3 > [class*="col-"] {
+    grid-column: span 1 !important;
+  }
+
+  #modalVerCliente .modal-body > .row.g-3.mb-3 > [class*="col-"]:nth-child(3),
+  #modalVerCliente .modal-body > .row.g-3.mb-3 > [class*="col-"]:nth-child(4),
+  #modalVerCliente .modal-body > .row.g-3.mb-3 > [class*="col-"]:nth-child(7) {
+    grid-column: 1 / -1 !important;
+  }
 }

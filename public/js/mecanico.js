@@ -113,6 +113,7 @@ let _ultimoPayloadConsumo = null;
 // ============================================================
 // HELPERS: PAGINACION
 // ============================================================
+// Lee una preferencia de paginación y valida que sea una opción permitida.
 function leerPreferencia(clave, porDefecto) {
     try {
         const valor = Number(localStorage.getItem(clave));
@@ -125,6 +126,7 @@ function leerPreferencia(clave, porDefecto) {
     return porDefecto;
 }
 
+// Guarda en localStorage la cantidad de registros elegida para una vista.
 function guardarPreferencia(clave, valor) {
     try {
         localStorage.setItem(clave, String(valor));
@@ -133,11 +135,13 @@ function guardarPreferencia(clave, valor) {
     }
 }
 
+// Actualiza el selector de registros por página al abrir una vista.
 function sincronizarSelectPorPagina(vista, valor) {
     const select = document.querySelector('.selector-por-pagina[data-vista="' + vista + '"]');
     if (select) select.value = String(valor);
 }
 
+// Muestra qué registros se ven y cuántos existen en total.
 function actualizarInfoRango(idInfo, inicio, fin, total) {
     const el = document.querySelector('#' + idInfo);
     if (!el) return;
@@ -148,6 +152,7 @@ function actualizarInfoRango(idInfo, inicio, fin, total) {
     }
 }
 
+// Configura el campo de salto directo según la página actual y el total disponible.
 function actualizarIrPagina(idInput, pagina, totalPaginas) {
     const el = document.querySelector('#' + idInput);
     if (!el) return;
@@ -155,6 +160,7 @@ function actualizarIrPagina(idInput, pagina, totalPaginas) {
     el.max = String(totalPaginas);
 }
 
+// Actualiza los estados de los controles de paginación.
 function actualizarBotonesPaginacion(prefijo, pagina, totalPaginas) {
     const liPrev  = document.querySelector('#li' + prefijo + 'Prev');
     const liNext  = document.querySelector('#li' + prefijo + 'Next');
@@ -176,6 +182,7 @@ function actualizarBotonesPaginacion(prefijo, pagina, totalPaginas) {
 // ============================================================
 // MENU LATERAL
 // ============================================================
+// Conecta las opciones del menú con las funciones que muestran cada sección.
 function enlazarMenu() {
     const menuMap = {
         '#btnMenuInicio':       renderDashboard,
@@ -201,6 +208,7 @@ function enlazarMenu() {
     if (document.body.dataset.sidebarBound === '1') return;
     document.body.dataset.sidebarBound = '1';
 
+// Maneja el evento pointerdown del control #menuBtn.
     document.addEventListener('pointerdown', function (event) {
         const boton = event.target.closest('#menuBtn');
         if (!boton) return;
@@ -218,6 +226,7 @@ function enlazarMenu() {
 // ============================================================
 // ARRANQUE
 // ============================================================
+// Inicializa menú, alertas y datos antes de mostrar el dashboard.
 document.addEventListener('DOMContentLoaded', async () => {
     enlazarMenu();
 
@@ -254,9 +263,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================================
 // FUNCIONES DE CARGA
 // ============================================================
+// Consulta la sesión actual y redirige al inicio si no se puede validar.
 async function cargarPerfil() {
     try {
-        const response = await axios.get("/api/perfil");
+        const response = await axios.get("/api/obtenerPerfil");
         perfilActual = response.data.usuario;
     } catch (error) {
         console.error(error);
@@ -264,23 +274,25 @@ async function cargarPerfil() {
     }
 }
 
+// Obtiene el registro de mecánico asociado al usuario autenticado.
 async function cargarMecanico() {
     if (!perfilActual) return;
     if (perfilActual.id_rol !== 3 || !perfilActual.id_mecanico) return;
 
     try {
-        const response = await axios.get("/api/mecanicos/" + perfilActual.id_mecanico);
+        const response = await axios.get("/api/buscarMecanicoPorId/" + perfilActual.id_mecanico);
         if (response.data.ok) mecanicoActual = response.data.mecanico;
     } catch (error) {
         console.error(error);
     }
 }
 
+// Obtiene la sucursal del usuario y usa la sucursal predeterminada como alternativa.
 async function cargarSucursal() {
     if (!perfilActual) return;
 
     try {
-        const response = await axios.get("/api/usuarios/" + perfilActual.id_usuario + "/sucursales");
+        const response = await axios.get("/api/listarSucursalesDeUsuario/" + perfilActual.id_usuario);
         if (response.data.ok && response.data.sucursales && response.data.sucursales.length > 0) {
             sucursalActual = response.data.sucursales[0];
             return;
@@ -290,34 +302,37 @@ async function cargarSucursal() {
     }
 
     try {
-        const response = await axios.get("/api/sucursales/1");
+        const response = await axios.get("/api/buscarSucursalPorId/1");
         if (response.data.ok) sucursalActual = response.data.sucursal;
     } catch (error) {
         console.error(error);
     }
 }
 
+// Carga las personas para las vistas y formularios del módulo.
 async function cargarPersonas() {
     try {
-        const response = await axios.get("/api/personas");
+        const response = await axios.get("/api/listarPersonas");
         listadoGeneralPersonas = [...response.data.personas];
     } catch (error) {
         console.error(error);
     }
 }
 
+// Carga la lista general de vehículos.
 async function cargarVehiculos() {
     try {
-        const response = await axios.get("/api/vehiculos");
+        const response = await axios.get("/api/listarVehiculos");
         listadoGeneralVehiculos = [...response.data.vehiculos];
     } catch (error) {
         console.error(error);
     }
 }
 
+// Carga los vehículos asociados a una persona.
 async function cargarVehiculosPorPersona(idPersona) {
     try {
-        const response = await axios.get("/api/vehiculos/persona/" + idPersona);
+        const response = await axios.get("/api/listarVehiculosPorPersona/" + idPersona);
         vehiculosClienteActual = [...response.data.vehiculos];
     } catch (error) {
         console.error(error);
@@ -325,6 +340,7 @@ async function cargarVehiculosPorPersona(idPersona) {
     }
 }
 
+// Carga las órdenes asignadas al mecánico autenticado.
 async function cargarOrdenes() {
     if (!mecanicoActual) {
         listadoGeneralOrdenes = [];
@@ -332,25 +348,27 @@ async function cargarOrdenes() {
     }
 
     try {
-        const response = await axios.get("/api/ordenes/mecanico/" + mecanicoActual.id_mecanico);
+        const response = await axios.get("/api/listarOrdenesPorMecanico/" + mecanicoActual.id_mecanico);
         listadoGeneralOrdenes = [...response.data.ordenes];
     } catch (error) {
         console.error(error);
     }
 }
 
+// Carga las cotizaciones disponibles para el módulo.
 async function cargarCotizaciones() {
     try {
-        const response = await axios.get("/api/cotizaciones");
+        const response = await axios.get("/api/listarCotizaciones");
         listadoGeneralCotizaciones = [...response.data.cotizaciones];
     } catch (error) {
         console.error(error);
     }
 }
 
+// Carga cotizaciones aprobadas que se pueden asociar a una orden.
 async function cargarCotizacionesAprobadas() {
     try {
-        const response = await axios.get("/api/cotizaciones", {
+        const response = await axios.get("/api/listarCotizaciones", {
             params: { estado: 'APROBADA' }
         });
         listadoCotizacionesAprobadas = [...(response.data.cotizaciones || [])];
@@ -360,18 +378,20 @@ async function cargarCotizacionesAprobadas() {
     }
 }
 
+// Carga las citas disponibles para el módulo.
 async function cargarCitas() {
     try {
-        const response = await axios.get("/api/citas");
+        const response = await axios.get("/api/listarCitas");
         listadoGeneralCitas = [...response.data.citas];
     } catch (error) {
         console.error(error);
     }
 }
 
+// Carga citas sin orden de trabajo de la sucursal activa.
 async function cargarCitasSinOrden() {
     try {
-        const response = await axios.get("/api/citas/sin-orden", {
+        const response = await axios.get("/api/listarCitasSinOrden", {
             params: { idSucursal: sucursalActual.id_sucursal }
         });
         listadoCitasSinOrden = [...(response.data.citas || [])];
@@ -381,36 +401,40 @@ async function cargarCitasSinOrden() {
     }
 }
 
+// Carga los productos disponibles en la sucursal activa.
 async function cargarProductos() {
     try {
-        const response = await axios.get("/api/productos/sucursal/" + sucursalActual.id_sucursal);
+        const response = await axios.get("/api/listarProductosPorSucursal/" + sucursalActual.id_sucursal);
         listadoGeneralProductos = [...response.data.productos];
     } catch (error) {
         console.error(error);
     }
 }
 
+// Carga los servicios disponibles en la sucursal activa.
 async function cargarServicios() {
     try {
-        const response = await axios.get("/api/servicios/sucursal/" + sucursalActual.id_sucursal);
+        const response = await axios.get("/api/listarServiciosPorSucursal/" + sucursalActual.id_sucursal);
         listadoGeneralServicios = [...response.data.servicios];
     } catch (error) {
         console.error(error);
     }
 }
 
+// Carga los mecánicos para las vistas de selección.
 async function cargarMecanicos() {
     try {
-        const response = await axios.get("/api/mecanicos/sucursal/" + sucursalActual.id_sucursal);
+        const response = await axios.get("/api/listarMecanicosPorSucursal/" + sucursalActual.id_sucursal);
         listadoGeneralMecanicos = [...response.data.mecanicos];
     } catch (error) {
         console.error(error);
     }
 }
 
+// Obtiene el informe y las evidencias vinculados a una orden.
 async function cargarInformePorOrden(idOrden) {
     try {
-        const response = await axios.get("/api/informes/orden/" + idOrden);
+        const response = await axios.get("/api/buscarInformePorOrden/" + idOrden);
         if (response.data.ok && response.data.informe) {
             idInformeActual = response.data.informe.id_informe;
             evidenciasGuardadas = [...(response.data.informe.evidencias || [])];
@@ -429,15 +453,17 @@ async function cargarInformePorOrden(idOrden) {
     }
 }
 
+// Carga las sucursales disponibles.
 async function cargarSucursales() {
     try {
-        const response = await axios.get("/api/sucursales");
+        const response = await axios.get("/api/listarSucursales");
         listadoGeneralSucursales = [...response.data.sucursales];
     } catch (error) {
         console.error(error);
     }
 }
 
+// Espera las consultas necesarias antes de iniciar la interfaz.
 async function cargarDatosIniciales() {
     await Promise.all([
         cargarPersonas(),
@@ -455,18 +481,21 @@ async function cargarDatosIniciales() {
 // ============================================================
 // HELPERS GENERALES
 // ============================================================
+// Devuelve la fecha actual con el formato usado en el encabezado.
 function formatearFechaHoy() {
     const d = new Date();
     const opciones = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
     return d.toLocaleDateString('es-PE', opciones);
 }
 
+// Convierte una fecha al formato legible que se muestra en pantalla.
 function formatearFecha(fechaIso) {
     const d = new Date(fechaIso);
     if (isNaN(d)) return '—';
     return d.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
+// Convierte una fecha al formato YYYY-MM-DD.
 function fechaISO(fecha) {
     const d = new Date(fecha);
     if (isNaN(d)) return '';
@@ -476,6 +505,7 @@ function fechaISO(fecha) {
     return `${y}-${m}-${dia}`;
 }
 
+// Selecciona las clases visuales de Bootstrap según el estado.
 function claseBadgeEstado(estado) {
     switch (estado) {
         case 'PENDIENTE':   return 'bg-warning text-dark';
@@ -492,6 +522,7 @@ function claseBadgeEstado(estado) {
     }
 }
 
+// Calcula el promedio de días de las órdenes finalizadas recibidas.
 function calcularTiempoPromedio(finalizadas) {
     if (!finalizadas || finalizadas.length === 0) return '--';
 
@@ -518,6 +549,7 @@ function calcularTiempoPromedio(finalizadas) {
     return `${promedio.toFixed(1)} días`;
 }
 
+// Actualiza el texto de un elemento si existe en la vista actual.
 function setTexto(selector, valor) {
     const el = document.querySelector(selector);
     if (el) el.textContent = valor;
@@ -526,12 +558,14 @@ function setTexto(selector, valor) {
 // ============================================================
 // HELPERS MODALES
 // ============================================================
+// Muestra un modal de Bootstrap identificado por su selector.
 function abrirModal(selector) {
     const el = document.querySelector(selector);
     if (!el) return;
     bootstrap.Modal.getOrCreateInstance(el).show();
 }
 
+// Oculta un modal de Bootstrap identificado por su selector.
 function cerrarModal(selector) {
     const el = document.querySelector(selector);
     if (!el) return;
@@ -543,6 +577,7 @@ function cerrarModal(selector) {
 // ============================================================
 var toastTimeoutId = null;
 
+// Muestra una notificación temporal con tipo, título y mensaje.
 function mostrarToast(tipo, titulo, mensaje) {
     var toast    = document.getElementById('toastCertificado');
     var icono    = document.getElementById('toastIcono');
@@ -575,6 +610,7 @@ function mostrarToast(tipo, titulo, mensaje) {
     }, 4000);
 }
 
+// Conecta el botón que cierra la notificación.
 function inicializarToastCerrar() {
     var btnCerrar = document.getElementById('toastCerrar');
     var toast     = document.getElementById('toastCertificado');
@@ -589,13 +625,17 @@ function inicializarToastCerrar() {
 // ============================================================
 // VALIDACIONES (NUEVO CLIENTE)
 // ============================================================
-function validarCamposCliente(nombres, correo) {
-    const nombreLimpio = (nombres || '').trim();
+// Valida el nombre o razón social y el formato del correo del cliente.
+function validarCamposCliente(nombreCliente, correo, esRuc = false) {
+    const nombreLimpio = (nombreCliente || '').trim();
     const correoLimpio = (correo || '').trim();
 
-    if (nombreLimpio.length < 2 || !REGEX_NOMBRE.test(nombreLimpio)) {
-        mostrarToast('advertencia', 'Nombre inválido',
-            'El nombre debe tener al menos 2 letras y solo puede contener letras, tildes, ñ, espacios, apóstrofes o guiones.');
+    if (nombreLimpio.length < 2 || (!esRuc && !REGEX_NOMBRE.test(nombreLimpio))) {
+        const titulo = esRuc ? 'Razón social inválida' : 'Nombre inválido';
+        const mensaje = esRuc
+            ? 'Ingrese una razón social de al menos 2 caracteres.'
+            : 'El nombre debe tener al menos 2 letras y solo puede contener letras, tildes, ñ, espacios, apóstrofes o guiones.';
+        mostrarToast('advertencia', titulo, mensaje);
         return false;
     }
 
@@ -606,11 +646,13 @@ function validarCamposCliente(nombres, correo) {
     }
 
     return true;
+
 }
 
 // ============================================================
 // SECCION DASHBOARD
 // ============================================================
+// Inserta la plantilla del dashboard y pinta sus métricas.
 function renderDashboard() {
     if (!contenedorReactivo) return;
 
@@ -622,16 +664,31 @@ function renderDashboard() {
     pintarDashboard();
 }
 
+// Calcula y muestra las métricas de órdenes, citas y cotizaciones.
 function pintarDashboard() {
     setTexto('#dashboardFecha', formatearFechaHoy());
     setTexto('#dashboardSucursal', sucursalActual.nombre);
 
+    // Las órdenes cargadas corresponden al mecánico que inició sesión.
     const pendientes  = listadoGeneralOrdenes.filter(o => o.estado === 'PENDIENTE');
     const enProceso   = listadoGeneralOrdenes.filter(o => o.estado === 'EN PROCESO');
     const finalizadas = listadoGeneralOrdenes.filter(o => o.estado === 'FINALIZADA');
 
+    setTexto('#totalOrdenesMecanico', listadoGeneralOrdenes.length);
     setTexto('#totalAsignadas', pendientes.length);
     setTexto('#totalEnProceso', enProceso.length);
+
+    // Las citas y cotizaciones se cuentan solo para la sucursal activa.
+    const idSucursalActual = Number(sucursalActual.id_sucursal);
+    const citasPendientes = listadoGeneralCitas.filter(cita =>
+        cita.estado === 'PENDIENTE' && Number(cita.id_sucursal) === idSucursalActual
+    );
+    const cotizacionesPendientes = listadoGeneralCotizaciones.filter(cotizacion =>
+        cotizacion.estado === 'PENDIENTE' && Number(cotizacion.id_sucursal) === idSucursalActual
+    );
+
+    setTexto('#totalCitasPendientes', citasPendientes.length);
+    setTexto('#totalCotizacionesPendientes', cotizacionesPendientes.length);
 
     const hoyIso = fechaISO(new Date());
     const finalizadasHoy = finalizadas.filter(o => {
@@ -640,11 +697,22 @@ function pintarDashboard() {
     });
     setTexto('#totalFinalizadasHoy', finalizadasHoy.length);
 
+    // Se considera atrasada una orden pendiente cuya fecha de atención ya pasó.
+    const ordenesAtrasadas = pendientes.filter(orden => {
+        if (!orden.fecha_atencion) return false;
+
+        // Se conserva la fecha YYYY-MM-DD del servidor para evitar desfases por zona horaria.
+        const fechaAtencion = String(orden.fecha_atencion).slice(0, 10);
+        return /^\d{4}-\d{2}-\d{2}$/.test(fechaAtencion) && fechaAtencion < hoyIso;
+    });
+    setTexto('#totalOrdenesAtrasadas', ordenesAtrasadas.length);
+
     setTexto('#tiempoPromedio', calcularTiempoPromedio(finalizadas));
 
     listarOrdenesPendientesDashboard(pendientes);
 }
 
+// Pinta la tabla de órdenes pendientes del dashboard.
 function listarOrdenesPendientesDashboard(pendientes) {
     let contenedor = document.querySelector('#contenedorOrdenesPendientes');
     if (!contenedor) return;
@@ -678,6 +746,7 @@ function listarOrdenesPendientesDashboard(pendientes) {
 // ============================================================
 // SECCION CLIENTES / VEHICULOS
 // ============================================================
+// Inserta la vista de clientes y prepara búsqueda y paginación.
 function renderClientes() {
     contenedorReactivo.innerHTML = "";
     const clone = templateContenedorClientes.cloneNode(true);
@@ -695,6 +764,7 @@ function renderClientes() {
     listarClientes();
 }
 
+// Filtra, pagina y pinta las personas en la tabla.
 function listarClientes(filtrados) {
     let contenedorTablaClientes = document.querySelector('#contenedorTablaClientes');
     if (!contenedorTablaClientes) return;
@@ -742,6 +812,7 @@ function listarClientes(filtrados) {
     actualizarPaginacionClientes(paginaClientesActual, totalPaginas, base.length, pagina.length);
 }
 
+// Actualiza controles y rango de la paginación de clientes.
 function actualizarPaginacionClientes(pagina, totalPaginas, totalRegistros, registrosPagina) {
     const btnNum = document.querySelector('#btnClientesPaginaNumero');
     if (btnNum) btnNum.textContent = String(pagina);
@@ -754,6 +825,7 @@ function actualizarPaginacionClientes(pagina, totalPaginas, totalRegistros, regi
     actualizarIrPagina('inputIrPaginaClientes', pagina, totalPaginas);
 }
 
+// Pinta los vehículos asociados al cliente seleccionado.
 function listarVehiculosCliente() {
     let contenedorVehiculos = document.querySelector('#contenedorVehiculosCliente');
     if (!contenedorVehiculos) return;
@@ -789,6 +861,7 @@ function listarVehiculosCliente() {
 // ============================================================
 // MODAL VEHICULO: ABRIR (crear / editar)
 // ============================================================
+// Prepara el formulario para registrar un vehículo de una persona.
 function abrirModalCrearVehiculo(persona) {
     if (document.querySelector('#modalVerCliente') && document.querySelector('#modalVerCliente').classList.contains('show')) {
         reabrirVerClienteAlCerrar = true;
@@ -808,6 +881,7 @@ function abrirModalCrearVehiculo(persona) {
     abrirModal('#modalNuevoVehiculo');
 }
 
+// Carga el vehículo seleccionado en el formulario de edición.
 function abrirModalEditarVehiculo(persona, vehiculo) {
     if (document.querySelector('#modalVerCliente') && document.querySelector('#modalVerCliente').classList.contains('show')) {
         reabrirVerClienteAlCerrar = true;
@@ -838,8 +912,9 @@ function abrirModalEditarVehiculo(persona, vehiculo) {
 // ============================================================
 // MODAL VEHICULO: GUARDAR (crear / editar)
 // ============================================================
+// Envía un vehículo nuevo al servidor y actualiza las listas.
 async function guardarVehiculoNuevo(datos) {
-    const res = await axios.post('/api/vehiculos', datos);
+    const res = await axios.post('/api/registrarVehiculo', datos);
 
     if (!res.data.ok) {
         mostrarToast('error', 'Error', res.data.mensaje);
@@ -853,8 +928,9 @@ async function guardarVehiculoNuevo(datos) {
     return true;
 }
 
+// Envía los cambios del vehículo al servidor y actualiza las listas.
 async function actualizarVehiculo(idVehiculo, datos) {
-    const res = await axios.put('/api/vehiculos/' + idVehiculo, datos);
+    const res = await axios.put('/api/editarVehiculo/' + idVehiculo, datos);
 
     if (!res.data.ok) {
         mostrarToast('error', 'Error', res.data.mensaje);
@@ -871,6 +947,7 @@ async function actualizarVehiculo(idVehiculo, datos) {
 // ============================================================
 // MODAL VEHICULO: utilidades compartidas
 // ============================================================
+// Vacía los campos del formulario de vehículo.
 function limpiarFormularioVehiculo() {
     document.querySelector('#inputPlacaVehiculo').value = '';
     document.querySelector('#inputVinVehiculo').value = '';
@@ -883,6 +960,7 @@ function limpiarFormularioVehiculo() {
     document.querySelector('#inputObservacionesVehiculo').value = '';
 }
 
+// Lee y normaliza los datos del formulario de vehículo.
 function leerDatosFormularioVehiculo() {
     const idPersona    = document.querySelector('#inputIdClienteVehiculo').value;
     const placa        = document.querySelector('#inputPlacaVehiculo').value.trim().toUpperCase();
@@ -909,6 +987,7 @@ function leerDatosFormularioVehiculo() {
     };
 }
 
+// Comprueba que el formulario del vehículo tenga los datos requeridos.
 function validarFormularioVehiculo(datos) {
     if (!datos.id_persona || !datos.placa || !datos.vin || !datos.marca || !datos.modelo
         || !datos.anio || !datos.color || !datos.numeroMotor || !datos.numeroChasis) {
@@ -919,6 +998,7 @@ function validarFormularioVehiculo(datos) {
     return true;
 }
 
+// Forma el objeto de datos que se envía para crear o editar un vehículo.
 function construirBodyVehiculo(datos) {
     return {
         id_persona: datos.id_persona,
@@ -934,6 +1014,7 @@ function construirBodyVehiculo(datos) {
     };
 }
 
+// Recarga vehículos y actualiza la lista del cliente activo.
 async function refrescarVehiculosYTabla() {
     await cargarVehiculos();
 
@@ -946,6 +1027,7 @@ async function refrescarVehiculosYTabla() {
 // ============================================================
 // HANDLERS CLIENTES
 // ============================================================
+// Maneja el evento click del control #btnNuevoCliente.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('#btnNuevoCliente');
     if (!boton) return;
@@ -954,6 +1036,7 @@ document.addEventListener('click', function (event) {
     abrirModal('#modalNuevoCliente');
 });
 
+// Maneja el evento change del control #chkVehiculoTambien.
 document.addEventListener('change', function (event) {
     const chk = event.target.closest('#chkVehiculoTambien');
     if (!chk) return;
@@ -962,29 +1045,56 @@ document.addEventListener('change', function (event) {
     if (seccion) seccion.classList.toggle('d-none', !chk.checked);
 });
 
+// Cambia entre los campos de persona natural y persona jurídica.
+document.addEventListener('change', function (event) {
+    const selector = event.target.closest('#selectTipoDocumentoCliente');
+    if (!selector) return;
+
+    actualizarCamposTipoDocumentoCliente();
+});
+
+// Maneja el evento click del control #btnGuardarCliente.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnGuardarCliente');
     if (!boton) return;
 
-    const documento   = document.querySelector('#inputDocumentoCliente').value.trim();
-    const nombres     = document.querySelector('#inputNombresCliente').value.trim();
-    const apellidos   = document.querySelector('#inputApellidosCliente').value.trim();
-    const correo      = document.querySelector('#inputCorreoCliente').value.trim();
-    const telefono    = document.querySelector('#inputTelefonoCliente').value.trim();
-    const direccion   = document.querySelector('#inputDireccionCliente').value.trim();
+    const tipoDocumento = document.querySelector('#selectTipoDocumentoCliente').value;
+    const esRuc = tipoDocumento === 'RUC';
+    const documento = document.querySelector('#inputDocumentoCliente').value.trim();
+    const razonSocial = esRuc
+        ? document.querySelector('#inputRazonSocialCliente').value.trim()
+        : '';
+    const nombres = esRuc
+        ? razonSocial
+        : document.querySelector('#inputNombresCliente').value.trim();
+    const apellidos = esRuc
+        ? null
+        : document.querySelector('#inputApellidosCliente').value.trim();
+    const correo = document.querySelector('#inputCorreoCliente').value.trim();
+    const telefono = document.querySelector('#inputTelefonoCliente').value.trim();
+    const direccion = document.querySelector('#inputDireccionCliente').value.trim();
     const chkVehiculo = document.querySelector('#chkVehiculoTambien').checked;
 
-    if (!documento || !nombres || !apellidos || !correo || !telefono) {
-        mostrarToast('advertencia', 'Campos Vacíos', 'Documento, nombres, apellidos, correo y teléfono son obligatorios');
+    if (!documento || !nombres || (!esRuc && !apellidos) || !correo || !telefono) {
+        const persona = esRuc ? 'razón social' : 'nombres, apellidos';
+        mostrarToast('advertencia', 'Campos Vacíos',
+            'Documento, ' + persona + ', correo y teléfono son obligatorios');
         return;
     }
 
-    if (!validarCamposCliente(nombres, correo)) return;
+    const documentoValido = esRuc ? /^\d{11}$/.test(documento) : /^\d{8}$/.test(documento);
+    if (!documentoValido) {
+        mostrarToast('advertencia', 'Documento inválido',
+            esRuc ? 'El RUC debe contener exactamente 11 dígitos.' : 'El DNI debe contener exactamente 8 dígitos.');
+        return;
+    }
+
+    if (!validarCamposCliente(nombres, correo, esRuc)) return;
 
     try {
-        const res = await axios.post('/api/personas', {
-            tipo_persona: 'NATURAL',
-            tipo_documento: documento.length > 8 ? 'RUC' : 'DNI',
+        const res = await axios.post('/api/registrarPersona', {
+            tipo_persona: esRuc ? 'JURIDICA' : 'NATURAL',
+            tipo_documento: tipoDocumento,
             documento,
             nombres,
             apellidos,
@@ -1023,6 +1133,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control .btn-ver-cliente.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-ver-cliente');
     if (!boton) return;
@@ -1058,6 +1169,7 @@ document.addEventListener('click', async function (event) {
 // ============================================================
 // HANDLERS VEHICULOS (crear / editar)
 // ============================================================
+// Maneja el evento click del control #btnAgregarVehiculoCliente.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('#btnAgregarVehiculoCliente');
     if (!boton) return;
@@ -1069,6 +1181,7 @@ document.addEventListener('click', function (event) {
     abrirModalCrearVehiculo(persona);
 });
 
+// Maneja el evento click del control .btn-agregar-vehiculo-cliente.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-agregar-vehiculo-cliente');
     if (!boton) return;
@@ -1080,6 +1193,7 @@ document.addEventListener('click', function (event) {
     abrirModalCrearVehiculo(persona);
 });
 
+// Maneja el evento click del control .btn-editar-vehiculo.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-editar-vehiculo');
     if (!boton) return;
@@ -1094,6 +1208,7 @@ document.addEventListener('click', function (event) {
     abrirModalEditarVehiculo(persona, vehiculo);
 });
 
+// Maneja el evento click del control #btnGuardarVehiculo.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnGuardarVehiculo');
     if (!boton) return;
@@ -1131,6 +1246,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control .btn-eliminar-vehiculo.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-eliminar-vehiculo');
     if (!boton) return;
@@ -1142,7 +1258,7 @@ document.addEventListener('click', async function (event) {
     if (!confirmar) return;
 
     try {
-        const res = await axios.delete('/api/vehiculos/' + idVehiculo);
+        const res = await axios.delete('/api/eliminarVehiculo/' + idVehiculo);
         if (res.data.ok) {
             mostrarToast('exito', 'Correcto', res.data.mensaje);
             await refrescarVehiculosYTabla();
@@ -1155,6 +1271,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento input del control #inputBuscarCliente.
 document.addEventListener('input', function (event) {
     const input = event.target.closest('#inputBuscarCliente');
     if (!input) return;
@@ -1164,6 +1281,7 @@ document.addEventListener('input', function (event) {
     listarClientes();
 });
 
+// Maneja el evento keypress del control #inputIrPaginaClientes.
 document.addEventListener('keypress', function (event) {
     const input = event.target.closest('#inputIrPaginaClientes');
     if (!input) return;
@@ -1181,10 +1299,40 @@ document.addEventListener('keypress', function (event) {
 // ============================================================
 // HELPERS: NUEVO CLIENTE
 // ============================================================
+// Sincroniza los campos visibles y obligatorios con el tipo de documento elegido.
+function actualizarCamposTipoDocumentoCliente() {
+    const tipoDocumento = document.querySelector('#selectTipoDocumentoCliente');
+    if (!tipoDocumento) return;
+
+    const esRuc = tipoDocumento.value === 'RUC';
+    const camposNatural = document.querySelector('#camposClienteNatural');
+    const camposJuridica = document.querySelector('#camposClienteJuridica');
+    const documento = document.querySelector('#inputDocumentoCliente');
+    const labelDocumento = document.querySelector('#labelDocumentoCliente');
+    const nombres = document.querySelector('#inputNombresCliente');
+    const apellidos = document.querySelector('#inputApellidosCliente');
+    const razonSocial = document.querySelector('#inputRazonSocialCliente');
+
+    if (camposNatural) camposNatural.classList.toggle('d-none', esRuc);
+    if (camposJuridica) camposJuridica.classList.toggle('d-none', !esRuc);
+    if (documento) documento.maxLength = esRuc ? 11 : 8;
+    if (labelDocumento) {
+        labelDocumento.innerHTML = '<i class="bi bi-card-text"></i> ' +
+            (esRuc ? 'RUC (11 dígitos)' : 'DNI (8 dígitos)');
+    }
+    if (nombres) nombres.required = !esRuc;
+    if (apellidos) apellidos.required = !esRuc;
+    if (razonSocial) razonSocial.required = esRuc;
+}
+
+// Restablece los campos del formulario de cliente y vehículo.
 function limpiarModalNuevoCliente() {
+    document.querySelector('#selectTipoDocumentoCliente').value = 'DNI';
     document.querySelector('#inputDocumentoCliente').value = '';
     document.querySelector('#inputNombresCliente').value = '';
     document.querySelector('#inputApellidosCliente').value = '';
+    document.querySelector('#inputRazonSocialCliente').value = '';
+    actualizarCamposTipoDocumentoCliente();
     document.querySelector('#inputCorreoCliente').value = '';
     document.querySelector('#inputTelefonoCliente').value = '';
     document.querySelector('#inputDireccionCliente').value = '';
@@ -1206,6 +1354,7 @@ function limpiarModalNuevoCliente() {
     document.querySelector('#inputObservacionesNuevo').value = '';
 }
 
+// Registra el vehículo usando el ID del cliente recién creado.
 async function guardarVehiculoDesdeModalCliente(idPersona, placa) {
     const vin          = document.querySelector('#inputVinNuevo').value.trim();
     const marca        = document.querySelector('#inputMarcaNuevo').value.trim();
@@ -1224,7 +1373,7 @@ async function guardarVehiculoDesdeModalCliente(idPersona, placa) {
     }
 
     try {
-        const res = await axios.post('/api/vehiculos', {
+        const res = await axios.post('/api/registrarVehiculo', {
             id_persona: idPersona,
             placa,
             vin,
@@ -1255,6 +1404,7 @@ async function guardarVehiculoDesdeModalCliente(idPersona, placa) {
 // ============================================================
 // SECCION CITAS
 // ============================================================
+// Inserta la vista de citas y prepara búsqueda y paginación.
 function renderCitas() {
     contenedorReactivo.innerHTML = "";
     const clone = templateContenedorCitas.cloneNode(true);
@@ -1273,10 +1423,12 @@ function renderCitas() {
     poblarSelectPersonasCita();
 }
 
+// Indica si una cita ya está vinculada a una orden de trabajo.
 function citaTieneOrden(idCita) {
     return listadoGeneralOrdenes.some(o => Number(o.id_cita) === Number(idCita));
 }
 
+// Filtra, pagina y pinta las citas.
 function listarCitas(filtradas) {
     let contenedorTablaCitas = document.querySelector('#contenedorTablaCitas');
     if (!contenedorTablaCitas) return;
@@ -1369,6 +1521,7 @@ function listarCitas(filtradas) {
     actualizarPaginacionCitas(paginaCitasActual, totalPaginas, base.length, pagina.length);
 }
 
+// Actualiza controles y rango de la paginación de citas.
 function actualizarPaginacionCitas(pagina, totalPaginas, totalRegistros, registrosPagina) {
     const btnNum = document.querySelector('#btnCitasPaginaNumero');
     if (btnNum) btnNum.textContent = String(pagina);
@@ -1381,6 +1534,7 @@ function actualizarPaginacionCitas(pagina, totalPaginas, totalRegistros, registr
     actualizarIrPagina('inputIrPaginaCitas', pagina, totalPaginas);
 }
 
+// Carga personas en el selector del formulario de cita.
 function poblarSelectPersonasCita() {
     const select = document.querySelector('#selectPersonaCita');
     if (!select) return;
@@ -1399,6 +1553,7 @@ function poblarSelectPersonasCita() {
     });
 }
 
+// Carga los vehículos pertenecientes a una persona en el selector.
 async function poblarSelectVehiculosCita(idPersona) {
     const select = document.querySelector('#selectVehiculoCita');
     if (!select) return;
@@ -1421,6 +1576,7 @@ async function poblarSelectVehiculosCita(idPersona) {
     });
 }
 
+// Maneja el evento change del control #selectPersonaCita.
 document.addEventListener('change', async function (event) {
     const select = event.target.closest('#selectPersonaCita');
     if (!select) return;
@@ -1428,6 +1584,7 @@ document.addEventListener('change', async function (event) {
     await poblarSelectVehiculosCita(select.value);
 });
 
+// Maneja el evento click del control #btnNuevaCita.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('#btnNuevaCita');
     if (!boton) return;
@@ -1437,6 +1594,7 @@ document.addEventListener('click', function (event) {
     abrirModal('#modalNuevaCita');
 });
 
+// Maneja el evento click del control #btnRegistrarCita.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnRegistrarCita');
     if (!boton) return;
@@ -1456,7 +1614,7 @@ document.addEventListener('click', async function (event) {
             return;
         }
 
-        const res = await axios.post('/api/citas', {
+        const res = await axios.post('/api/registrarCita', {
             id_persona: idPersona,
             id_sucursal: sucursalActual.id_sucursal,
             id_vehiculo: idVehiculo,
@@ -1488,6 +1646,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control .btn-ver-cita.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-ver-cita');
     if (!boton) return;
@@ -1495,7 +1654,7 @@ document.addEventListener('click', async function (event) {
     const idCita = boton.dataset.id;
 
     try {
-        const res = await axios.get('/api/citas/' + idCita);
+        const res = await axios.get('/api/buscarCitaPorId/' + idCita);
         if (!res.data.ok || !res.data.cita) {
             mostrarToast('error', 'Error', 'No se pudo obtener la cita');
             return;
@@ -1541,6 +1700,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control .btn-tomar-cita.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-tomar-cita');
     if (!boton) return;
@@ -1563,7 +1723,7 @@ document.addEventListener('click', async function (event) {
     if (!confirmar) return;
 
     try {
-        const res = await axios.patch('/api/citas/' + idCita + '/estado', { estado: 'CONFIRMADA' });
+        const res = await axios.patch('/api/actualizarEstadoCita/' + idCita, { estado: 'CONFIRMADA' });
 
         if (!res.data.ok) {
             mostrarToast('error', 'Error', res.data.mensaje);
@@ -1583,6 +1743,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control .btn-cancelar-cita.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-cancelar-cita');
     if (!boton) return;
@@ -1598,7 +1759,7 @@ document.addEventListener('click', async function (event) {
     if (!confirmar) return;
 
     try {
-        const res = await axios.patch('/api/citas/' + idCita + '/estado', { estado: 'CANCELADA' });
+        const res = await axios.patch('/api/actualizarEstadoCita/' + idCita, { estado: 'CANCELADA' });
 
         if (!res.data.ok) {
             mostrarToast('error', 'Error', res.data.mensaje);
@@ -1618,6 +1779,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control .btn-eliminar-cita.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-eliminar-cita');
     if (!boton) return;
@@ -1639,7 +1801,7 @@ document.addEventListener('click', async function (event) {
     if (!confirmar) return;
 
     try {
-        const res = await axios.delete('/api/citas/' + idCita);
+        const res = await axios.delete('/api/eliminarCita/' + idCita);
 
         if (!res.data.ok) {
             mostrarToast('error', 'Error', res.data.mensaje);
@@ -1659,6 +1821,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento input del control #inputBuscarCita.
 document.addEventListener('input', function (event) {
     const input = event.target.closest('#inputBuscarCita');
     if (!input) return;
@@ -1668,6 +1831,7 @@ document.addEventListener('input', function (event) {
     listarCitas();
 });
 
+// Maneja el evento keypress del control #inputIrPaginaCitas.
 document.addEventListener('keypress', function (event) {
     const input = event.target.closest('#inputIrPaginaCitas');
     if (!input) return;
@@ -1682,6 +1846,7 @@ document.addEventListener('keypress', function (event) {
     listarCitas();
 });
 
+// Restablece el formulario de nueva cita.
 function limpiarModalNuevaCita() {
     document.querySelector('#selectPersonaCita').value = '';
 
@@ -1697,6 +1862,7 @@ function limpiarModalNuevaCita() {
 // ============================================================
 // SECCION COTIZACIONES
 // ============================================================
+// Inserta la vista de cotizaciones y prepara sus filtros.
 function renderCotizaciones() {
     contenedorReactivo.innerHTML = "";
     const clone = templateContenedorCotizaciones.cloneNode(true);
@@ -1735,6 +1901,7 @@ function renderCotizaciones() {
     recalcularTotalesCotizacion();
 }
 
+// Filtra, pagina y pinta cotizaciones en el panel lateral.
 function listarCotizacionesSidebar(filtradas) {
     let contenedor = document.querySelector('#contenedorListaCotizaciones');
     if (!contenedor) return;
@@ -1828,6 +1995,7 @@ function listarCotizacionesSidebar(filtradas) {
     actualizarPaginacionCotizaciones(paginaCotizacionesActual, totalPaginas, base.length, pagina.length);
 }
 
+// Actualiza controles y rango de la paginación de cotizaciones.
 function actualizarPaginacionCotizaciones(pagina, totalPaginas, totalRegistros, registrosPagina) {
     const btnNum = document.querySelector('#btnCotizacionesPaginaNumero');
     if (btnNum) btnNum.textContent = String(pagina);
@@ -1840,6 +2008,7 @@ function actualizarPaginacionCotizaciones(pagina, totalPaginas, totalRegistros, 
     actualizarIrPagina('inputIrPaginaCotizaciones', pagina, totalPaginas);
 }
 
+// Pinta productos y servicios de la cotización actual.
 function listarItemsCotizacion() {
     let contenedor = document.querySelector('#contenedorItemsCotizacion');
     if (!contenedor) return;
@@ -1881,11 +2050,13 @@ function listarItemsCotizacion() {
     });
 }
 
+// Carga las listas de servicios y productos para cotizar.
 function poblarListasDisponiblesCotizacion() {
     poblarListaServiciosDisponibles();
     poblarListaProductosDisponibles();
 }
 
+// Pinta servicios disponibles para añadir a la cotización.
 function poblarListaServiciosDisponibles() {
     let contenedor = document.querySelector('#listaServiciosDisponibles');
     if (!contenedor) return;
@@ -1931,6 +2102,7 @@ function poblarListaServiciosDisponibles() {
     });
 }
 
+// Pinta productos disponibles para añadir a la cotización.
 function poblarListaProductosDisponibles() {
     let contenedor = document.querySelector('#listaProductosDisponibles');
     if (!contenedor) return;
@@ -1979,6 +2151,7 @@ function poblarListaProductosDisponibles() {
 // ============================================================
 // HANDLERS COTIZACIONES
 // ============================================================
+// Maneja el evento input del control #inputBuscarServicioCotizacion.
 document.addEventListener('input', function (event) {
     const input = event.target.closest('#inputBuscarServicioCotizacion');
     if (!input) return;
@@ -1986,6 +2159,7 @@ document.addEventListener('input', function (event) {
     poblarListaServiciosDisponibles();
 });
 
+// Maneja el evento input del control #inputBuscarProductoCotizacion.
 document.addEventListener('input', function (event) {
     const input = event.target.closest('#inputBuscarProductoCotizacion');
     if (!input) return;
@@ -1993,6 +2167,7 @@ document.addEventListener('input', function (event) {
     poblarListaProductosDisponibles();
 });
 
+// Maneja el evento click del control #btnBuscarPlaca.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnBuscarPlaca');
     if (!boton) return;
@@ -2004,7 +2179,7 @@ document.addEventListener('click', async function (event) {
     }
 
     try {
-        const res = await axios.get('/api/vehiculos/placa/' + placa);
+        const res = await axios.get('/api/buscarVehiculoPorPlaca/' + placa);
         if (!res.data.ok || !res.data.vehiculo) {
             mostrarToast('error', 'No encontrado', 'No existe un vehículo con esa placa');
             limpiarInfoClienteCotizacion();
@@ -2040,6 +2215,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control .btn-agregar-servicio-lista.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-agregar-servicio-lista');
     if (!boton) return;
@@ -2080,6 +2256,7 @@ document.addEventListener('click', function (event) {
     poblarListaServiciosDisponibles();
 });
 
+// Maneja el evento click del control .btn-agregar-producto-lista.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-agregar-producto-lista');
     if (!boton) return;
@@ -2120,6 +2297,7 @@ document.addEventListener('click', function (event) {
     poblarListaProductosDisponibles();
 });
 
+// Maneja el evento click del control .btn-sumar-item.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-sumar-item');
     if (!boton) return;
@@ -2137,6 +2315,7 @@ document.addEventListener('click', function (event) {
     recalcularTotalesCotizacion();
 });
 
+// Maneja el evento click del control .btn-restar-item.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-restar-item');
     if (!boton) return;
@@ -2155,6 +2334,7 @@ document.addEventListener('click', function (event) {
     recalcularTotalesCotizacion();
 });
 
+// Maneja el evento change del control .input-cantidad-item.
 document.addEventListener('change', function (event) {
     const input = event.target.closest('.input-cantidad-item');
     if (!input) return;
@@ -2175,6 +2355,7 @@ document.addEventListener('change', function (event) {
     recalcularTotalesCotizacion();
 });
 
+// Maneja el evento click del control .btn-quitar-item.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-quitar-item');
     if (!boton) return;
@@ -2188,6 +2369,7 @@ document.addEventListener('click', function (event) {
     recalcularTotalesCotizacion();
 });
 
+// Maneja el evento click del control #btnGenerarCotizacion.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnGenerarCotizacion');
     if (!boton) return;
@@ -2219,7 +2401,7 @@ document.addEventListener('click', async function (event) {
     _enviandoCotizacion = true;
 
     try {
-        const res = await axios.post('/api/cotizaciones', {
+        const res = await axios.post('/api/registrarCotizacion', {
             id_persona: idPersona,
             id_sucursal: sucursalActual.id_sucursal,
             id_vehiculo: idVehiculo,
@@ -2258,6 +2440,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control #btnLimpiarCotizacion.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('#btnLimpiarCotizacion');
     if (!boton) return;
@@ -2265,6 +2448,7 @@ document.addEventListener('click', function (event) {
     limpiarFormularioCotizacion();
 });
 
+// Maneja el evento click del control .btn-aprobar-cotizacion.
 document.addEventListener('click', async function (event) {
     const botonAprobar   = event.target.closest('.btn-aprobar-cotizacion');
     const botonRechazar  = event.target.closest('.btn-rechazar-cotizacion');
@@ -2290,7 +2474,7 @@ document.addEventListener('click', async function (event) {
     if (botonRechazar) nuevoEstado = 'RECHAZADA';
 
     try {
-        const res = await axios.patch('/api/cotizaciones/' + idCotizacion + '/estado', {
+        const res = await axios.patch('/api/actualizarEstadoCotizacion/' + idCotizacion, {
             estado: nuevoEstado
         });
 
@@ -2312,6 +2496,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control .item-cotizacion.
 document.addEventListener('click', async function (event) {
     const itemCotizacion = event.target.closest('.item-cotizacion');
     if (!itemCotizacion) return;
@@ -2326,7 +2511,7 @@ document.addEventListener('click', async function (event) {
     if (!idCotizacion) return;
 
     try {
-        const res = await axios.get('/api/cotizaciones/' + idCotizacion + '/detalle');
+        const res = await axios.get('/api/buscarCotizacionConDetalle/' + idCotizacion);
         if (!res.data.ok || !res.data.cotizacion) {
             mostrarToast('error', 'Error', 'No se pudo cargar la cotización');
             return;
@@ -2359,7 +2544,7 @@ document.addEventListener('click', async function (event) {
         };
 
         try {
-            const resVeh = await axios.get('/api/vehiculos/' + cot.id_vehiculo);
+            const resVeh = await axios.get('/api/buscarVehiculoPorId/' + cot.id_vehiculo);
             if (resVeh.data.ok && resVeh.data.vehiculo) {
                 vehiculo = resVeh.data.vehiculo;
             }
@@ -2399,6 +2584,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control .filtro-cotizacion.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.filtro-cotizacion');
     if (!boton) return;
@@ -2409,6 +2595,7 @@ document.addEventListener('click', function (event) {
     aplicarFiltroCotizacion(boton.dataset.filtro);
 });
 
+// Maneja el evento keypress del control #inputIrPaginaCotizaciones.
 document.addEventListener('keypress', function (event) {
     const input = event.target.closest('#inputIrPaginaCotizaciones');
     if (!input) return;
@@ -2439,12 +2626,14 @@ document.addEventListener('keypress', function (event) {
 // ============================================================
 // HELPERS COTIZACIONES
 // ============================================================
+// Aplica el filtro de estado seleccionado a las cotizaciones.
 function aplicarFiltroCotizacion(filtro) {
     filtroCotizacionActual = filtro || 'todas';
     paginaCotizacionesActual = 1;
     listarCotizacionesSidebar();
 }
 
+// Recalcula subtotales, impuestos y total de la cotización.
 function recalcularTotalesCotizacion() {
     const subtotal = itemsCotizacion.reduce((acc, it) => acc + Number(it.subtotal || 0), 0);
     const igv = subtotal * 0.18;
@@ -2457,6 +2646,7 @@ function recalcularTotalesCotizacion() {
     setTexto('#pillTotalCotizacion', 'S/ ' + total.toFixed(2));
 }
 
+// Muestra el cliente y vehículo asociados a la cotización.
 function mostrarInfoClienteCotizacion(persona, vehiculo) {
     const contCliente  = document.querySelector('#contenedorInfoClienteCotizacion');
     const contVehiculo = document.querySelector('#contenedorInfoVehiculoCotizacion');
@@ -2481,6 +2671,7 @@ function mostrarInfoClienteCotizacion(persona, vehiculo) {
     document.querySelector('#vehiculoObservaciones').textContent = vehiculo.observaciones || '—';
 }
 
+// Quita de la vista el cliente y vehículo seleccionados.
 function limpiarInfoClienteCotizacion() {
     const contCliente  = document.querySelector('#contenedorInfoClienteCotizacion');
     const contVehiculo = document.querySelector('#contenedorInfoVehiculoCotizacion');
@@ -2503,6 +2694,7 @@ function limpiarInfoClienteCotizacion() {
     document.querySelector('#vehiculoObservaciones').textContent = '--';
 }
 
+// Restablece el formulario y los artículos de la cotización.
 function limpiarFormularioCotizacion() {
     itemsCotizacion = [];
     cotizacionActual = null;
@@ -2540,6 +2732,7 @@ function limpiarFormularioCotizacion() {
 // ============================================================
 // SECCION ORDENES DE TRABAJO
 // ============================================================
+// Inserta la vista de órdenes y prepara sus filtros y controles.
 function renderOrdenes() {
     // Flush del autoguardado pendiente antes de salir de la vista
     if (_autoguardadoConsumoPendiente) {
@@ -2587,6 +2780,7 @@ function renderOrdenes() {
     limpiarDetalleOrden();
 }
 
+// Limpia el panel de detalle de la orden seleccionada.
 function limpiarDetalleOrden() {
     setTexto('#consumoOrdenCodigo', '--');
     setTexto('#consumoOrdenFecha', '--');
@@ -2658,6 +2852,7 @@ function limpiarDetalleOrden() {
     setIndicadorAutoguardado('');
 }
 
+// Filtra, pagina y pinta las órdenes de trabajo.
 function listarOrdenes() {
     let contenedor = document.querySelector('#contenedorListaOrdenes');
     if (!contenedor) return;
@@ -2720,6 +2915,7 @@ function listarOrdenes() {
     actualizarPaginacionOrdenes(paginaOrdenesActual, totalPaginas, filtradas.length, pagina.length);
 }
 
+// Actualiza controles y rango de la paginación de órdenes.
 function actualizarPaginacionOrdenes(pagina, totalPaginas, totalRegistros, registrosPagina) {
     const btnNum = document.querySelector('#btnOrdenesPaginaNumero');
     if (btnNum) btnNum.textContent = String(pagina);
@@ -2732,9 +2928,10 @@ function actualizarPaginacionOrdenes(pagina, totalPaginas, totalRegistros, regis
     actualizarIrPagina('inputIrPaginaOrdenes', pagina, totalPaginas);
 }
 
+// Consulta y selecciona una orden para mostrar su detalle.
 async function cargarOrdenActual(idOrden) {
     try {
-        const res = await axios.get('/api/ordenes/' + idOrden + '/detalle');
+        const res = await axios.get('/api/buscarOrdenConDetalle/' + idOrden);
         if (!res.data.ok || !res.data.orden) {
             mostrarToast('error', 'Error', 'No se pudo cargar la orden');
             return;
@@ -2796,6 +2993,7 @@ async function cargarOrdenActual(idOrden) {
     }
 }
 
+// Ajusta botones y campos disponibles según el estado de la orden.
 function aplicarReglasEstadoOrden(orden) {
     const estado = orden.estado || '';
     const esPendiente = estado === 'PENDIENTE';
@@ -2846,6 +3044,7 @@ function aplicarReglasEstadoOrden(orden) {
         });
 }
 
+// Pinta la información principal de la orden seleccionada.
 function pintarDetalleOrden(orden) {
     setTexto('#consumoOrdenCodigo', 'OT-' + String(orden.id_orden_trabajo).padStart(4, '0'));
     setTexto('#consumoOrdenFecha', orden.fecha_atencion ? formatearFecha(orden.fecha_atencion) : '—');
@@ -2870,11 +3069,13 @@ function pintarDetalleOrden(orden) {
     }
 }
 
+// Prepara los productos y servicios disponibles para una orden.
 function poblarListasOT() {
     poblarListaServiciosOT();
     poblarListaProductosOT();
 }
 
+// Pinta los servicios que se pueden añadir a la orden.
 function poblarListaServiciosOT() {
     let contenedor = document.querySelector('#listaServiciosOT');
     if (!contenedor) return;
@@ -2922,6 +3123,7 @@ function poblarListaServiciosOT() {
     });
 }
 
+// Pinta los productos que se pueden añadir a la orden.
 function poblarListaProductosOT() {
     let contenedor = document.querySelector('#listaProductosOT');
     if (!contenedor) return;
@@ -2971,6 +3173,7 @@ function poblarListaProductosOT() {
     });
 }
 
+// Pinta los productos y servicios registrados como consumo.
 function listarItemsOT() {
     let contenedor = document.querySelector('#contenedorItemsConsumo');
     if (!contenedor) return;
@@ -3034,6 +3237,7 @@ function listarItemsOT() {
     if (ordenActual) aplicarReglasEstadoOrden(ordenActual);
 }
 
+// Recalcula los importes del consumo de la orden actual.
 function recalcularTotalesOT() {
     const subtotal = itemsOT.reduce((acc, it) => acc + Number(it.subtotal || 0), 0);
     setTexto('#contenedorTotalConsumo', 'S/ ' + subtotal.toFixed(2));
@@ -3043,6 +3247,7 @@ function recalcularTotalesOT() {
 // ============================================================
 // AUTOGUARDADO DE CONSUMO (debounce)
 // ============================================================
+// Construye los datos que se guardan como consumo de la orden.
 function construirPayloadConsumo() {
     return itemsOT.map(it => ({
         id_producto: it.id_producto,
@@ -3054,6 +3259,7 @@ function construirPayloadConsumo() {
     }));
 }
 
+// Actualiza el mensaje visual del estado de autoguardado.
 function setIndicadorAutoguardado(estado) {
     const el = document.querySelector('#indicadorAutoguardadoConsumo');
     if (!el) return;
@@ -3081,6 +3287,7 @@ function setIndicadorAutoguardado(estado) {
     }
 }
 
+// Programa el guardado tras una pausa en los cambios.
 function programarAutoguardadoConsumo() {
     if (!ordenActual || ordenActual.estado !== 'EN PROCESO') return;
 
@@ -3091,6 +3298,7 @@ function programarAutoguardadoConsumo() {
     _autoguardadoConsumoTimer = setTimeout(ejecutarAutoguardadoConsumo, 700);
 }
 
+// Envía al servidor el consumo pendiente de la orden.
 async function ejecutarAutoguardadoConsumo() {
     if (!_autoguardadoConsumoPendiente) return;
     if (!ordenActual || ordenActual.estado !== 'EN PROCESO') {
@@ -3113,7 +3321,7 @@ async function ejecutarAutoguardadoConsumo() {
 
     try {
         const res = await axios.put(
-            '/api/ordenes/' + ordenActual.id_orden_trabajo + '/detalles',
+            '/api/reemplazarDetallesOrden/' + ordenActual.id_orden_trabajo,
             { id_sucursal: ordenActual.id_sucursal, items: itemsPayload }
         );
 
@@ -3141,6 +3349,7 @@ async function ejecutarAutoguardadoConsumo() {
     }
 }
 
+// Completa de inmediato el autoguardado que esté pendiente.
 async function flushAutoguardadoConsumo() {
     if (_autoguardadoConsumoTimer) {
         clearTimeout(_autoguardadoConsumoTimer);
@@ -3151,6 +3360,7 @@ async function flushAutoguardadoConsumo() {
     }
 }
 
+// Pinta las evidencias guardadas y pendientes de la orden.
 function pintarEvidenciasOT() {
     const album    = document.querySelector('#albumEvidencias');
     const contVacio= document.querySelector('#contenedorVacioEvidencias');
@@ -3204,6 +3414,7 @@ function pintarEvidenciasOT() {
     if (ordenActual) aplicarReglasEstadoOrden(ordenActual);
 }
 
+// Prepara y muestra el formulario para crear una orden.
 function abrirModalNuevaOrden() {
     limpiarModalNuevaOrden();
     abrirModal('#modalNuevaOrden');
@@ -3211,6 +3422,7 @@ function abrirModalNuevaOrden() {
     poblarSelectCotizacionesOrden();
 }
 
+// Carga citas que se pueden asociar a una orden nueva.
 async function poblarSelectCitasOrden() {
     const select = document.querySelector('#selectCitaOrden');
     if (!select) return;
@@ -3232,6 +3444,7 @@ async function poblarSelectCitasOrden() {
     });
 }
 
+// Carga cotizaciones que se pueden asociar a una orden nueva.
 async function poblarSelectCotizacionesOrden() {
     const select = document.querySelector('#selectCotizacionOrden');
     if (!select) return;
@@ -3255,6 +3468,7 @@ async function poblarSelectCotizacionesOrden() {
     });
 }
 
+// Restablece los campos del formulario de orden.
 function limpiarModalNuevaOrden() {
     const origen = document.querySelector('#selectOrigenOrden');
     if (origen) origen.value = 'CITA';
@@ -3275,6 +3489,7 @@ function limpiarModalNuevaOrden() {
     if (wrapCot) wrapCot.classList.add('d-none');
 }
 
+// Maneja el evento click del control .filtro-orden.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.filtro-orden');
     if (!boton) return;
@@ -3287,6 +3502,7 @@ document.addEventListener('click', function (event) {
     listarOrdenes();
 });
 
+// Maneja el evento input del control #inputBuscarOrden.
 document.addEventListener('input', function (event) {
     const input = event.target.closest('#inputBuscarOrden');
     if (!input) return;
@@ -3296,6 +3512,7 @@ document.addEventListener('input', function (event) {
     listarOrdenes();
 });
 
+// Maneja el evento input del control #inputBuscarServicioOT.
 document.addEventListener('input', function (event) {
     const input = event.target.closest('#inputBuscarServicioOT');
     if (!input) return;
@@ -3303,6 +3520,7 @@ document.addEventListener('input', function (event) {
     poblarListaServiciosOT();
 });
 
+// Maneja el evento input del control #inputBuscarProductoOT.
 document.addEventListener('input', function (event) {
     const input = event.target.closest('#inputBuscarProductoOT');
     if (!input) return;
@@ -3310,6 +3528,7 @@ document.addEventListener('input', function (event) {
     poblarListaProductosOT();
 });
 
+// Maneja el evento click del control .item-orden.
 document.addEventListener('click', async function (event) {
     const item = event.target.closest('.item-orden');
     if (!item) return;
@@ -3326,6 +3545,7 @@ document.addEventListener('click', async function (event) {
     await cargarOrdenActual(idOrden);
 });
 
+// Maneja el evento keypress del control #inputIrPaginaOrdenes.
 document.addEventListener('keypress', function (event) {
     const input = event.target.closest('#inputIrPaginaOrdenes');
     if (!input) return;
@@ -3340,6 +3560,7 @@ document.addEventListener('keypress', function (event) {
     listarOrdenes();
 });
 
+// Maneja el evento click del control .cambiar-estado-orden.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.cambiar-estado-orden');
     if (!boton) return;
@@ -3378,7 +3599,7 @@ document.addEventListener('click', async function (event) {
     }
 
     try {
-        const res = await axios.patch('/api/ordenes/' + ordenActual.id_orden_trabajo + '/estado', {
+        const res = await axios.patch('/api/cambiarEstadoOrden/' + ordenActual.id_orden_trabajo, {
             estado: nuevoEstado
         });
 
@@ -3401,6 +3622,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control #btnAbrirModalOrden.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('#btnAbrirModalOrden');
     if (!boton) return;
@@ -3408,6 +3630,7 @@ document.addEventListener('click', function (event) {
     abrirModalNuevaOrden();
 });
 
+// Maneja el evento change del control #selectOrigenOrden.
 document.addEventListener('change', function (event) {
     const select = event.target.closest('#selectOrigenOrden');
     if (!select) return;
@@ -3424,6 +3647,7 @@ document.addEventListener('change', function (event) {
     }
 });
 
+// Maneja el evento click del control #btnGuardarOrden.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnGuardarOrden');
     if (!boton) return;
@@ -3449,7 +3673,7 @@ document.addEventListener('click', async function (event) {
                 return;
             }
 
-            const resCita = await axios.get('/api/citas/' + idCita);
+            const resCita = await axios.get('/api/buscarCitaPorId/' + idCita);
             if (!resCita.data.ok || !resCita.data.cita) {
                 mostrarToast('error', 'Error', 'No se pudo cargar la cita');
                 return;
@@ -3469,7 +3693,7 @@ document.addEventListener('click', async function (event) {
                 return;
             }
 
-            const resCot = await axios.get('/api/cotizaciones/' + idCotizacion + '/detalle');
+            const resCot = await axios.get('/api/buscarCotizacionConDetalle/' + idCotizacion);
             if (!resCot.data.ok || !resCot.data.cotizacion) {
                 mostrarToast('error', 'Error', 'No se pudo cargar la cotización');
                 return;
@@ -3491,7 +3715,7 @@ document.addEventListener('click', async function (event) {
             }));
         }
 
-        const res = await axios.post('/api/ordenes', body);
+        const res = await axios.post('/api/registrarOrden', body);
 
         if (!res.data.ok) {
             mostrarToast('error', 'Error', res.data.mensaje);
@@ -3520,6 +3744,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control .btn-agregar-servicio-ot.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-agregar-servicio-ot');
     if (!boton) return;
@@ -3562,6 +3787,7 @@ document.addEventListener('click', function (event) {
     poblarListaServiciosOT();
 });
 
+// Maneja el evento click del control .btn-agregar-producto-ot.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-agregar-producto-ot');
     if (!boton) return;
@@ -3604,6 +3830,7 @@ document.addEventListener('click', function (event) {
     poblarListaProductosOT();
 });
 
+// Maneja el evento click del control .btn-sumar-ot.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-sumar-ot');
     if (!boton) return;
@@ -3623,6 +3850,7 @@ document.addEventListener('click', function (event) {
     programarAutoguardadoConsumo();
 });
 
+// Maneja el evento click del control .btn-restar-ot.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-restar-ot');
     if (!boton) return;
@@ -3643,6 +3871,7 @@ document.addEventListener('click', function (event) {
     programarAutoguardadoConsumo();
 });
 
+// Maneja el evento change del control .input-cantidad-ot.
 document.addEventListener('change', function (event) {
     const input = event.target.closest('.input-cantidad-ot');
     if (!input) return;
@@ -3665,6 +3894,7 @@ document.addEventListener('change', function (event) {
     programarAutoguardadoConsumo();
 });
 
+// Maneja el evento click del control .btn-quitar-ot.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-quitar-ot');
     if (!boton) return;
@@ -3680,6 +3910,7 @@ document.addEventListener('click', function (event) {
     programarAutoguardadoConsumo();
 });
 
+// Maneja el evento click del control #btnSubirEvidencias.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('#btnSubirEvidencias');
     if (!boton) return;
@@ -3695,6 +3926,7 @@ document.addEventListener('click', function (event) {
     input.click();
 });
 
+// Maneja el evento change del control #inputEvidencias.
 document.addEventListener('change', function (event) {
     const input = event.target.closest('#inputEvidencias');
     if (!input) return;
@@ -3743,6 +3975,7 @@ document.addEventListener('change', function (event) {
     pintarEvidenciasOT();
 });
 
+// Maneja el evento click del control .btn-quitar-evidencia-pendiente.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-quitar-evidencia-pendiente');
     if (!boton) return;
@@ -3758,6 +3991,7 @@ document.addEventListener('click', function (event) {
     pintarEvidenciasOT();
 });
 
+// Maneja el evento click del control .evidencia-card__quitar.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.evidencia-card__quitar');
     if (!boton) return;
@@ -3775,7 +4009,7 @@ document.addEventListener('click', async function (event) {
     if (!confirmar) return;
 
     try {
-        const res = await axios.delete('/api/informes/evidencias/' + idEvidencia);
+        const res = await axios.delete('/api/eliminarEvidencia/' + idEvidencia);
 
         if (!res.data.ok) {
             mostrarToast('error', 'Error', res.data.mensaje);
@@ -3795,6 +4029,7 @@ document.addEventListener('click', async function (event) {
     }
 });
 
+// Maneja el evento click del control #btnGuardarEvidencias.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnGuardarEvidencias');
     if (!boton) return;
@@ -3821,7 +4056,7 @@ document.addEventListener('click', async function (event) {
             }
 
             const resCrear = await axios.post(
-                '/api/informes/orden/' + ordenActual.id_orden_trabajo,
+                '/api/obtenerOCrearInforme/' + ordenActual.id_orden_trabajo,
                 { id_mecanico: mecanicoActual.id_mecanico }
             );
 
@@ -3848,7 +4083,7 @@ document.addEventListener('click', async function (event) {
         });
 
         const res = await axios.post(
-            '/api/informes/' + idInformeActual + '/evidencias',
+            '/api/agregarEvidencias/' + idInformeActual,
             formData,
             { headers: { 'Content-Type': 'multipart/form-data' } }
         );
@@ -3882,6 +4117,7 @@ document.addEventListener('click', async function (event) {
 // ============================================================
 // SECCION HISTORIAL
 // ============================================================
+// Inserta el historial y prepara búsqueda y paginación.
 function renderHistorial() {
     contenedorReactivo.innerHTML = "";
     const clone = templateContenedorHistorial.cloneNode(true);
@@ -3899,6 +4135,7 @@ function renderHistorial() {
     listarHistorial();
 }
 
+// Filtra, pagina y pinta las órdenes finalizadas.
 function listarHistorial(filtradas) {
     let contenedor = document.querySelector('#contenedorTablaHistorial');
     if (!contenedor) return;
@@ -3948,6 +4185,7 @@ function listarHistorial(filtradas) {
     actualizarPaginacionHistorial(paginaHistorialActual, totalPaginas, base.length, pagina.length);
 }
 
+// Actualiza controles y rango de la paginación del historial.
 function actualizarPaginacionHistorial(pagina, totalPaginas, totalRegistros, registrosPagina) {
     const btnNum = document.querySelector('#btnHistorialPaginaNumero');
     if (btnNum) btnNum.textContent = String(pagina);
@@ -3960,6 +4198,7 @@ function actualizarPaginacionHistorial(pagina, totalPaginas, totalRegistros, reg
     actualizarIrPagina('inputIrPaginaHistorial', pagina, totalPaginas);
 }
 
+// Maneja el evento input del control #inputBuscarHistorial.
 document.addEventListener('input', function (event) {
     const input = event.target.closest('#inputBuscarHistorial');
     if (!input) return;
@@ -3969,6 +4208,7 @@ document.addEventListener('input', function (event) {
     listarHistorial();
 });
 
+// Maneja el evento keypress del control #inputIrPaginaHistorial.
 document.addEventListener('keypress', function (event) {
     const input = event.target.closest('#inputIrPaginaHistorial');
     if (!input) return;
@@ -3984,6 +4224,7 @@ document.addEventListener('keypress', function (event) {
     listarHistorial();
 });
 
+// Maneja el evento click del control .btn-ver-historial.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-ver-historial');
     if (!boton) return;
@@ -3992,7 +4233,7 @@ document.addEventListener('click', async function (event) {
     if (!idOrden) return;
 
     try {
-        const res = await axios.get('/api/ordenes/' + idOrden + '/detalle');
+        const res = await axios.get('/api/buscarOrdenConDetalle/' + idOrden);
         if (!res.data.ok || !res.data.orden) {
             mostrarToast('error', 'Error', 'No se pudo cargar la orden');
             return;
@@ -4037,7 +4278,7 @@ document.addEventListener('click', async function (event) {
         if (album) album.innerHTML = '';
 
         try {
-            const resInf = await axios.get('/api/informes/orden/' + idOrden);
+            const resInf = await axios.get('/api/buscarInformePorOrden/' + idOrden);
             const informe = resInf.data.ok ? resInf.data.informe : null;
             const evidencias = informe ? (informe.evidencias || []) : [];
 
@@ -4077,6 +4318,7 @@ document.addEventListener('click', async function (event) {
 // ============================================================
 // SECCION AGENDA (accesible, NO funcional por ahora)
 // ============================================================
+// Inserta la vista de agenda y muestra el nombre del mecánico.
 function renderAgenda() {
     contenedorReactivo.innerHTML = "";
     const clone = templateContenedorAgenda.cloneNode(true);
@@ -4092,6 +4334,7 @@ function renderAgenda() {
 // ============================================================
 // HANDLER GLOBAL: PAGINACIÓN (flechas / número / ir a página)
 // ============================================================
+// Maneja el evento click delegado en los controles de la vista.
 document.addEventListener('click', function (event) {
     const item = event.target.closest(
         '#contenedorPaginacionOrdenes [data-pagina], ' +
@@ -4146,6 +4389,7 @@ document.addEventListener('click', function (event) {
 // ============================================================
 // HANDLER GLOBAL: SELECTOR "REGISTROS POR PÁGINA"
 // ============================================================
+// Maneja el evento change del control .selector-por-pagina.
 document.addEventListener('change', function (event) {
     const select = event.target.closest('.selector-por-pagina');
     if (!select) return;
