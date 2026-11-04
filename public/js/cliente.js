@@ -1,63 +1,72 @@
-/* Scrip para frontend */
-/* const socket = io('/administrador'); */
+/* Navegación entre las vistas visuales del portal Cliente. */
+(function () {
+    const vistas = {
+        '#dashboardCliente': { tipo: 'dashboard' },
+        '#citasCliente': { plantilla: 'templateCitasCliente' },
+        '#vehiculosCliente': { plantilla: 'templateVehiculosCliente' },
+        '#cotizacionesCliente': { plantilla: 'templateCotizacionesCliente' },
+        '#historialCliente': { plantilla: 'templateHistorialCliente' },
+        '#perfilCliente': { plantilla: 'templatePerfilCliente' }
+    };
 
-// Creación de fragmento para optimizar manipulaciones del DOM
-const fragmento = document.createDocumentFragment();
+    function iniciarNavegacionCliente() {
+        const contenedor = document.querySelector('#contenedorReactivo');
+        const dashboardInicial = document.querySelector('#dashboard');
 
-/* Invocamos a los botones */
-let btnMenuContactos = document.querySelector('#btnMenuContactos');
-let btnMenuGaleria = document.querySelector('#btnMenuGaleria');
-let btnMenuAlbum = document.querySelector('#btnMenuAlbum');
-let btnMenuNotificacion = document.querySelector('#btnMenuNotificacion');
-let btnMenuConfiguracion = document.querySelector('#btnMenuConfiguracion');
-let btnMenuCerrar = document.querySelector('#btnMenuCerrar');
+        if (!contenedor || !dashboardInicial) return;
 
-// Capturar referencia al contenedor principal de renderizado
-let contenedorReactivo = document.querySelector('#contenedorReactivo');
+        // Conserva una copia para volver al dashboard después de cambiar de vista.
+        const dashboard = dashboardInicial.cloneNode(true);
 
-// Capturar los templates de las secciones
-const templateContactos = document.querySelector('#templateContactos').content;
-const templateGaleria = document.querySelector('#templateGaleria').content;
-/* const templateAlbum = document.querySelector('#templateAlbum').content;
-const templateNotificacion = document.querySelector('#templateNotificacion').content;
-const templateConfiguracion = document.querySelector('#templateConfiguracion').content; */
+        function mostrarVista(hash) {
+            const vista = vistas[hash];
+            if (!vista) return;
 
+            let contenido;
 
-/* Variables globales */
-let listadoGeneralContactos = {};
+            if (vista.tipo === 'dashboard') {
+                contenido = dashboard.cloneNode(true);
+            } else {
+                const plantilla = document.getElementById(vista.plantilla);
+                if (!plantilla) return;
+                contenido = plantilla.content.cloneNode(true);
+            }
 
+            contenedor.replaceChildren(contenido);
+            actualizarMenuActivo(hash);
+        }
 
+        function actualizarMenuActivo(hashActivo) {
+            document.querySelectorAll('#menuItems a[href^="#"]').forEach(enlace => {
+                const activo = enlace.getAttribute('href') === hashActivo;
+                enlace.classList.toggle('active', activo);
 
-/* Sockets de escucha */
-/* socket.on('/index/listarUsuarios', (data)=>{
-    listadoGeneralContactos = data;  
-    console.log(listadoGeneralContactos);
-    
-}) */
+                if (activo) {
+                    enlace.setAttribute('aria-current', 'page');
+                } else {
+                    enlace.removeAttribute('aria-current');
+                }
+            });
+        }
 
-/* Funciones de los botones para reenderizar elDOM */
+        // Atiende los enlaces del menú y los accesos rápidos que apuntan a una vista.
+        document.addEventListener('click', event => {
+            const enlace = event.target.closest('a[href^="#"]');
+            if (!enlace) return;
 
+            const hash = enlace.getAttribute('href');
+            if (!vistas[hash]) return;
 
-btnMenuContactos.addEventListener('click', function(){
-    
-    contenedorReactivo.innerHTML = "";
+            event.preventDefault();
+            mostrarVista(hash);
+        });
 
-    templateContactos.querySelector('.mis-contactos').textContent = "Yo me reenderizo cuando haces clic en contactos cliente";
-   
+        actualizarMenuActivo('#dashboardCliente');
+    }
 
-    const clone = templateContactos.cloneNode(true);
-    fragmento.appendChild(clone);
-
-    contenedorReactivo.appendChild(fragmento);
-});
-
-btnMenuGaleria.addEventListener('click', function(){
-    contenedorReactivo.innerHTML = "";
-
-    templateGaleria.querySelector('.mi-galeria').textContent = "Yo me reenderizo cuando haces clic en galeria, cliente";
-
-    const clone = templateGaleria.cloneNode(true);
-    fragmento.appendChild(clone);
-
-    contenedorReactivo.appendChild(fragmento);
-});
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', iniciarNavegacionCliente, { once: true });
+    } else {
+        iniciarNavegacionCliente();
+    }
+})();

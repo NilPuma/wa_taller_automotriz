@@ -16,18 +16,18 @@
               <div class="col-sm-12 col-md-6 col-lg-6">
                 <div id="contenedorLogin" class="row">
                   <div class="col-12 col-lg-6 col-md-8">
-                    <form action="" class=" formulario-login form-group p-4 shadow">
+                    <form action="" class=" formulario-login form-group p-4 shadow" novalidate>
                       <div>
                         <div class="text-center mb-4">
                           <img id="logo" src="/img/logo.png" alt="" class="img-fluid logo" width="150px">
                         </div>
 
                         <div class="form-floating mb-2">
-                          <input id="correoSesion" type="text" class="form-control" placeholder="" required>
+                          <input id="correoSesion" type="email" class="form-control" placeholder="" autocomplete="username" required>
                           <label for="correoSesion"><i class="bi bi-person me-1"></i>Correo</label>
                         </div>
                         <div class="form-floating mb-4">
-                          <input id="passwordSesion" type="text" class="form-control" placeholder="" required>
+                          <input id="passwordSesion" type="password" class="form-control" placeholder="" autocomplete="current-password" required>
                           <label for="passwordSesion"><i class="bi bi-shield-check me-1"></i>Contraseña</label>
                         </div>
                         <div class="text-center mb-4">
@@ -67,11 +67,11 @@
                               <label for="">&nbsp Alias</label>
                               <input id="nick" class="form-control mb-3 style-input" type="text">
                               <label for="">&nbsp Telefono</label>
-                              <input id="telefono" class="form-control mb-3 style-input" type="number">
+                              <input id="telefono" class="form-control mb-3 style-input" type="tel" inputmode="tel" autocomplete="tel">
                               <label for="">&nbsp Correo (Sera tu usuario de iniciar sesion)</label>
-                              <input id="correoRegistro" class="form-control mb-3 style-input" type="text">
+                              <input id="correoRegistro" class="form-control mb-3 style-input" type="email" autocomplete="email">
                               <label for="">&nbsp Contraseña</label>
-                              <input id="passwordRegistro" class="form-control mb-3 style-input" type="password">
+                              <input id="passwordRegistro" class="form-control mb-3 style-input" type="password" autocomplete="new-password" minlength="8">
                               {{!-- <span
                                 class="lbx-datos-select nav-link dropdown-toggle border border-1 rounded-2 mb-3 text-dark"
                                 data-bs-toggle="dropdown" role="button" aria-expanded="false">Seleccione tipo

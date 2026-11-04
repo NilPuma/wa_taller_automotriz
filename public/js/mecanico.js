@@ -49,6 +49,7 @@ let mecanicoActual = null;
 let sucursalActual = { id_sucursal: 1, nombre: 'Taller Central', igv: 18.00 };
 
 let ordenActual              = null;
+let vehiculoBuscadoOT         = null;
 let cotizacionActual         = null;
 let citaActual               = null;
 let clienteActual            = null;
@@ -61,6 +62,13 @@ let evidenciasGuardadas          = [];
 let evidenciasPendientes         = [];
 let archivosEvidenciaPendientes  = [];
 let idInformeActual              = null;
+let ticketPDFActualURL           = null;
+let ticketPDFActualNombre        = 'ticket-ot.pdf';
+let ticketPDFActualComprobante   = null;
+let ticketPDFActualTipo          = 'general';
+let ticketPDFCargando            = false;
+let detallesTicketHistorial      = [];
+let tipoTicketHistorialActual    = 'general';
 
 // Búsqueda local de servicios / productos
 let busquedaServicioCotizacion = '';
@@ -99,6 +107,7 @@ let filtroCotizacionActual   = 'todas';
 
 // Flags
 let _enviandoVehiculo   = false;
+let _enviandoCliente    = false;
 let _enviandoCita       = false;
 let _enviandoCotizacion = false;
 let _enviandoOrden      = false;
@@ -229,6 +238,11 @@ function enlazarMenu() {
 // Inicializa menú, alertas y datos antes de mostrar el dashboard.
 document.addEventListener('DOMContentLoaded', async () => {
     enlazarMenu();
+
+    const modalTicketPDF = document.querySelector('#modalTicketPDF');
+    if (modalTicketPDF) {
+        modalTicketPDF.addEventListener('hidden.bs.modal', limpiarTicketPDFActual);
+    }
 
     const btnMenuCerrarSesion = document.querySelector('#btnMenuCerrarSesion');
     if (btnMenuCerrarSesion) {
@@ -626,27 +640,30 @@ function inicializarToastCerrar() {
 // VALIDACIONES (NUEVO CLIENTE)
 // ============================================================
 // Valida el nombre o razón social y el formato del correo del cliente.
-function validarCamposCliente(nombreCliente, correo, esRuc = false) {
+function validarCamposCliente(nombreCliente, correo, esRuc = false, apellidos = '', telefono = '') {
     const nombreLimpio = (nombreCliente || '').trim();
+    const apellidosLimpios = (apellidos || '').trim();
     const correoLimpio = (correo || '').trim();
+    const digitosTelefono = String(telefono || '').replace(/\D/g, '');
 
     if (nombreLimpio.length < 2 || (!esRuc && !REGEX_NOMBRE.test(nombreLimpio))) {
-        const titulo = esRuc ? 'Razón social inválida' : 'Nombre inválido';
-        const mensaje = esRuc
-            ? 'Ingrese una razón social de al menos 2 caracteres.'
-            : 'El nombre debe tener al menos 2 letras y solo puede contener letras, tildes, ñ, espacios, apóstrofes o guiones.';
-        mostrarToast('advertencia', titulo, mensaje);
+        mostrarToast('advertencia', esRuc ? 'Razón social inválida' : 'Nombre inválido',
+            esRuc ? 'Ingrese una razón social de al menos 2 caracteres.' : 'Ingrese un nombre válido de al menos 2 caracteres.');
         return false;
     }
-
+    if (!esRuc && (apellidosLimpios.length < 2 || !REGEX_NOMBRE.test(apellidosLimpios))) {
+        mostrarToast('advertencia', 'Apellido inválido', 'Ingrese apellidos válidos de al menos 2 caracteres.');
+        return false;
+    }
     if (!REGEX_CORREO.test(correoLimpio)) {
-        mostrarToast('advertencia', 'Correo inválido',
-            'Ingrese un correo con formato válido (ejemplo: usuario@dominio.com).');
+        mostrarToast('advertencia', 'Correo inválido', 'Ingrese un correo con formato válido (ejemplo: usuario@dominio.com).');
         return false;
     }
-
+    if (!/^[+0-9()\s-]+$/.test(String(telefono || '').trim()) || digitosTelefono.length < 7 || digitosTelefono.length > 15) {
+        mostrarToast('advertencia', 'Teléfono inválido', 'Ingrese un teléfono con entre 7 y 15 dígitos.');
+        return false;
+    }
     return true;
-
 }
 
 // ============================================================
@@ -988,11 +1005,33 @@ function leerDatosFormularioVehiculo() {
 }
 
 // Comprueba que el formulario del vehículo tenga los datos requeridos.
-function validarFormularioVehiculo(datos) {
+function validarFormularioVehiculo(datos, idVehiculoActual = null) {
     if (!datos.id_persona || !datos.placa || !datos.vin || !datos.marca || !datos.modelo
         || !datos.anio || !datos.color || !datos.numeroMotor || !datos.numeroChasis) {
-        mostrarToast('advertencia', 'Campos Vacíos',
-            'Placa, VIN, marca, modelo, año, color, N° motor y N° chasis son obligatorios');
+        mostrarToast('advertencia', 'Campos incompletos',
+            'Placa, VIN, marca, modelo, año, color, N° motor y N° chasis son obligatorios.');
+        return false;
+    }
+
+    const anio = Number(datos.anio);
+    const anioMaximo = new Date().getFullYear() + 1;
+    if (!Number.isInteger(anio) || anio < 1900 || anio > anioMaximo) {
+        mostrarToast('advertencia', 'Año inválido', 'Ingrese un año entre 1900 y ' + anioMaximo + '.');
+        return false;
+    }
+
+    if (!/^[A-Z0-9-]{5,10}$/.test(datos.placa)) {
+        mostrarToast('advertencia', 'Placa inválida', 'Use entre 5 y 10 letras, números o guiones.');
+        return false;
+    }
+
+    const duplicado = listadoGeneralVehiculos.find(vehiculo =>
+        Number(vehiculo.id_vehiculo) !== Number(idVehiculoActual) &&
+        (String(vehiculo.placa || '').trim().toUpperCase() === datos.placa ||
+         String(vehiculo.vin || '').trim().toUpperCase() === datos.vin.toUpperCase())
+    );
+    if (duplicado) {
+        mostrarToast('advertencia', 'Vehículo duplicado', 'La placa o el VIN ya están registrados.');
         return false;
     }
     return true;
@@ -1074,6 +1113,7 @@ document.addEventListener('click', async function (event) {
     const telefono = document.querySelector('#inputTelefonoCliente').value.trim();
     const direccion = document.querySelector('#inputDireccionCliente').value.trim();
     const chkVehiculo = document.querySelector('#chkVehiculoTambien').checked;
+    if (_enviandoCliente) return;
 
     if (!documento || !nombres || (!esRuc && !apellidos) || !correo || !telefono) {
         const persona = esRuc ? 'razón social' : 'nombres, apellidos';
@@ -1089,8 +1129,13 @@ document.addEventListener('click', async function (event) {
         return;
     }
 
-    if (!validarCamposCliente(nombres, correo, esRuc)) return;
+    if (!validarCamposCliente(nombres, correo, esRuc, apellidos, telefono)) return;
 
+    const datosVehiculo = chkVehiculo ? leerDatosVehiculoNuevo() : null;
+    if (chkVehiculo && !validarFormularioVehiculo({ ...datosVehiculo, id_persona: 'nuevo' })) return;
+
+    _enviandoCliente = true;
+    boton.disabled = true;
     try {
         const res = await axios.post('/api/registrarPersona', {
             tipo_persona: esRuc ? 'JURIDICA' : 'NATURAL',
@@ -1111,8 +1156,7 @@ document.addEventListener('click', async function (event) {
         const idPersona = res.data.id_persona;
 
         if (chkVehiculo) {
-            const placa = document.querySelector('#inputPlacaNuevo').value.trim().toUpperCase();
-            const okVehiculo = await guardarVehiculoDesdeModalCliente(idPersona, placa);
+            const okVehiculo = await guardarVehiculoDesdeModalCliente(idPersona, datosVehiculo);
             if (!okVehiculo) return;
         }
 
@@ -1127,9 +1171,11 @@ document.addEventListener('click', async function (event) {
 
     } catch (error) {
         console.error(error);
-        if (error.response) {
-            mostrarToast('error', 'Error', error.response.data.mensaje);
-        }
+        const mensaje = error.response?.data?.mensaje || 'No se pudo registrar el cliente.';
+        mostrarToast('error', 'Error', mensaje);
+    } finally {
+        _enviandoCliente = false;
+        boton.disabled = false;
     }
 });
 
@@ -1219,10 +1265,9 @@ document.addEventListener('click', async function (event) {
     try {
         const datos = leerDatosFormularioVehiculo();
 
-        if (!validarFormularioVehiculo(datos)) return;
-
         const modo = document.querySelector('#inputModoVehiculo').value;
         const idVehiculo = document.querySelector('#inputIdVehiculoEditar').value;
+        if (!validarFormularioVehiculo(datos, modo === 'editar' ? idVehiculo : null)) return;
 
         const body = construirBodyVehiculo(datos);
 
@@ -1354,49 +1399,44 @@ function limpiarModalNuevoCliente() {
     document.querySelector('#inputObservacionesNuevo').value = '';
 }
 
-// Registra el vehículo usando el ID del cliente recién creado.
-async function guardarVehiculoDesdeModalCliente(idPersona, placa) {
-    const vin          = document.querySelector('#inputVinNuevo').value.trim();
-    const marca        = document.querySelector('#inputMarcaNuevo').value.trim();
-    const modelo       = document.querySelector('#inputModeloNuevo').value.trim();
-    const anio         = document.querySelector('#inputAnioNuevo').value;
-    const color        = document.querySelector('#inputColorNuevo').value.trim();
-    const numeroMotor  = document.querySelector('#inputNumeroMotorNuevo').value.trim();
-    const numeroChasis = document.querySelector('#inputNumeroChasisNuevo').value.trim();
-    const observaciones = document.querySelector('#inputObservacionesNuevo').value.trim();
+// Lee y valida el vehículo opcional antes de registrar al cliente.
+function leerDatosVehiculoNuevo() {
+    return {
+        placa: document.querySelector('#inputPlacaNuevo').value.trim().toUpperCase(),
+        vin: document.querySelector('#inputVinNuevo').value.trim(),
+        marca: document.querySelector('#inputMarcaNuevo').value.trim(),
+        modelo: document.querySelector('#inputModeloNuevo').value.trim(),
+        anio: document.querySelector('#inputAnioNuevo').value,
+        color: document.querySelector('#inputColorNuevo').value.trim(),
+        numeroMotor: document.querySelector('#inputNumeroMotorNuevo').value.trim(),
+        numeroChasis: document.querySelector('#inputNumeroChasisNuevo').value.trim(),
+        observaciones: document.querySelector('#inputObservacionesNuevo').value.trim()
+    };
+}
 
-    if (!placa || !vin || !marca || !modelo || !anio || !color
-        || !numeroMotor || !numeroChasis) {
-        mostrarToast('advertencia', 'Campos Vacíos',
-            'Si registra un vehículo, complete: placa, VIN, marca, modelo, año, color, N° motor y N° chasis');
-        return false;
-    }
-
+// Registra el vehículo opcional con el ID del cliente recién creado.
+async function guardarVehiculoDesdeModalCliente(idPersona, datos) {
     try {
         const res = await axios.post('/api/registrarVehiculo', {
             id_persona: idPersona,
-            placa,
-            vin,
-            marca,
-            modelo,
-            anio: anio ? Number(anio) : null,
-            color,
-            numero_motor: numeroMotor,
-            numero_chasis: numeroChasis,
-            observaciones
+            placa: datos.placa,
+            vin: datos.vin,
+            marca: datos.marca,
+            modelo: datos.modelo,
+            anio: Number(datos.anio),
+            color: datos.color,
+            numero_motor: datos.numeroMotor,
+            numero_chasis: datos.numeroChasis,
+            observaciones: datos.observaciones
         });
-
         if (!res.data.ok) {
-            mostrarToast('error', 'Error', res.data.mensaje);
+            mostrarToast('error', 'Error al registrar vehículo', res.data.mensaje || 'Revise los datos del vehículo.');
             return false;
         }
         return true;
-
     } catch (error) {
         console.error(error);
-        if (error.response) {
-            mostrarToast('error', 'Error', error.response.data.mensaje);
-        }
+        mostrarToast('error', 'Error al registrar vehículo', error.response?.data?.mensaje || 'No se pudo registrar el vehículo.');
         return false;
     }
 }
@@ -1594,6 +1634,58 @@ document.addEventListener('click', function (event) {
     abrirModal('#modalNuevaCita');
 });
 
+// Abre una cita nueva con cliente y vehículo de la cotización seleccionada.
+document.addEventListener('click', async function (event) {
+    const boton = event.target.closest('#btnAgendarCitaCotizacion');
+    if (!boton || !cotizacionActual) return;
+
+    const cot = cotizacionActual;
+    const citaActiva = listadoGeneralCitas.find(cita =>
+        Number(cita.id_vehiculo) === Number(cot.id_vehiculo) &&
+        Number(cita.id_sucursal) === Number(sucursalActual.id_sucursal) &&
+        ['PENDIENTE', 'CONFIRMADA', 'ATENDIDA'].includes(String(cita.estado || '').toUpperCase()) &&
+        Number(cita.tiene_ot) !== 1 && !citaTieneOrden(cita.id_cita)
+    );
+    if (citaActiva) {
+        mostrarToast('advertencia', 'Cita activa existente', 'El vehículo ya tiene la cita #' + citaActiva.id_cita + ' activa.');
+        return;
+    }
+
+    limpiarModalNuevaCita();
+    poblarSelectPersonasCita();
+    document.querySelector('#selectPersonaCita').value = cot.id_persona;
+    await poblarSelectVehiculosCita(cot.id_persona);
+    document.querySelector('#selectVehiculoCita').value = cot.id_vehiculo;
+    document.querySelector('#inputMotivoCita').value = 'Seguimiento de cotización COT-' + String(cot.id_cotizacion).padStart(4, '0');
+
+    const contexto = document.querySelector('#contextoCitaCotizacion');
+    if (contexto) {
+        contexto.textContent = 'Cliente y vehículo cargados desde la cotización. La cita se guardará como registro independiente.';
+        contexto.classList.remove('d-none');
+    }
+    abrirModal('#modalNuevaCita');
+});
+
+// Valida que la cita no se programe en el pasado.
+function validarFechaHoraCita(fecha, hora) {
+    if (!fecha || !hora) {
+        mostrarToast('advertencia', 'Falta fecha u hora', 'Seleccione la fecha y la hora de la cita.');
+        return false;
+    }
+    const [anio, mes, dia] = fecha.split('-').map(Number);
+    const [horas, minutos] = hora.split(':').map(Number);
+    const seleccionada = new Date(anio, mes - 1, dia, horas, minutos, 0, 0);
+    if (Number.isNaN(seleccionada.getTime())) {
+        mostrarToast('advertencia', 'Fecha u hora inválida', 'Revise la fecha y la hora seleccionadas.');
+        return false;
+    }
+    if (seleccionada < new Date()) {
+        mostrarToast('advertencia', 'Fecha u hora pasada', 'La cita debe programarse para ahora o una fecha futura.');
+        return false;
+    }
+    return true;
+}
+
 // Maneja el evento click del control #btnRegistrarCita.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnRegistrarCita');
@@ -1609,8 +1701,20 @@ document.addEventListener('click', async function (event) {
         const horaCita   = document.querySelector('#inputHoraCita').value;
         const motivo     = document.querySelector('#inputMotivoCita').value.trim();
 
-        if (!idPersona || !idVehiculo || !fechaCita || !horaCita) {
-            mostrarToast('advertencia', 'Campos Vacíos', 'Cliente, vehículo, fecha y hora son obligatorios');
+        if (!idPersona || !idVehiculo) {
+            mostrarToast('advertencia', 'Faltan datos', 'Seleccione un cliente y un vehículo para la cita.');
+            return;
+        }
+        if (!validarFechaHoraCita(fechaCita, horaCita)) return;
+
+        await cargarCitas();
+        const citaActiva = listadoGeneralCitas.find(cita =>
+            Number(cita.id_vehiculo) === Number(idVehiculo) && Number(cita.id_sucursal) === Number(sucursalActual.id_sucursal) &&
+            ['PENDIENTE', 'CONFIRMADA', 'ATENDIDA'].includes(String(cita.estado || '').toUpperCase()) &&
+            Number(cita.tiene_ot) !== 1 && !citaTieneOrden(cita.id_cita)
+        );
+        if (citaActiva) {
+            mostrarToast('advertencia', 'Cita activa existente', 'El vehículo ya tiene la cita #' + citaActiva.id_cita + ' activa.');
             return;
         }
 
@@ -1643,6 +1747,44 @@ document.addEventListener('click', async function (event) {
         }
     } finally {
         _enviandoCita = false;
+    }
+});
+
+// Prepara una cotización con los datos de la cita seleccionada.
+document.addEventListener('click', async function (event) {
+    const boton = event.target.closest('#btnCrearCotizacionDesdeCita');
+    if (!boton || !citaActual) return;
+
+    const cita = citaActual;
+    const cotActiva = listadoGeneralCotizaciones.find(cot =>
+        Number(cot.id_vehiculo) === Number(cita.id_vehiculo) &&
+        Number(cot.id_sucursal) === Number(cita.id_sucursal || sucursalActual.id_sucursal) &&
+        ['PENDIENTE', 'APROBADA'].includes(String(cot.estado || '').toUpperCase()) &&
+        Number(cot.tiene_ot) !== 1
+    );
+    if (cotActiva) {
+        const codigo = 'COT-' + String(cotActiva.id_cotizacion).padStart(4, '0');
+        mostrarToast('advertencia', 'Cotización activa existente', 'El vehículo ya tiene la cotización ' + codigo + ' activa.');
+        return;
+    }
+
+    try {
+        const respuesta = await axios.get('/api/buscarVehiculoPorId/' + cita.id_vehiculo);
+        const vehiculo = respuesta.data && respuesta.data.vehiculo;
+        if (!respuesta.data.ok || !vehiculo) throw new Error('No se pudo cargar el vehículo de la cita.');
+
+        cerrarModal('#modalVerCita');
+        renderCotizaciones();
+        clienteActual = { id_persona: cita.id_persona, nombres: cita.cliente_nombres, apellidos: cita.cliente_apellidos, correo: cita.cliente_correo, telefono: cita.cliente_telefono };
+        vehiculoActualCotizacion = vehiculo;
+        mostrarInfoClienteCotizacion(clienteActual, vehiculo);
+        document.querySelector('#inputPlacaCotizacion').value = vehiculo.placa || cita.placa || '';
+        document.querySelector('#textareaObservacionesCotizacion').value = cita.motivo || '';
+        mostrarToast('exito', 'Cotización preparada', 'Cliente y vehículo cargados. Añada los productos o servicios antes de generarla.');
+    } catch (error) {
+        console.error(error);
+        const mensaje = error.response && error.response.data && error.response.data.mensaje;
+        mostrarToast('error', 'No se pudo preparar la cotización', mensaje || error.message);
     }
 });
 
@@ -1849,6 +1991,8 @@ document.addEventListener('keypress', function (event) {
 // Restablece el formulario de nueva cita.
 function limpiarModalNuevaCita() {
     document.querySelector('#selectPersonaCita').value = '';
+    const contexto = document.querySelector('#contextoCitaCotizacion');
+    if (contexto) { contexto.textContent = ''; contexto.classList.add('d-none'); }
 
     const selectVehiculo = document.querySelector('#selectVehiculoCita');
     const opciones = selectVehiculo.querySelectorAll('option:not([disabled])');
@@ -2369,74 +2513,94 @@ document.addEventListener('click', function (event) {
     recalcularTotalesCotizacion();
 });
 
-// Maneja el evento click del control #btnGenerarCotizacion.
+// Registra una cotización después de validar cliente, vehículo, fecha e ítems.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnGenerarCotizacion');
-    if (!boton) return;
-
-    if (_enviandoCotizacion) return;
-
-    const idVehiculo = vehiculoActualCotizacion ? vehiculoActualCotizacion.id_vehiculo : null;
-    const idPersona  = clienteActual ? clienteActual.id_persona : null;
-
-    if (!idPersona || !idVehiculo) {
-        mostrarToast('advertencia', 'Falta vehículo', 'Busque una placa antes de generar la cotización');
-        return;
-    }
-
-    if (itemsCotizacion.length === 0) {
-        mostrarToast('advertencia', 'Sin items', 'Agregue al menos un servicio o producto');
-        return;
-    }
-
-    const fechaCotizacion = document.querySelector('#inputFechaCotizacion').value;
-    if (!fechaCotizacion) {
-        mostrarToast('advertencia', 'Falta fecha', 'Seleccione una fecha para la cotización');
-        return;
-    }
-
-    const observacion = document.querySelector('#textareaObservacionesCotizacion').value.trim();
-    const validez     = document.querySelector('#selectValidezCotizacion').value;
+    if (!boton || _enviandoCotizacion) return;
 
     _enviandoCotizacion = true;
-
+    boton.disabled = true;
     try {
+        const idVehiculo = vehiculoActualCotizacion ? vehiculoActualCotizacion.id_vehiculo : null;
+        const idPersona = clienteActual ? clienteActual.id_persona : null;
+        if (!idPersona || !idVehiculo) {
+            mostrarToast('advertencia', 'Falta vehículo', 'Busque y seleccione la placa antes de generar la cotización.');
+            return;
+        }
+
+        const fechaCotizacion = document.querySelector('#inputFechaCotizacion').value;
+        if (!fechaCotizacion) {
+            mostrarToast('advertencia', 'Falta fecha', 'Seleccione una fecha para la cotización.');
+            return;
+        }
+        if (fechaCotizacion < fechaISO(new Date())) {
+            mostrarToast('advertencia', 'Fecha inválida', 'La fecha de la cotización no puede ser anterior a hoy.');
+            return;
+        }
+        if (!itemsCotizacion.length) {
+            mostrarToast('advertencia', 'Sin conceptos', 'Agregue al menos un servicio o producto.');
+            return;
+        }
+        const itemsValidos = itemsCotizacion.every(item =>
+            Number.isFinite(Number(item.cantidad)) && Number(item.cantidad) > 0 &&
+            Number.isFinite(Number(item.precio_unitario)) && Number(item.precio_unitario) >= 0
+        );
+        if (!itemsValidos) {
+            mostrarToast('advertencia', 'Ítems inválidos', 'Revise cantidades y precios de los conceptos agregados.');
+            return;
+        }
+
+        const validez = document.querySelector('#selectValidezCotizacion').value;
+        if (!['7', '15', '30', '60'].includes(validez)) {
+            mostrarToast('advertencia', 'Vigencia inválida', 'Seleccione una vigencia disponible para la cotización.');
+            return;
+        }
+
+        await cargarCotizaciones();
+        const cotizacionActiva = listadoGeneralCotizaciones.find(cotizacion =>
+            Number(cotizacion.id_vehiculo) === Number(idVehiculo) &&
+            Number(cotizacion.id_sucursal) === Number(sucursalActual.id_sucursal) &&
+            ['PENDIENTE', 'APROBADA'].includes(String(cotizacion.estado || '').toUpperCase()) &&
+            Number(cotizacion.tiene_ot) !== 1
+        );
+        if (cotizacionActiva) {
+            const codigo = 'COT-' + String(cotizacionActiva.id_cotizacion).padStart(4, '0');
+            mostrarToast('advertencia', 'Cotización activa existente', 'El vehículo ya tiene la cotización ' + codigo + ' activa.');
+            return;
+        }
+
+        const observacion = document.querySelector('#textareaObservacionesCotizacion').value.trim();
         const res = await axios.post('/api/registrarCotizacion', {
             id_persona: idPersona,
             id_sucursal: sucursalActual.id_sucursal,
             id_vehiculo: idVehiculo,
             observacion,
-            validez,
+            validez: Number(validez),
             fecha_cotizacion: fechaCotizacion,
-            items: itemsCotizacion.map(it => ({
-                id_producto: it.id_producto,
-                id_servicio: it.id_servicio,
-                cantidad: it.cantidad,
-                precio_unitario: it.precio_unitario,
+            items: itemsCotizacion.map(item => ({
+                id_producto: item.id_producto,
+                id_servicio: item.id_servicio,
+                cantidad: Number(item.cantidad),
+                precio_unitario: Number(item.precio_unitario),
                 observacion: null
             }))
         });
-
-        if (!res.data.ok) {
-            mostrarToast('error', 'Error', res.data.mensaje);
+        if (!res.data || !res.data.ok) {
+            mostrarToast('error', 'No se pudo crear la cotización', res.data?.mensaje || 'Revise los datos e inténtelo nuevamente.');
             return;
         }
 
         await cargarCotizaciones();
         listarCotizacionesSidebar();
-
         limpiarFormularioCotizacion();
-
         mostrarToast('exito', 'Cotización registrada',
-            `COT-${String(res.data.id_cotizacion).padStart(4, '0')} creada correctamente`);
-
+            'COT-' + String(res.data.id_cotizacion).padStart(4, '0') + ' creada correctamente.');
     } catch (error) {
         console.error(error);
-        if (error.response) {
-            mostrarToast('error', 'Error', error.response.data.mensaje);
-        }
+        mostrarToast('error', 'Error de cotización', error.response?.data?.mensaje || 'No se pudo registrar la cotización.');
     } finally {
         _enviandoCotizacion = false;
+        boton.disabled = false;
     }
 });
 
@@ -2519,6 +2683,8 @@ document.addEventListener('click', async function (event) {
 
         const cot = res.data.cotizacion;
         cotizacionActual = cot;
+        const btnAgendarCita = document.querySelector('#btnAgendarCitaCotizacion');
+        if (btnAgendarCita) btnAgendarCita.disabled = false;
 
         setTexto('#contenedorPlacaActiva', cot.placa || '--');
 
@@ -2700,6 +2866,8 @@ function limpiarFormularioCotizacion() {
     cotizacionActual = null;
     clienteActual = null;
     vehiculoActualCotizacion = null;
+    const btnAgendarCita = document.querySelector('#btnAgendarCitaCotizacion');
+    if (btnAgendarCita) btnAgendarCita.disabled = true;
 
     const inputPlaca = document.querySelector('#inputPlacaCotizacion');
     if (inputPlaca) inputPlaca.value = '';
@@ -2789,13 +2957,20 @@ function limpiarDetalleOrden() {
     setTexto('#consumoOrdenVehiculo', '--');
     setTexto('#consumoOrdenMecanico', '--');
     setTexto('#consumoOrdenServicio', '--');
-    setTexto('#consumoOrdenDescripcion', '--');
+    const descripcionOrden = document.querySelector('#consumoOrdenDescripcion');
+    if (descripcionOrden) descripcionOrden.value = '';
 
     const badge = document.querySelector('#consumoOrdenEstado');
     if (badge) {
         badge.textContent = '--';
         badge.className = 'badge bg-secondary';
     }
+
+    vehiculoBuscadoOT = null;
+    const tarjetaVehiculo = document.querySelector('#contenedorVehiculoBuscadoOT');
+    if (tarjetaVehiculo) tarjetaVehiculo.classList.add('d-none');
+    const accionCrearOT = document.querySelector('#contenedorAccionCrearOrdenDirecta');
+    if (accionCrearOT) accionCrearOT.classList.add('d-none');
 
     const info = document.querySelector('#contenedorInfoOrden');
     if (info) info.classList.add('d-none');
@@ -2808,6 +2983,11 @@ function limpiarDetalleOrden() {
 
     const contEvid = document.querySelector('#contenedorEvidencias');
     if (contEvid) contEvid.classList.add('d-none');
+
+    const observacionDirecta = document.querySelector('#contenedorObservacionOrdenDirecta');
+    if (observacionDirecta) observacionDirecta.classList.add('d-none');
+    const observacionOrden = document.querySelector('#contenedorObservacionOrdenActual');
+    if (observacionOrden) observacionOrden.classList.add('d-none');
 
     const formListas = document.querySelector('#contenedorListasDisponiblesOT');
     if (formListas) formListas.classList.add('d-none');
@@ -2847,7 +3027,9 @@ function limpiarDetalleOrden() {
     if (footerEvid) footerEvid.classList.add('d-none');
 
     setTexto('#contadorEvidencias', '0');
-    setTexto('#pillTotalConsumo', 'S/ 0.00');
+    setTexto('#resumenSubtotalOT', 'S/ 0.00');
+    setTexto('#resumenIGVOT', 'S/ 0.00');
+    setTexto('#resumenTotalConsumo', 'S/ 0.00');
 
     setIndicadorAutoguardado('');
 }
@@ -2939,10 +3121,17 @@ async function cargarOrdenActual(idOrden) {
 
         const orden = res.data.orden;
         ordenActual = orden;
+        vehiculoBuscadoOT = null;
+        const tarjetaVehiculo = document.querySelector('#contenedorVehiculoBuscadoOT');
+        if (tarjetaVehiculo) tarjetaVehiculo.classList.add('d-none');
+        const observacionDirecta = document.querySelector('#contenedorObservacionOrdenDirecta');
+        if (observacionDirecta) observacionDirecta.classList.add('d-none');
 
         await cargarInformePorOrden(idOrden);
 
         pintarDetalleOrden(orden);
+        const observacionOrden = document.querySelector('#contenedorObservacionOrdenActual');
+        if (observacionOrden) observacionOrden.classList.remove('d-none');
 
         itemsOT = (orden.detalles || []).map(it => ({
             id_producto: it.id_producto,
@@ -3060,7 +3249,8 @@ function pintarDetalleOrden(orden) {
     setTexto('#consumoOrdenMecanico', mecanicos.length ? mecanicos.join(', ') : '—');
 
     setTexto('#consumoOrdenServicio', orden.observacion || '—');
-    setTexto('#consumoOrdenDescripcion', orden.observacion || '—');
+    const descripcionOrden = document.querySelector('#consumoOrdenDescripcion');
+    if (descripcionOrden) descripcionOrden.value = orden.observacion || '';
 
     const badge = document.querySelector('#consumoOrdenEstado');
     if (badge) {
@@ -3240,8 +3430,11 @@ function listarItemsOT() {
 // Recalcula los importes del consumo de la orden actual.
 function recalcularTotalesOT() {
     const subtotal = itemsOT.reduce((acc, it) => acc + Number(it.subtotal || 0), 0);
-    setTexto('#contenedorTotalConsumo', 'S/ ' + subtotal.toFixed(2));
-    setTexto('#pillTotalConsumo', 'S/ ' + subtotal.toFixed(2));
+    const igv = subtotal * 0.18;
+    const total = subtotal + igv;
+    setTexto('#resumenSubtotalOT', 'S/ ' + subtotal.toFixed(2));
+    setTexto('#resumenIGVOT', 'S/ ' + igv.toFixed(2));
+    setTexto('#resumenTotalConsumo', 'S/ ' + total.toFixed(2));
 }
 
 // ============================================================
@@ -3415,11 +3608,11 @@ function pintarEvidenciasOT() {
 }
 
 // Prepara y muestra el formulario para crear una orden.
-function abrirModalNuevaOrden() {
+async function abrirModalNuevaOrden() {
     limpiarModalNuevaOrden();
+    await poblarSelectCitasOrden();
+    await poblarSelectCotizacionesOrden();
     abrirModal('#modalNuevaOrden');
-    poblarSelectCitasOrden();
-    poblarSelectCotizacionesOrden();
 }
 
 // Carga citas que se pueden asociar a una orden nueva.
@@ -3427,19 +3620,24 @@ async function poblarSelectCitasOrden() {
     const select = document.querySelector('#selectCitaOrden');
     if (!select) return;
 
-    const opciones = select.querySelectorAll('option:not([disabled])');
-    opciones.forEach(o => o.remove());
+    select.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
+    await cargarCitas();
 
-    await cargarCitasSinOrden();
+    const idCotizacion = document.querySelector('#selectCotizacionOrden')?.value;
+    const cot = listadoGeneralCotizaciones.find(item => Number(item.id_cotizacion) === Number(idCotizacion));
+    const disponibles = listadoGeneralCitas.filter(cita =>
+        Number(cita.id_sucursal) === Number(sucursalActual.id_sucursal) &&
+        ['PENDIENTE', 'CONFIRMADA', 'ATENDIDA'].includes(String(cita.estado || '').toUpperCase()) &&
+        Number(cita.tiene_ot) !== 1 && !citaTieneOrden(cita.id_cita) &&
+        (!cot || (Number(cita.id_vehiculo) === Number(cot.id_vehiculo) && Number(cita.id_persona) === Number(cot.id_persona) && Number(cita.id_sucursal) === Number(cot.id_sucursal)))
+    );
 
     const templateOption = document.querySelector('#templateOptionCita').content;
-
-    listadoCitasSinOrden.forEach(cita => {
+    disponibles.forEach(cita => {
         const clone = templateOption.cloneNode(true);
         const option = clone.querySelector('option');
         option.value = cita.id_cita;
-        option.textContent =
-            `#${cita.id_cita} · ${cita.fecha_cita ? formatearFecha(cita.fecha_cita) : '—'} ${cita.hora_cita || ''} · ${cita.placa || ''} · ${cita.cliente_nombres || ''} ${cita.cliente_apellidos || ''}`.trim();
+        option.textContent = '#' + cita.id_cita + ' · ' + (cita.fecha_cita ? formatearFecha(cita.fecha_cita) : '—') + ' ' + (cita.hora_cita || '') + ' · ' + (cita.placa || '') + ' · ' + (cita.cliente_nombres || '') + ' ' + (cita.cliente_apellidos || '');
         select.appendChild(clone);
     });
 }
@@ -3449,12 +3647,15 @@ async function poblarSelectCotizacionesOrden() {
     const select = document.querySelector('#selectCotizacionOrden');
     if (!select) return;
 
-    const opciones = select.querySelectorAll('option:not([disabled])');
+    const opciones = select.querySelectorAll('option:not(:first-child)');
     opciones.forEach(o => o.remove());
 
     await cargarCotizacionesAprobadas();
 
-    const disponibles = listadoCotizacionesAprobadas.filter(cot => !cot.tiene_ot);
+    const idCita = document.querySelector('#selectCitaOrden')?.value;
+    const cita = listadoGeneralCitas.find(item => Number(item.id_cita) === Number(idCita));
+    const disponibles = listadoCotizacionesAprobadas.filter(cot => !cot.tiene_ot && Number(cot.id_sucursal) === Number(sucursalActual.id_sucursal) && (!cita ||
+        (Number(cot.id_vehiculo) === Number(cita.id_vehiculo) && Number(cot.id_persona) === Number(cita.id_persona) && Number(cot.id_sucursal) === Number(cita.id_sucursal))));
 
     const templateOption = document.querySelector('#templateOptionCotizacion').content;
 
@@ -3468,11 +3669,23 @@ async function poblarSelectCotizacionesOrden() {
     });
 }
 
+// Mantiene las opciones de cita y cotización compatibles al cambiar la selección.
+document.addEventListener('change', async function (event) {
+    if (event.target.closest('#selectCitaOrden')) {
+        const selectCot = document.querySelector('#selectCotizacionOrden');
+        const seleccion = selectCot ? selectCot.value : '';
+        await poblarSelectCotizacionesOrden();
+        if (selectCot && Array.from(selectCot.options).some(option => option.value === seleccion)) selectCot.value = seleccion;
+    } else if (event.target.closest('#selectCotizacionOrden')) {
+        const selectCita = document.querySelector('#selectCitaOrden');
+        const seleccion = selectCita ? selectCita.value : '';
+        await poblarSelectCitasOrden();
+        if (selectCita && Array.from(selectCita.options).some(option => option.value === seleccion)) selectCita.value = seleccion;
+    }
+});
+
 // Restablece los campos del formulario de orden.
 function limpiarModalNuevaOrden() {
-    const origen = document.querySelector('#selectOrigenOrden');
-    if (origen) origen.value = 'CITA';
-
     const selectCita = document.querySelector('#selectCitaOrden');
     if (selectCita) selectCita.value = '';
 
@@ -3486,7 +3699,7 @@ function limpiarModalNuevaOrden() {
     if (wrapCita) wrapCita.classList.remove('d-none');
 
     const wrapCot = document.querySelector('#wrapperSelectCotizacion');
-    if (wrapCot) wrapCot.classList.add('d-none');
+    if (wrapCot) wrapCot.classList.remove('d-none');
 }
 
 // Maneja el evento click del control .filtro-orden.
@@ -3510,6 +3723,251 @@ document.addEventListener('input', function (event) {
     busquedaOrdenActual = input.value.trim();
     paginaOrdenesActual = 1;
     listarOrdenes();
+});
+
+// Muestra únicamente las citas y cotizaciones disponibles para crear la OT.
+function pintarOrigenesVehiculoOT(vehiculo) {
+    const contenedor = document.querySelector('#listaOrigenesVehiculoOT');
+    const mensajeVacio = document.querySelector('#mensajeSinOrigenVehiculoOT');
+    const botonCrear = document.querySelector('#btnCrearOrdenDesdeVehiculo');
+    const contenedorAccionCrear = document.querySelector('#contenedorAccionCrearOrdenDirecta');
+    if (!contenedor) return;
+
+    contenedor.innerHTML = '';
+    const sucursalId = Number(sucursalActual.id_sucursal);
+    const citasDisponibles = listadoGeneralCitas
+        .filter(cita => Number(cita.id_vehiculo) === Number(vehiculo.id_vehiculo) &&
+            Number(cita.id_sucursal) === sucursalId &&
+            ['PENDIENTE', 'CONFIRMADA', 'ATENDIDA'].includes(String(cita.estado || '').toUpperCase()) &&
+            Number(cita.tiene_ot) !== 1)
+        .sort((a, b) => Number(b.id_cita) - Number(a.id_cita));
+    const cotizacionesDisponibles = listadoGeneralCotizaciones
+        .filter(cotizacion => Number(cotizacion.id_vehiculo) === Number(vehiculo.id_vehiculo) &&
+            Number(cotizacion.id_sucursal) === sucursalId &&
+            String(cotizacion.estado || '').toUpperCase() === 'APROBADA' &&
+            Number(cotizacion.tiene_ot) !== 1)
+        .sort((a, b) => Number(b.id_cotizacion) - Number(a.id_cotizacion));
+
+    const agregarOpcion = (tipo, registro, seleccionada) => {
+        const id = tipo === 'CITA' ? registro.id_cita : registro.id_cotizacion;
+        const opcion = document.createElement('label');
+        opcion.className = 'opcion-origen-ot form-check';
+
+        const icono = document.createElement('span');
+        icono.className = 'opcion-origen-ot__icono';
+        icono.innerHTML = tipo === 'CITA'
+            ? '<i class="bi bi-calendar-check"></i>'
+            : '<i class="bi bi-file-earmark-text"></i>';
+
+        const texto = document.createElement('span');
+        texto.className = 'opcion-origen-ot__texto';
+        const titulo = document.createElement('strong');
+        const detalle = document.createElement('small');
+
+        if (tipo === 'CITA') {
+            titulo.textContent = 'Cita disponible';
+            const fecha = registro.fecha_cita ? formatearFecha(registro.fecha_cita) : '—';
+            detalle.textContent = 'N° ' + registro.id_cita + ' · ' + fecha +
+                (registro.hora_cita ? ' · ' + registro.hora_cita : '');
+        } else {
+            titulo.textContent = 'Cotización disponible';
+            const fecha = registro.fecha_cotizacion ? formatearFecha(registro.fecha_cotizacion) : '—';
+            detalle.textContent = 'COT-' + String(registro.id_cotizacion).padStart(4, '0') +
+                ' · ' + fecha + ' · S/ ' + Number(registro.monto_cotizacion || 0).toFixed(2);
+        }
+
+        texto.append(titulo, detalle);
+        opcion.append(icono, texto);
+
+        const radio = document.createElement('input');
+        radio.type = 'checkbox';
+        radio.className = 'form-check-input';
+        radio.name = 'origenOrdenVehiculo';
+        radio.value = (tipo === 'CITA' ? 'CITA:' : 'COTIZACION:') + id;
+        radio.checked = seleccionada;
+        opcion.prepend(radio);
+        opcion.classList.toggle('is-seleccionada', seleccionada);
+        contenedor.appendChild(opcion);
+    };
+
+    const citaSeleccionada = citasDisponibles[0] || null;
+    const cotizacionSeleccionada = cotizacionesDisponibles[0] || null;
+
+    if (citaSeleccionada) agregarOpcion('CITA', citaSeleccionada, false);
+    if (cotizacionSeleccionada) agregarOpcion('COTIZACION', cotizacionSeleccionada, false);
+
+    if (mensajeVacio) {
+        mensajeVacio.classList.toggle('d-none', Boolean(citaSeleccionada || cotizacionSeleccionada));
+    }
+
+    const tieneOrdenActiva = Number(vehiculo.tiene_orden_activa) === 1 ||
+        vehiculo.tiene_orden_activa === true;
+    const vehiculoActivo = String(vehiculo.estado || '').toUpperCase() === 'ACTIVO';
+    if (botonCrear) botonCrear.disabled = !vehiculoActivo || tieneOrdenActiva;
+    if (contenedorAccionCrear) contenedorAccionCrear.classList.toggle('d-none', tieneOrdenActiva || !vehiculoActivo);
+}
+// Mantiene visible la selección actual del origen.
+document.addEventListener('change', function (event) {
+    const radio = event.target.closest('input[name="origenOrdenVehiculo"]');
+    if (!radio) return;
+    document.querySelectorAll('.opcion-origen-ot').forEach(opcion => {
+        opcion.classList.toggle('is-seleccionada', opcion.contains(radio));
+    });
+});
+
+// Busca un vehículo por placa para iniciar una OT desde la misma vista.
+async function buscarVehiculoParaNuevaOrden() {
+    const input = document.querySelector('#inputBuscarOrden');
+    const placa = input ? input.value.trim().toUpperCase() : '';
+    if (!placa) {
+        mostrarToast('advertencia', 'Falta la placa', 'Ingresa la placa del vehículo para buscarlo.');
+        return;
+    }
+
+    try {
+        const respuesta = await axios.get('/api/buscarVehiculoPorPlaca/' + encodeURIComponent(placa));
+        const vehiculo = respuesta.data && respuesta.data.vehiculo;
+        if (!respuesta.data.ok || !vehiculo) throw new Error('No se encontró un vehículo con esa placa.');
+
+        if (ordenActual) {
+            await flushAutoguardadoConsumo();
+            if (_autoguardadoConsumoPendiente) {
+                mostrarToast('advertencia', 'Guardado pendiente', 'Espera a que se guarden los cambios de la orden actual.');
+                return;
+            }
+        }
+
+        ordenActual = null;
+        itemsOT = [];
+        limpiarDetalleOrden();
+        vehiculoBuscadoOT = vehiculo;
+        document.querySelectorAll('.item-orden').forEach(item => item.classList.remove('active'));
+
+        setTexto('#vehiculoBuscadoPlaca', vehiculo.placa || placa);
+        setTexto('#vehiculoBuscadoCliente', ((vehiculo.cliente_nombres || '') + ' ' + (vehiculo.cliente_apellidos || '')).trim() || '—');
+        setTexto('#vehiculoBuscadoDocumento', vehiculo.cliente_documento || '—');
+        setTexto('#vehiculoBuscadoDescripcion', ((vehiculo.marca || '') + ' ' + (vehiculo.modelo || '')).trim() || '—');
+        setTexto('#vehiculoBuscadoAnioColor', [vehiculo.anio, vehiculo.color].filter(Boolean).join(' · ') || '—');
+        pintarOrigenesVehiculoOT(vehiculo);
+
+        const tarjeta = document.querySelector('#contenedorVehiculoBuscadoOT');
+        if (tarjeta) tarjeta.classList.remove('d-none');
+        const observacionDirecta = document.querySelector('#contenedorObservacionOrdenDirecta');
+        if (observacionDirecta) observacionDirecta.classList.remove('d-none');
+
+        const botonCrear = document.querySelector('#btnCrearOrdenDesdeVehiculo');
+        if (botonCrear) botonCrear.title = botonCrear.disabled ? 'El vehículo está inactivo' : '';
+
+        const observacion = document.querySelector('#textareaObservacionOrdenDirecta');
+        if (observacion) observacion.value = '';
+    } catch (error) {
+        console.error(error);
+        vehiculoBuscadoOT = null;
+        const tarjeta = document.querySelector('#contenedorVehiculoBuscadoOT');
+        if (tarjeta) tarjeta.classList.add('d-none');
+        const mensaje = error.response && error.response.data && error.response.data.mensaje;
+        mostrarToast('error', 'No se encontró el vehículo', mensaje || error.message || 'Verifica la placa e inténtalo nuevamente.');
+    }
+}
+
+// Ejecuta la búsqueda desde el botón al lado del buscador.
+document.addEventListener('click', async function (event) {
+    const boton = event.target.closest('#btnBuscarVehiculoOT');
+    if (!boton) return;
+    await buscarVehiculoParaNuevaOrden();
+});
+
+// También permite buscar la placa presionando Enter.
+document.addEventListener('keydown', async function (event) {
+    const input = event.target.closest('#inputBuscarOrden');
+    if (!input || event.key !== 'Enter') return;
+    event.preventDefault();
+    await buscarVehiculoParaNuevaOrden();
+});
+
+// Crea una OT desde el origen elegido o genera una cita de ingreso automáticamente.
+document.addEventListener('click', async function (event) {
+    const boton = event.target.closest('#btnCrearOrdenDesdeVehiculo');
+    if (!boton || !vehiculoBuscadoOT || boton.disabled) return;
+
+    boton.disabled = true;
+    const observacion = document.querySelector('#textareaObservacionOrdenDirecta')?.value.trim();
+    const body = {
+        id_persona: vehiculoBuscadoOT.id_persona,
+        id_sucursal: sucursalActual.id_sucursal,
+        id_vehiculo: vehiculoBuscadoOT.id_vehiculo,
+        observacion: observacion || ('Ingreso directo del vehículo ' + vehiculoBuscadoOT.placa + '.'),
+        fecha_atencion: fechaISO(new Date()),
+        ids_mecanicos: mecanicoActual ? [mecanicoActual.id_mecanico] : [],
+        items: []
+    };
+
+    try {
+        const origenesElegidos = Array.from(document.querySelectorAll('input[name="origenOrdenVehiculo"]:checked'));
+        const origenesDisponibles = document.querySelectorAll('input[name="origenOrdenVehiculo"]').length;
+        if (origenesElegidos.length === 0 && origenesDisponibles > 0) {
+            mostrarToast('advertencia', 'Seleccione un origen', 'Marque la cita, la cotización aprobada o ambas antes de crear la OT.');
+            return;
+        }
+        if (origenesElegidos.length === 0) {
+            const citaActiva = listadoGeneralCitas.find(cita =>
+                Number(cita.id_vehiculo) === Number(vehiculoBuscadoOT.id_vehiculo) &&
+                Number(cita.id_sucursal) === Number(sucursalActual.id_sucursal) &&
+                ['PENDIENTE', 'CONFIRMADA', 'ATENDIDA'].includes(String(cita.estado || '').toUpperCase()) &&
+                Number(cita.tiene_ot) !== 1 && !citaTieneOrden(cita.id_cita)
+            );
+            if (citaActiva) {
+                mostrarToast('advertencia', 'Cita activa existente', 'Seleccione la cita activa que ya tiene este vehículo.');
+                return;
+            }
+            body.crear_cita_automatica = true;
+        } else {
+            for (const origenElegido of origenesElegidos) {
+                const [tipo, id] = origenElegido.value.split(':');
+                if (tipo === 'CITA') {
+                    const cita = listadoGeneralCitas.find(item => Number(item.id_cita) === Number(id));
+                    if (!cita || Number(cita.id_vehiculo) !== Number(vehiculoBuscadoOT.id_vehiculo)) throw new Error('La cita seleccionada ya no está disponible.');
+                    body.id_cita = Number(cita.id_cita);
+                    if (!observacion && cita.motivo) body.observacion = cita.motivo;
+                } else {
+                    const respuesta = await axios.get('/api/buscarCotizacionConDetalle/' + id);
+                    const cot = respuesta.data && respuesta.data.cotizacion;
+                    if (!respuesta.data.ok || !cot || Number(cot.id_vehiculo) !== Number(vehiculoBuscadoOT.id_vehiculo) ||
+                        Number(cot.id_persona) !== Number(vehiculoBuscadoOT.id_persona) || Number(cot.id_sucursal) !== Number(sucursalActual.id_sucursal)) {
+                        throw new Error('La cotización seleccionada ya no está disponible para este vehículo.');
+                    }
+                    body.id_cotizacion = Number(cot.id_cotizacion);
+                    if (!observacion && !body.id_cita && cot.observacion) body.observacion = cot.observacion;
+                    body.items = (cot.items || []).map(item => ({ id_producto: item.id_producto, id_servicio: item.id_servicio, cantidad: Number(item.cantidad), precio_unitario: Number(item.precio_unitario), observacion: item.observacion || null }));
+                }
+            }
+        }
+
+        const respuesta = await axios.post('/api/registrarOrden', body);
+        if (!respuesta.data || !respuesta.data.ok || !respuesta.data.id_orden_trabajo) {
+            throw new Error((respuesta.data && respuesta.data.mensaje) || 'No se pudo crear la orden.');
+        }
+
+        mostrarToast('exito', 'Orden creada', 'La orden de trabajo quedó vinculada a su origen.');
+        const tarjeta = document.querySelector('#contenedorVehiculoBuscadoOT');
+        if (tarjeta) tarjeta.classList.add('d-none');
+        const accionCrearOT = document.querySelector('#contenedorAccionCrearOrdenDirecta');
+        if (accionCrearOT) accionCrearOT.classList.add('d-none');
+        vehiculoBuscadoOT = null;
+        filtroOrdenActual = 'todas';
+        document.querySelectorAll('.filtro-orden').forEach(filtro => {
+            filtro.classList.toggle('active', filtro.dataset.filtro === 'todas');
+        });
+        await Promise.all([cargarOrdenes(), cargarCitas(), cargarCotizaciones()]);
+        listarOrdenes();
+        await cargarOrdenActual(respuesta.data.id_orden_trabajo);
+    } catch (error) {
+        console.error(error);
+        const mensaje = error.response && error.response.data && error.response.data.mensaje;
+        mostrarToast('error', 'No se pudo crear la orden', mensaje || error.message || 'Inténtalo nuevamente.');
+    } finally {
+        boton.disabled = false;
+    }
 });
 
 // Maneja el evento input del control #inputBuscarServicioOT.
@@ -3560,6 +4018,125 @@ document.addEventListener('keypress', function (event) {
     listarOrdenes();
 });
 
+// Obtiene o crea el ticket de una orden finalizada y devuelve sus datos.
+async function obtenerTicketOT(idOrden) {
+    const respuesta = await axios.post('/api/emitirTicketOT/' + idOrden);
+    const ticket = respuesta.data && respuesta.data.ticket;
+
+    if (!respuesta.data || !respuesta.data.ok || !ticket || !ticket.id_comprobante) {
+        throw new Error((respuesta.data && respuesta.data.mensaje) || 'No se pudo preparar el ticket.');
+    }
+
+    return ticket;
+}
+
+// Carga el PDF dentro del modal para verlo y descargarlo desde la misma página.
+async function mostrarPDFTicketOT(idComprobante, tipo = 'general', mostrarFiltrosFinalizacion = false) {
+    const modal = document.querySelector('#modalTicketPDF');
+    const visor = document.querySelector('#iframeTicketPDF');
+    const botonDescargar = document.querySelector('#btnDescargarTicketPDF');
+    const filtrosFinalizacion = document.querySelector('#contenedorFiltrosTicketFinalizacion');
+
+    if (!modal || !visor || !botonDescargar) throw new Error('No se encontró la ventana del ticket en la página.');
+
+    const respuesta = await axios.get('/api/descargarTicketPDFOT/' + idComprobante, { params: { tipo }, responseType: 'blob' });
+    const archivo = new Blob([respuesta.data], { type: 'application/pdf' });
+    const urlArchivo = URL.createObjectURL(archivo);
+    const disposicion = respuesta.headers && respuesta.headers['content-disposition'];
+    const coincidencia = /filename="?([^";]+)"?/i.exec(disposicion || '');
+
+    if (ticketPDFActualURL) URL.revokeObjectURL(ticketPDFActualURL);
+    ticketPDFActualURL = urlArchivo;
+    ticketPDFActualComprobante = idComprobante;
+    ticketPDFActualTipo = tipo;
+    ticketPDFActualNombre = coincidencia ? coincidencia[1] : 'ticket-ot-' + idComprobante + '-' + tipo + '.pdf';
+    visor.src = urlArchivo;
+    botonDescargar.disabled = false;
+    if (filtrosFinalizacion) filtrosFinalizacion.classList.toggle('d-none', !mostrarFiltrosFinalizacion);
+    if (mostrarFiltrosFinalizacion) {
+        document.querySelectorAll('.filtro-ticket-finalizacion').forEach(boton => {
+            boton.classList.toggle('active', boton.dataset.tipo === tipo);
+        });
+    }
+    bootstrap.Modal.getOrCreateInstance(modal).show();
+}
+
+// Habilita solo los formatos que tienen conceptos en la orden recién finalizada.
+function prepararFiltrosTicketFinalizacion(ticket) {
+    const items = ticket.items || [];
+    const disponibles = {
+        general: items.length > 0,
+        servicios: items.some(item => String(item.descripcion || '').startsWith('Servicio:')),
+        productos: items.some(item => String(item.descripcion || '').startsWith('Producto:'))
+    };
+    const contenedor = document.querySelector('#contenedorFiltrosTicketFinalizacion');
+    if (contenedor) contenedor.classList.remove('d-none');
+    document.querySelectorAll('.filtro-ticket-finalizacion').forEach(boton => {
+        boton.dataset.disponible = String(Boolean(disponibles[boton.dataset.tipo]));
+        boton.disabled = !disponibles[boton.dataset.tipo];
+        boton.classList.toggle('active', boton.dataset.tipo === 'general');
+    });
+}
+
+// Cambia la vista previa al tipo seleccionado después de finalizar la orden.
+document.addEventListener('click', async function (event) {
+    const boton = event.target.closest('.filtro-ticket-finalizacion');
+    const contenedor = document.querySelector('#contenedorFiltrosTicketFinalizacion');
+    if (!boton || !contenedor || contenedor.classList.contains('d-none') || boton.disabled || ticketPDFCargando) return;
+    if (!ticketPDFActualComprobante) return;
+
+    ticketPDFCargando = true;
+    document.querySelectorAll('.filtro-ticket-finalizacion').forEach(item => { item.disabled = true; });
+    try {
+        await mostrarPDFTicketOT(ticketPDFActualComprobante, boton.dataset.tipo || 'general', true);
+    } catch (error) {
+        console.error(error);
+        const mensaje = error.response && error.response.data && error.response.data.mensaje;
+        mostrarToast('error', 'No se pudo cambiar el ticket', mensaje || error.message || 'Inténtalo nuevamente.');
+    } finally {
+        ticketPDFCargando = false;
+        document.querySelectorAll('.filtro-ticket-finalizacion').forEach(item => {
+            item.disabled = item.dataset.disponible !== 'true';
+        });
+    }
+});
+
+// Libera el PDF cuando se cierra el modal.
+function limpiarTicketPDFActual() {
+    const visor = document.querySelector('#iframeTicketPDF');
+    const botonDescargar = document.querySelector('#btnDescargarTicketPDF');
+    if (visor) visor.src = 'about:blank';
+    if (botonDescargar) botonDescargar.disabled = true;
+    const filtrosFinalizacion = document.querySelector('#contenedorFiltrosTicketFinalizacion');
+    if (filtrosFinalizacion) filtrosFinalizacion.classList.add('d-none');
+    ticketPDFActualComprobante = null;
+    ticketPDFActualTipo = 'general';
+    ticketPDFCargando = false;
+
+    if (ticketPDFActualURL) {
+        const urlAnterior = ticketPDFActualURL;
+        ticketPDFActualURL = null;
+        setTimeout(() => URL.revokeObjectURL(urlAnterior), 1000);
+    }
+}
+
+// Crea el ticket y lo muestra en el modal después de finalizar la orden.
+async function mostrarTicketTrasFinalizar(idOrden) {
+    try {
+        const ticket = await obtenerTicketOT(idOrden);
+        prepararFiltrosTicketFinalizacion(ticket);
+        await mostrarPDFTicketOT(ticket.id_comprobante, 'general', true);
+    } catch (error) {
+        console.error(error);
+        const mensaje = error.response && error.response.data && error.response.data.mensaje;
+        mostrarToast(
+            'advertencia',
+            'Orden finalizada',
+            (mensaje || error.message || 'No se pudo preparar el ticket.') + ' Puedes reintentarlo desde el historial.'
+        );
+    }
+}
+
 // Maneja el evento click del control .cambiar-estado-orden.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.cambiar-estado-orden');
@@ -3598,8 +4175,10 @@ document.addEventListener('click', async function (event) {
         }
     }
 
+    const idOrdenActualizada = ordenActual.id_orden_trabajo;
+
     try {
-        const res = await axios.patch('/api/cambiarEstadoOrden/' + ordenActual.id_orden_trabajo, {
+        const res = await axios.patch('/api/cambiarEstadoOrden/' + idOrdenActualizada, {
             estado: nuevoEstado
         });
 
@@ -3608,10 +4187,14 @@ document.addEventListener('click', async function (event) {
             return;
         }
 
-        mostrarToast('exito', 'Correcto', 'Estado actualizado a ' + nuevoEstado);
+        if (nuevoEstado === 'FINALIZADA') {
+            await mostrarTicketTrasFinalizar(idOrdenActualizada);
+        } else {
+            mostrarToast('exito', 'Correcto', 'Estado actualizado a ' + nuevoEstado);
+        }
 
         await cargarOrdenes();
-        await cargarOrdenActual(ordenActual.id_orden_trabajo);
+        await cargarOrdenActual(idOrdenActualizada);
         listarOrdenes();
 
     } catch (error) {
@@ -3630,23 +4213,6 @@ document.addEventListener('click', function (event) {
     abrirModalNuevaOrden();
 });
 
-// Maneja el evento change del control #selectOrigenOrden.
-document.addEventListener('change', function (event) {
-    const select = event.target.closest('#selectOrigenOrden');
-    if (!select) return;
-
-    const wrapCita = document.querySelector('#wrapperSelectCita');
-    const wrapCot  = document.querySelector('#wrapperSelectCotizacion');
-
-    if (select.value === 'COTIZACION') {
-        if (wrapCita) wrapCita.classList.add('d-none');
-        if (wrapCot) wrapCot.classList.remove('d-none');
-    } else {
-        if (wrapCita) wrapCita.classList.remove('d-none');
-        if (wrapCot) wrapCot.classList.add('d-none');
-    }
-});
-
 // Maneja el evento click del control #btnGuardarOrden.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnGuardarOrden');
@@ -3656,64 +4222,41 @@ document.addEventListener('click', async function (event) {
     _enviandoOrden = true;
 
     try {
-        const origen = document.querySelector('#selectOrigenOrden').value;
+        const idCita = document.querySelector('#selectCitaOrden').value;
+        const idCotizacion = document.querySelector('#selectCotizacionOrden').value;
         const observacion = document.querySelector('#textareaDescripcion').value.trim();
-
-        let body = {
-            observacion,
-            fecha_atencion: fechaISO(new Date()),
-            ids_mecanicos: mecanicoActual ? [mecanicoActual.id_mecanico] : [],
-            items: []
-        };
-
-        if (origen === 'CITA') {
-            const idCita = document.querySelector('#selectCitaOrden').value;
-            if (!idCita) {
-                mostrarToast('advertencia', 'Falta cita', 'Seleccione una cita');
-                return;
-            }
-
-            const resCita = await axios.get('/api/buscarCitaPorId/' + idCita);
-            if (!resCita.data.ok || !resCita.data.cita) {
-                mostrarToast('error', 'Error', 'No se pudo cargar la cita');
-                return;
-            }
-            const cita = resCita.data.cita;
-
-            body.id_cita = cita.id_cita;
-            body.id_persona = cita.id_persona;
-            body.id_sucursal = cita.id_sucursal || sucursalActual.id_sucursal;
-            body.id_vehiculo = cita.id_vehiculo;
-            if (!body.observacion && cita.motivo) body.observacion = cita.motivo;
-
-        } else {
-            const idCotizacion = document.querySelector('#selectCotizacionOrden').value;
-            if (!idCotizacion) {
-                mostrarToast('advertencia', 'Falta cotización', 'Seleccione una cotización aprobada');
-                return;
-            }
-
-            const resCot = await axios.get('/api/buscarCotizacionConDetalle/' + idCotizacion);
-            if (!resCot.data.ok || !resCot.data.cotizacion) {
-                mostrarToast('error', 'Error', 'No se pudo cargar la cotización');
-                return;
-            }
-            const cot = resCot.data.cotizacion;
-
-            body.id_cotizacion = cot.id_cotizacion;
-            body.id_persona = cot.id_persona;
-            body.id_sucursal = cot.id_sucursal || sucursalActual.id_sucursal;
-            body.id_vehiculo = cot.id_vehiculo;
-            if (!body.observacion && cot.observacion) body.observacion = cot.observacion;
-
-            body.items = (cot.items || []).map(it => ({
-                id_producto: it.id_producto,
-                id_servicio: it.id_servicio,
-                cantidad: Number(it.cantidad),
-                precio_unitario: Number(it.precio_unitario),
-                observacion: it.observacion || null
-            }));
+        if (!idCita && !idCotizacion) {
+            mostrarToast('advertencia', 'Falta origen', 'Seleccione una cita, una cotización aprobada o ambas.');
+            return;
         }
+
+        const body = { observacion, fecha_atencion: fechaISO(new Date()), ids_mecanicos: mecanicoActual ? [mecanicoActual.id_mecanico] : [], items: [] };
+        let cita = null;
+        let cot = null;
+
+        if (idCita) {
+            const resCita = await axios.get('/api/buscarCitaPorId/' + idCita);
+            if (!resCita.data.ok || !resCita.data.cita) { mostrarToast('error', 'Error', 'No se pudo cargar la cita'); return; }
+            cita = resCita.data.cita;
+            body.id_cita = Number(cita.id_cita);
+        }
+        if (idCotizacion) {
+            const resCot = await axios.get('/api/buscarCotizacionConDetalle/' + idCotizacion);
+            if (!resCot.data.ok || !resCot.data.cotizacion) { mostrarToast('error', 'Error', 'No se pudo cargar la cotización'); return; }
+            cot = resCot.data.cotizacion;
+            body.id_cotizacion = Number(cot.id_cotizacion);
+            body.items = (cot.items || []).map(it => ({ id_producto: it.id_producto, id_servicio: it.id_servicio, cantidad: Number(it.cantidad), precio_unitario: Number(it.precio_unitario), observacion: it.observacion || null }));
+        }
+
+        const origen = cita || cot;
+        if (cita && cot && (Number(cita.id_vehiculo) !== Number(cot.id_vehiculo) || Number(cita.id_persona) !== Number(cot.id_persona) || Number(cita.id_sucursal) !== Number(cot.id_sucursal))) {
+            mostrarToast('advertencia', 'Orígenes distintos', 'La cita y la cotización deben pertenecer al mismo vehículo, cliente y sucursal.');
+            return;
+        }
+        body.id_persona = Number(origen.id_persona);
+        body.id_sucursal = Number(origen.id_sucursal || sucursalActual.id_sucursal);
+        body.id_vehiculo = Number(origen.id_vehiculo);
+        if (!body.observacion) body.observacion = (cita && cita.motivo) || (cot && cot.observacion) || '';
 
         const res = await axios.post('/api/registrarOrden', body);
 
@@ -3943,6 +4486,14 @@ document.addEventListener('change', function (event) {
     const descripcion = (document.querySelector('#textareaDescripcionEvidencia').value || '').trim();
 
     for (const archivo of archivos) {
+        if (!archivo.type || !archivo.type.startsWith('image/')) {
+            mostrarToast('advertencia', 'Formato no permitido', archivo.name + ' no es un archivo de imagen.');
+            continue;
+        }
+        if (archivo.size <= 0) {
+            mostrarToast('advertencia', 'Archivo vacío', archivo.name + ' no contiene datos.');
+            continue;
+        }
         if (archivo.size > MAX_MB_EVIDENCIA * 1024 * 1024) {
             mostrarToast('advertencia', 'Archivo muy grande',
                 `${archivo.name} supera ${MAX_MB_EVIDENCIA} MB`);
@@ -4224,6 +4775,91 @@ document.addEventListener('keypress', function (event) {
     listarHistorial();
 });
 
+// Filtra la tabla del historial y recalcula el monto del PDF seleccionado.
+function renderDetallesTicketHistorial() {
+    const contenedor = document.querySelector('#contenedorVerHistorialConsumo');
+    const template = document.querySelector('#templateFilaConsumoHistorial');
+    const botonImprimir = document.querySelector('#btnImprimirTicketHistorial');
+    if (!contenedor || !template) return;
+
+    const tipo = tipoTicketHistorialActual;
+    const items = detallesTicketHistorial.filter(item => {
+        if (tipo === 'general') return true;
+        const esProducto = String(item.tipo || '').toUpperCase() === 'PRODUCTO' || item.id_producto != null;
+        return tipo === 'productos' ? esProducto : !esProducto;
+    });
+
+    contenedor.innerHTML = '';
+    let total = 0;
+    items.forEach(item => {
+        const cantidad = Number(item.cantidad || 0);
+        const precio = Number(item.precio_unitario || 0);
+        const subtotal = Number(item.subtotal || precio * cantidad);
+        const clone = template.content.cloneNode(true);
+        clone.querySelector('.nombre-consumo').textContent = item.descripcion || '—';
+        clone.querySelector('.cantidad-consumo').textContent = cantidad;
+        clone.querySelector('.precio-consumo').textContent = 'S/ ' + precio.toFixed(2);
+        clone.querySelector('.subtotal-consumo').textContent = 'S/ ' + subtotal.toFixed(2);
+        total += subtotal;
+        contenedor.appendChild(clone);
+    });
+
+    if (items.length === 0) {
+        const fila = document.createElement('tr');
+        fila.innerHTML = '<td colspan="4" class="text-center text-muted py-3">No hay conceptos de este tipo en la orden.</td>';
+        contenedor.appendChild(fila);
+    }
+
+    setTexto('#verHistorialTotalConsumo', 'S/ ' + total.toFixed(2));
+    if (botonImprimir) botonImprimir.disabled = items.length === 0;
+}
+
+// Cambia el filtro que se usará tanto en la tabla como en el PDF.
+document.addEventListener('click', function (event) {
+    const boton = event.target.closest('.filtro-ticket-historial');
+    if (!boton) return;
+
+    tipoTicketHistorialActual = boton.dataset.filtroTicket || 'general';
+    document.querySelectorAll('.filtro-ticket-historial').forEach(item => {
+        item.classList.toggle('active', item === boton);
+    });
+    renderDetallesTicketHistorial();
+});
+
+// Abre el ticket de una orden finalizada desde el historial.
+document.addEventListener('click', async function (event) {
+    const botonDescargar = event.target.closest('#btnDescargarTicketPDF');
+    if (botonDescargar) {
+        if (!ticketPDFActualURL || botonDescargar.disabled) return;
+        const enlace = document.createElement('a');
+        enlace.href = ticketPDFActualURL;
+        enlace.download = ticketPDFActualNombre;
+        document.body.appendChild(enlace);
+        enlace.click();
+        enlace.remove();
+        return;
+    }
+
+    const boton = event.target.closest('#btnImprimirTicketHistorial');
+    if (!boton || boton.disabled) return;
+
+    const modalHistorial = document.querySelector('#modalVerHistorial');
+    const idOrden = modalHistorial && modalHistorial.dataset.idOrden;
+    if (!idOrden) return;
+
+    boton.disabled = true;
+    try {
+        const ticket = await obtenerTicketOT(idOrden);
+        await mostrarPDFTicketOT(ticket.id_comprobante, tipoTicketHistorialActual);
+    } catch (error) {
+        console.error(error);
+        const mensaje = error.response && error.response.data && error.response.data.mensaje;
+        mostrarToast('error', 'No se pudo abrir el ticket', mensaje || error.message || 'Inténtalo nuevamente.');
+    } finally {
+        boton.disabled = false;
+        renderDetallesTicketHistorial();
+    }
+});
 // Maneja el evento click del control .btn-ver-historial.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-ver-historial');
@@ -4240,7 +4876,13 @@ document.addEventListener('click', async function (event) {
         }
 
         const orden = res.data.orden;
-
+        const modalHistorial = document.querySelector('#modalVerHistorial');
+        if (modalHistorial) modalHistorial.dataset.idOrden = idOrden;
+        tipoTicketHistorialActual = 'general';
+        detallesTicketHistorial = orden.detalles || [];
+        document.querySelectorAll('.filtro-ticket-historial').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.filtroTicket === 'general');
+        });
         setTexto('#verHistorialCodigo', 'OT-' + String(orden.id_orden_trabajo).padStart(4, '0'));
         setTexto('#verHistorialFecha', orden.fecha_atencion ? formatearFecha(orden.fecha_atencion) : '—');
         setTexto('#verHistorialCliente',
@@ -4249,29 +4891,7 @@ document.addEventListener('click', async function (event) {
             `${orden.placa || ''} · ${orden.marca || ''} ${orden.modelo || ''}`.trim() || '—');
         setTexto('#verHistorialDescripcion', orden.observacion || '—');
 
-        const contConsumo = document.querySelector('#contenedorVerHistorialConsumo');
-        const templateConsumo = document.querySelector('#templateFilaConsumoHistorial').content;
-        contConsumo.innerHTML = '';
-
-        let total = 0;
-        (orden.detalles || []).forEach(it => {
-            const precio = Number(it.precio_unitario || 0);
-            const cant = Number(it.cantidad || 0);
-            const subtotal = Number(it.subtotal || (precio * cant));
-
-            const clone = templateConsumo.cloneNode(true);
-
-            clone.querySelector('.nombre-consumo').textContent = it.descripcion || '—';
-            clone.querySelector('.cantidad-consumo').textContent = cant;
-            clone.querySelector('.precio-consumo').textContent = 'S/ ' + precio.toFixed(2);
-            clone.querySelector('.subtotal-consumo').textContent = 'S/ ' + subtotal.toFixed(2);
-
-            total += subtotal;
-
-            contConsumo.appendChild(clone);
-        });
-
-        setTexto('#verHistorialTotalConsumo', 'S/ ' + total.toFixed(2));
+        renderDetallesTicketHistorial();
 
         const contEvid = document.querySelector('#contenedorEvidenciasHistorial');
         const album = document.querySelector('#albumEvidenciasHistorial');

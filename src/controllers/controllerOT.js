@@ -161,6 +161,7 @@ const registrarOrden = async (req, res) => {
         const {
             id_cita,
             id_cotizacion,
+            crear_cita_automatica = false,
             id_persona,
             id_sucursal,
             id_vehiculo,
@@ -169,6 +170,23 @@ const registrarOrden = async (req, res) => {
             ids_mecanicos = [],
             items = []
         } = req.body;
+
+        const crearCitaAutomatica = crear_cita_automatica === true;
+
+        // Toda OT debe vincularse a una cita o cotización.
+        if (!id_cita && !id_cotizacion && !crearCitaAutomatica) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'La orden debe estar vinculada a una cita o cotización'
+            });
+        }
+
+        if (crearCitaAutomatica && (id_cita || id_cotizacion)) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'La cita automática solo se usa cuando no se seleccionó otro origen'
+            });
+        }
 
         // Validaciones obligatorias
         if (!id_persona || !id_sucursal || !id_vehiculo) {
@@ -199,6 +217,13 @@ const registrarOrden = async (req, res) => {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'El vehículo no pertenece a la persona seleccionada'
+            });
+        }
+
+        if (crearCitaAutomatica && String(vehiculo.estado || '').toUpperCase() !== 'ACTIVO') {
+            return res.status(409).json({
+                ok: false,
+                mensaje: 'No se puede crear una orden para un vehículo inactivo'
             });
         }
 
@@ -305,6 +330,7 @@ const registrarOrden = async (req, res) => {
         const resultado = await model.registrarOrden({
             id_cita: id_cita || null,
             id_cotizacion: id_cotizacion || null,
+            crear_cita_automatica: crearCitaAutomatica,
             id_persona,
             id_sucursal,
             id_vehiculo,
@@ -318,11 +344,20 @@ const registrarOrden = async (req, res) => {
         return res.status(201).json({
             ok: true,
             mensaje: 'Orden de trabajo registrada correctamente',
-            id_orden_trabajo: resultado.id_orden_trabajo
+            id_orden_trabajo: resultado.id_orden_trabajo,
+            id_cita: resultado.id_cita
         });
 
     } catch (error) {
         console.error(error);
+
+        if (error.code === 'VEHICULO_CON_ORDEN_ACTIVA') {
+            return res.status(409).json({ ok: false, mensaje: error.message });
+        }
+
+        if (error.code === 'CITA_NO_DISPONIBLE_OT' || error.code === 'COTIZACION_NO_DISPONIBLE_OT') {
+            return res.status(409).json({ ok: false, mensaje: error.message });
+        }
 
         // Constraint UNIQUE: la cotización ya fue usada (condición de carrera)
         if (error.code === 'ER_DUP_ENTRY') {

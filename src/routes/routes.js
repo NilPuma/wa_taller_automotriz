@@ -24,6 +24,7 @@ const controllerCotizacion = require('../controllers/controllerCotizacion');
 const controllerOT = require('../controllers/controllerOT');
 const controllerInforme = require('../controllers/controllerInforme');
 const controllerOV = require('../controllers/controllerOV');
+const controllerTicketOT = require('../controllers/controllerTicketOT');
 
 // ==========================================================
 // VISTAS DE RENDERIZADO (Protegidas)
@@ -213,6 +214,13 @@ router.put('/api/reemplazarDetallesOrden/:id', controllerOT.reemplazarDetallesOr
 router.put('/api/asignarMecanicosAOrden/:id', controllerOT.asignarMecanicosAOrden);
 router.patch('/api/cambiarEstadoOrden/:id', controllerOT.cambiarEstadoOrden);
 router.delete('/api/eliminarOrden/:id', controllerOT.eliminarOrden);
+// ==========================================================
+// API: TICKETS PDF DE ÓRDENES DE TRABAJO
+// ==========================================================
+router.post('/api/emitirTicketOT/:idOrden', controllerTicketOT.emitirTicketOT);
+router.get('/api/buscarTicketOTPorOrden/:idOrden', controllerTicketOT.buscarTicketOTPorOrden);
+router.get('/api/buscarTicketOTPorId/:idTicket', controllerTicketOT.buscarTicketOTPorId);
+router.get('/api/descargarTicketPDFOT/:idTicket', controllerTicketOT.descargarTicketPDFOT);
 
 // ==========================================================
 // API: INFORMES + EVIDENCIAS

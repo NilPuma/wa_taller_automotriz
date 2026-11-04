@@ -18,6 +18,7 @@ const listarCitas = async (filtros = {}) => {
             c.motivo,
             c.estado,
             c.fecha_modificacion,
+            EXISTS (SELECT 1 FROM ORDENES_TRABAJO ot WHERE ot.id_cita = c.id_cita) AS tiene_ot,
             p.nombres AS cliente_nombres,
             p.apellidos AS cliente_apellidos,
             p.documento AS cliente_documento,
@@ -25,7 +26,7 @@ const listarCitas = async (filtros = {}) => {
             v.placa,
             v.marca,
             v.modelo,
-            v.\`año\` AS anio,
+            v.\`anio\` AS anio,
             s.nombre AS sucursal_nombre
         FROM CITAS c
         INNER JOIN PERSONAS p   ON p.id_persona  = c.id_persona
@@ -195,7 +196,7 @@ const buscarCitaPorId = async (idCita) => {
             v.vin,
             v.marca,
             v.modelo,
-            v.\`año\` AS anio,
+            v.\`anio\` AS anio,
             v.color,
             v.tipo_combustible,
             s.nombre AS sucursal_nombre

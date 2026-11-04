@@ -12,7 +12,7 @@ const listarVehiculos = async (busqueda = null) => {
             v.vin,
             v.marca,
             v.modelo,
-            v.\`año\` AS anio,
+            v.\`anio\` AS anio,
             v.color,
             v.numero_motor,
             v.numero_chasis,
@@ -65,7 +65,7 @@ const listarVehiculosPorPersona = async (idPersona) => {
             vin,
             marca,
             modelo,
-            \`año\` AS anio,
+            \`anio\` AS anio,
             color,
             numero_motor,
             numero_chasis,
@@ -98,7 +98,7 @@ const buscarVehiculoPorId = async (idVehiculo) => {
             v.vin,
             v.marca,
             v.modelo,
-            v.\`año\` AS anio,
+            v.\`anio\` AS anio,
             v.color,
             v.numero_motor,
             v.numero_chasis,
@@ -137,13 +137,19 @@ const buscarVehiculoPorPlaca = async (placa) => {
             v.vin,
             v.marca,
             v.modelo,
-            v.\`año\` AS anio,
+            v.\`anio\` AS anio,
             v.color,
             v.numero_motor,
             v.numero_chasis,
             v.tipo_combustible,
             v.observaciones,
             v.estado,
+            EXISTS (
+                SELECT 1
+                FROM ORDENES_TRABAJO ot_activa
+                WHERE ot_activa.id_vehiculo = v.id_vehiculo
+                  AND ot_activa.estado IN ('PENDIENTE', 'EN PROCESO')
+            ) AS tiene_orden_activa,
             p.nombres AS cliente_nombres,
             p.apellidos AS cliente_apellidos,
             p.documento AS cliente_documento,
@@ -170,7 +176,7 @@ const buscarVehiculoPorPlaca = async (placa) => {
 const registrarVehiculo = async (datos) => {
     const sql = `
         INSERT INTO VEHICULOS
-        (id_persona, placa, vin, marca, modelo, \`año\`, color,
+        (id_persona, placa, vin, marca, modelo, \`anio\`, color,
          numero_motor, numero_chasis, tipo_combustible, observaciones, estado)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
@@ -207,7 +213,7 @@ const actualizarVehiculo = async (idVehiculo, datos) => {
             vin              = ?,
             marca            = ?,
             modelo           = ?,
-            \`año\`            = ?,
+            \`anio\`            = ?,
             color            = ?,
             numero_motor     = ?,
             numero_chasis    = ?,

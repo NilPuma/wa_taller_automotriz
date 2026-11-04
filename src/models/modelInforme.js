@@ -93,7 +93,7 @@ const buscarInformePorId = async (idInforme) => {
             v.placa,
             v.marca,
             v.modelo,
-            v.\`año\` AS anio
+            v.\`anio\` AS anio
         FROM INFORMES i
         INNER JOIN ORDENES_TRABAJO ot ON ot.id_orden_trabajo = i.id_orden_trabajo
         INNER JOIN MECANICOS m        ON m.id_mecanico = i.id_mecanico

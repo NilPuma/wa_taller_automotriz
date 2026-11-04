@@ -599,6 +599,7 @@ a:hover {
   background: transparent;
   border: none;
   color: #131F33;
+
   font-size: 0.85rem;
   line-height: 1;
   padding: 2px;
@@ -682,11 +683,8 @@ a:hover {
   color: #003263;
   transform: scale(1.12);
 }
-
-
-
+ 
 /* ===================================MECANICO=================================== */
-
 
 /* Variables compartidas que necesitan los componentes de la vista mecánico. */
 :root {
@@ -1706,6 +1704,58 @@ body {
    ============================================================ */
 /* Los estilos de tabla se heredan de .tabla-sistema */
 
+/* Acciones del historial: detalle y descarga del ticket de servicio. */
+#historial .acciones-historial {
+  white-space: nowrap;
+}
+
+#historial .btn-ticket-historial {
+  padding: 2px 6px;
+  transition: var(--transicion-media);
+}
+
+#historial .btn-ticket-historial:hover {
+  transform: scale(1.15);
+}
+
+/* Modal de previsualización y descarga del ticket. */
+#modalTicketPDF .modal-ticket-pdf__dialog {
+  width: calc(100% - 1.5rem);
+  max-width: 1100px;
+}
+
+#modalTicketPDF .modal-ticket-pdf__contenido {
+  display: flex;
+  flex-direction: column;
+  height: min(88vh, 900px);
+}
+
+#modalTicketPDF .modal-ticket-pdf__body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#modalTicketPDF .modal-ticket-pdf__body iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #F0F2F5;
+}
+
+@media (max-width: 767.98px) {
+  #modalTicketPDF .modal-ticket-pdf__dialog {
+    width: calc(100% - 1rem);
+    margin: 0.5rem auto;
+  }
+
+  #modalTicketPDF .modal-ticket-pdf__contenido {
+    height: 92vh;
+  }
+}
 /* ============================================================
    12. COTIZACIONES
    ============================================================ */
@@ -1761,10 +1811,12 @@ body {
   border-radius: 5px;
 }
 
-#cotizaciones .resumen-sticky {
+#cotizaciones .resumen-sticky,
+#ordenes .resumen-sticky {
   position: sticky;
   top: 0;
-  align-self: flex-start;
+  align-self: stretch;
+  width: 100%;
 }
 
 #cotizaciones .resumen-totales {
@@ -2219,11 +2271,11 @@ body {
     font-size: 0.75rem;
   }
 
-  /* 21.9 Resumen (Cotizaciones) en móvil: sticky no aplica al apilar */
-  #cotizaciones .resumen-sticky {
+  /* 21.9 Resúmenes: sticky no aplica al apilar */
+  #cotizaciones .resumen-sticky,
+  #ordenes .resumen-sticky {
     position: static;
   }
-
 
   /* 21.11 Input-group de búsqueda: más compacto */
   #cotizaciones .input-group-sm > .input-group-text,
@@ -2536,4 +2588,280 @@ input[type="number"] {
   #modalVerCliente .modal-body > .row.g-3.mb-3 > [class*="col-"]:nth-child(7) {
     grid-column: 1 / -1 !important;
   }
+}
+
+
+/* Panel compacto de vehículo y origen de OT — sección mecánico. */
+#ordenes .panel-vehiculo-ot {
+  padding: 12px 14px;
+  background: #FFFFFF;
+  border: 1px solid rgba(40, 68, 115, .14);
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+#ordenes .panel-vehiculo-ot__resumen {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#ordenes .panel-vehiculo-ot__icono {
+  display: grid;
+  flex: 0 0 34px;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #E8EDF5;
+  color: #284473;
+  font-size: 1rem;
+}
+
+#ordenes .panel-vehiculo-ot__datos {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 14px;
+  margin: 0;
+}
+
+#ordenes .panel-vehiculo-ot__datos > div {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+#ordenes .panel-vehiculo-ot__datos span {
+  display: block;
+  margin-bottom: 1px;
+  color: #78869A;
+  font-size: .57rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+
+#ordenes .panel-vehiculo-ot__datos strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: #24344D;
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+#ordenes .panel-vehiculo-ot__placa {
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: #284473;
+  color: #FFFFFF;
+  font-size: .72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+#ordenes .panel-origen-ot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid #EDF0F5;
+}
+
+#ordenes .panel-origen-ot__titulo {
+  flex: 0 0 auto;
+  color: #536782;
+  font-size: .69rem;
+}
+
+#ordenes .panel-origen-ot__opciones {
+  display: flex;
+  flex: 1;
+  gap: 7px;
+  margin: 0;
+}
+
+#ordenes .opcion-origen-ot {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 7px 9px;
+  border: 1px solid #E5EAF1;
+  border-radius: 8px;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+#ordenes .opcion-origen-ot:hover {
+  border-color: #9AABC4;
+  background: #F8FAFF;
+}
+
+#ordenes .opcion-origen-ot.is-seleccionada {
+  border-color: #284473;
+  background: #F3F6FB;
+}
+
+
+
+#ordenes .opcion-origen-ot input {
+  position: static;
+  flex: 0 0 auto;
+  margin: 3px 0 0;
+  accent-color: #284473;
+}
+
+#ordenes .opcion-origen-ot__icono {
+  color: #284473;
+  font-size: .88rem;
+}
+
+#ordenes .opcion-origen-ot__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+#ordenes .opcion-origen-ot__texto strong {
+  display: block;
+  color: #203658;
+  font-size: .68rem;
+}
+
+#ordenes .opcion-origen-ot__texto small {
+  display: block;
+  margin-top: 2px;
+  color: #718096;
+  font-size: .62rem;
+  line-height: 1.3;
+}
+
+
+
+
+
+#ordenes .panel-origen-ot__vacio {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: #F5F7FA;
+  color: #536782;
+}
+
+#ordenes .panel-origen-ot__vacio > i {
+  color: #284473;
+  font-size: 1rem;
+}
+
+#ordenes .panel-origen-ot__vacio strong,
+#ordenes .panel-origen-ot__vacio small {
+  display: block;
+}
+
+#ordenes .panel-origen-ot__vacio strong {
+  font-size: .68rem;
+}
+
+#ordenes .panel-origen-ot__vacio small {
+  margin-top: 2px;
+  color: #718096;
+  font-size: .62rem;
+}
+
+
+
+
+
+#ordenes #contenedorAccionCrearOrdenDirecta .btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+  #ordenes .panel-vehiculo-ot__resumen {
+    flex-wrap: wrap;
+  }
+
+  #ordenes .panel-vehiculo-ot__datos {
+    flex-basis: calc(100% - 48px);
+  }
+
+  #ordenes .panel-vehiculo-ot__placa {
+    margin-left: auto;
+  }
+
+  #ordenes .panel-origen-ot {
+    display: block;
+  }
+
+  #ordenes .panel-origen-ot__titulo {
+    display: block;
+    margin-bottom: 7px;
+  }
+
+  #ordenes .panel-origen-ot__opciones {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+@media (max-width: 991.98px) {
+  #ordenes .ordenes-columna-trabajo > .panel-tabla {
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 0;
+  }
+
+  #ordenes .ordenes-panel-evidencias {
+    height: auto;
+    min-height: 0;
+  }
+}
+
+/* Resumen del consumo de la orden. */
+
+
+#ordenes .ordenes-bloque-consumo,
+#ordenes .ordenes-bloque-evidencias {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #EDF0F5;
+}
+
+@media (max-width: 991.98px) {
+  #ordenes .resumen-sticky {
+    position: static;
+  }
+}
+
+
+#ordenes #contenedorFooterConsumo {
+  flex-shrink: 0;
+}
+
+#ordenes #contenedorFooterConsumo .btn {
+  margin-bottom: 4px;
+}
+
+#ordenes .resumen-totales {
+  font-size: 0.82rem;
+}
+
+#ordenes .bg-success-subtle {
+  background: #E5F5E5;
+  border: 1px solid rgba(2, 163, 2, 0.25);
+}
+
+#ordenes .bg-success-subtle .text-success {
+  color: #02A302 !important;
 }

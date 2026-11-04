@@ -58,58 +58,50 @@ function limpiarLogin() {
   document.querySelector("#passwordSesion").value = "";
 }
 
-function validarUsuario() {
-  if (!inputUsuario.value || !inputPassword.value) {
-    
-    mostrarToast('error', 'Campos Vacios', 'Ingrese usuario y contraseña');
+let _enviandoLogin = false;
+
+async function validarUsuario() {
+  const correo = inputUsuario.value.trim();
+  const password = inputPassword.value;
+
+  if (!correo || !password) {
+    mostrarToast('advertencia', 'Campos incompletos', 'Ingrese su correo y contraseña.');
     return;
   }
-  /* Consulta a backend */
-  axios.post('/api/login', {
-    usuario: inputUsuario.value,
-    password: inputPassword.value
-  })
-  .then((res) => {
-    if (res.data.ok) { 
-        
-        let usuario = res.data.usuario
-      console.log(usuario.rol);
-      
-      // Redirige al template administrador
-      if (usuario.rol == 1) {
-        window.location.href = '/admin';
-        mostrarToast('exito', 'BienVenido', 'Acceso Correcto al Sistema');
-        limpiarLogin();
-      }
-      if (usuario.rol == 3) {
-        window.location.href = '/mecanico';
-        mostrarToast('exito', 'BienVenido', 'Acceso Correcto al Sistema');
-        limpiarLogin();
-      }
-      if (usuario.rol == 4) {
-        window.location.href = '/cliente';
-        mostrarToast('exito', 'BienVenido', 'Acceso Correcto al Sistema');
-        limpiarLogin();
-      }
-      
-    } else {
-      /* alert(res.data.mensaje); */
-      console.log("hokss");
-      
-      mostrarToast('error', 'Error', res.data.mensaje);
+  if (!expresiones.test(correo)) {
+    mostrarToast('advertencia', 'Correo inválido', 'Ingrese un correo con formato válido.');
+    inputUsuario.focus();
+    return;
+  }
+  if (_enviandoLogin) return;
+
+  _enviandoLogin = true;
+  const boton = document.querySelector('#btn_login');
+  if (boton) boton.disabled = true;
+  try {
+    const res = await axios.post('/api/login', { usuario: correo, password });
+    if (!res.data || !res.data.ok || !res.data.usuario) {
+      mostrarToast('error', 'No se pudo iniciar sesión', res.data?.mensaje || 'Verifique sus credenciales.');
+      return;
     }
 
-  })
-  .catch((error) => {
+    const destinos = { 1: '/admin', 3: '/mecanico', 4: '/cliente' };
+    const destino = destinos[res.data.usuario.rol];
+    if (!destino) {
+      mostrarToast('error', 'Acceso no disponible', 'El usuario no tiene un perfil habilitado para ingresar.');
+      return;
+    }
+
+    limpiarLogin();
+    window.location.href = destino;
+  } catch (error) {
     console.error(error);
-    if (error.response) {
-      /* console.log(error.response.data.mensaje); */
-      mostrarToast('error', 'Error de Datos', error.response.data.mensaje);
-    } else {
-      console.log('No se pudo conectar con el servidor');
-    }
-
-  })
+    const mensaje = error.response?.data?.mensaje || 'No se pudo conectar con el servidor. Inténtelo nuevamente.';
+    mostrarToast('error', 'Error de acceso', mensaje);
+  } finally {
+    _enviandoLogin = false;
+    if (boton) boton.disabled = false;
+  }
 }
 
 function limpiarRegistro() {
@@ -121,52 +113,70 @@ function limpiarRegistro() {
   document.querySelector("#passwordRegistro").value ='';
 }
 
-function guardarRegistro() {
-  let documento = document.querySelector("#documento").value;
-  let nombres = document.querySelector("#nombres").value;
-  let apellidos = document.querySelector("#apellidos").value;
-  let telefono = document.querySelector("#telefono").value;
-  let correo = document.querySelector("#correoRegistro").value;
-  let password = document.querySelector("#passwordRegistro").value;
+let _enviandoRegistro = false;
 
-  if (!documento || !nombres || !telefono || !correo || !password ) {
-    mostrarToast('error', 'Campos Vacios', 'Ingrese los datos solicitados');
-    return;
-  }
-  /* Validamos formato de correo */
-  let CorreoValido = expresiones.test(correo);
-  if(!CorreoValido){
-    mostrarToast('error', 'Formato Invalido', 'Es obligatorio ingresar un correo con formato valido para realizar el registro.');
+async function guardarRegistro() {
+  const documentoInput = document.querySelector('#documento');
+  const apellidosInput = document.querySelector('#apellidos');
+  if (!documentoInput || !apellidosInput) {
+    mostrarToast('advertencia', 'Registro incompleto',
+      'El formulario público no tiene los datos ni la ruta necesarios para crear una cuenta. No se enviaron datos; este cambio requiere ajustar el backend.');
     return;
   }
 
-  axios.post("/api/registrarPersona",
-  {
-    documento,
-    nombres,
-    apellidos,
-    telefono,
-    correo,
-    password
-  })
-  .then((res) => {
-    if (res.data.ok) {
-      mostrarToast('exito', 'Registro Exitoso', 'Los datos fueron registrados correctamente');
-      limpiarRegistro();
-    } else {
-      alert(res.data.mensaje);
+  const documento = documentoInput.value.trim();
+  const nombres = document.querySelector('#nombres').value.trim();
+  const apellidos = apellidosInput.value.trim();
+  const telefono = document.querySelector('#telefono').value.trim();
+  const correo = document.querySelector('#correoRegistro').value.trim();
+  const password = document.querySelector('#passwordRegistro').value;
+
+  if (!documento || !nombres || !apellidos || !telefono || !correo || !password) {
+    mostrarToast('advertencia', 'Campos incompletos', 'Complete documento, nombres, apellidos, teléfono, correo y contraseña.');
+    return;
+  }
+  if (!/^\d{8}$/.test(documento)) {
+    mostrarToast('advertencia', 'Documento inválido', 'El DNI debe contener exactamente 8 dígitos.');
+    documentoInput.focus();
+    return;
+  }
+  if (nombres.length < 2 || apellidos.length < 2 || !/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+$/.test(nombres) || !/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+$/.test(apellidos)) {
+    mostrarToast('advertencia', 'Nombre inválido', 'Ingrese nombres y apellidos válidos, con al menos 2 caracteres.');
+    return;
+  }
+  if (!expresiones.test(correo)) {
+    mostrarToast('advertencia', 'Correo inválido', 'Ingrese un correo con formato válido.');
+    return;
+  }
+  const digitosTelefono = telefono.replace(/\D/g, '');
+  if (digitosTelefono.length < 7 || digitosTelefono.length > 15) {
+    mostrarToast('advertencia', 'Teléfono inválido', 'Ingrese un teléfono con entre 7 y 15 dígitos.');
+    return;
+  }
+  if (password.length < 8) {
+    mostrarToast('advertencia', 'Contraseña débil', 'La contraseña debe tener al menos 8 caracteres.');
+    return;
+  }
+  if (_enviandoRegistro) return;
+
+  _enviandoRegistro = true;
+  if (btnRegistrar) btnRegistrar.disabled = true;
+  try {
+    const res = await axios.post('/api/registrarPersona', { documento, nombres, apellidos, telefono, correo, password });
+    if (!res.data || !res.data.ok) {
+      mostrarToast('error', 'No se pudo registrar', res.data?.mensaje || 'Revise los datos e inténtelo nuevamente.');
+      return;
     }
-    
-  })
-  .catch((error) => {
-    if (error.response) {
-      console.log(error.response);
-      mostrarToast('error', 'Error', error.response.data.error);
-    } else {
-      mostrarToast('error', 'Error', "Error en el servidor");
-      
-    }
-  });
+    mostrarToast('exito', 'Datos registrados', 'La persona fue registrada. La habilitación de acceso se gestiona desde el taller.');
+    limpiarRegistro();
+  } catch (error) {
+    console.error(error);
+    const mensaje = error.response?.data?.mensaje || error.response?.data?.error || 'No se pudo completar el registro.';
+    mostrarToast('error', 'Error de registro', mensaje);
+  } finally {
+    _enviandoRegistro = false;
+    if (btnRegistrar) btnRegistrar.disabled = false;
+  }
 }
 
 function recuperarPassword(){

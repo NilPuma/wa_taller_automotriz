@@ -1,120 +1,518 @@
 <div id="bodyAdministrador">
-    
-    <div id="sideMenu" class="menu-colapsado">
-        {{!-- Header --}}
+
+    {{!-- ============================================================ --}}
+    {{!-- MENÚ LATERAL DEL CLIENTE                                    --}}
+    {{!-- ============================================================ --}}
+    <aside id="sideMenu" class="menu-colapsado" aria-label="Menú principal">
         <div id="cabecera">
             <div id="titulo"><span>MI TALLER</span></div>
-            <div id="menuBtn">
+            <div id="menuBtn" role="button" tabindex="0" aria-label="Expandir o contraer menú">
                 <div class="btn-hamburger"></div>
                 <div class="btn-hamburger"></div>
                 <div class="btn-hamburger"></div>
             </div>
         </div>
-        {{!-- Perfil --}}
+
         <div id="perfil">
-            <div id="foto"><img src="/img/perfil.png" alt="" ></div>
+            <div id="foto"><img src="/img/perfil.png" alt="Foto de perfil del cliente"></div>
             <div id="nombre"><span>CLIENTE</span></div>
         </div>
-        {{!-- Items --}}
-        <div id="menuItems">
+
+        <nav id="menuItems">
             <div class="item">
-                <a href="#" id="btnMenuInicio">
-                    <div class="icono"><img src="/icons/home.svg" alt="" ></div>
+                <a href="#dashboardCliente" id="btnMenuInicioCliente" aria-label="Ir al inicio">
+                    <div class="icono"><i class="bi bi-house-door"></i></div>
                     <div class="titulo"><span>Inicio</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuContactos">
-                    <div class="icono"><img src="/icons/personas.svg" alt="" ></div>
-                    <div class="titulo"><span>Contactos</span></div>
+                <a href="#citasCliente" id="btnMenuCitasCliente" aria-label="Ir a mis citas">
+                    <div class="icono"><i class="bi bi-calendar-check"></i></div>
+                    <div class="titulo"><span>Mis citas</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuGaleria">
-                    <div class="icono"><img src="/icons/home.svg" alt="" ></div>
-                    <div class="titulo"><span>Menu-Opcional</span></div>
+                <a href="#vehiculosCliente" id="btnMenuVehiculosCliente" aria-label="Ir a mis vehículos">
+                    <div class="icono"><i class="bi bi-car-front"></i></div>
+                    <div class="titulo"><span>Mis vehículos</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuAlbum">
-                    <div class="icono"><img src="/icons/home.svg" alt="" ></div>
-                    <div class="titulo"><span>Menu-Opcional</span></div>
+                <a href="#cotizacionesCliente" id="btnMenuCotizacionesCliente" aria-label="Ir a mis cotizaciones">
+                    <div class="icono"><i class="bi bi-receipt"></i></div>
+                    <div class="titulo"><span>Cotizaciones</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuNotificacion">
-                    <div class="icono"><img src="/icons/notificacion.svg" alt="" ></div>
-                    <div class="titulo"><span>Notificación</span></div>
+                <a href="#historialCliente" id="btnMenuHistorialCliente" aria-label="Ir a mi historial">
+                    <div class="icono"><i class="bi bi-clock-history"></i></div>
+                    <div class="titulo"><span>Historial</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuConfiguracion">
-                    <div class="icono"><img src="/icons/configuracion.svg" alt="" ></div>
-                    <div class="titulo"><span>Configuración</span></div>
+                <a href="#perfilCliente" id="btnMenuPerfilCliente" aria-label="Ir a mi perfil">
+                    <div class="icono"><i class="bi bi-person-circle"></i></div>
+                    <div class="titulo"><span>Mi perfil</span></div>
                 </a>
             </div>
-            <div class="item-separator">
-            </div>
+            <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuCerrar">
-                    <div class="icono"><img src="/icons/turn-off.svg" alt="" ></div>
-                    <div class="titulo"><span>Cerrar Sesion</span></div>
+                <a href="#" id="btnMenuCerrarSesionCliente" aria-label="Cerrar sesión">
+                    <div class="icono"><i class="bi bi-box-arrow-right"></i></div>
+                    <div class="titulo"><span>Cerrar sesión</span></div>
                 </a>
             </div>
-        </div>
-    </div>
+        </nav>
+    </aside>
 
-    {{!-- ================Area pricipal de trabajo================ --}}
-
+    {{!-- ============================================================ --}}
+    {{!-- ÁREA PRINCIPAL                                               --}}
+    {{!-- ============================================================ --}}
     <section id="contenedorPrincipal">
-        <div id="header">
+        <header id="header">
             <div class="contenedor-header row d-flex align-items-center">
-                {{!-- <div class="col">
-                    <div>
-                        <img src="img/logo.png" alt="" width="120px" class="rounded">
-                    </div>
-                </div> --}}
                 <div class="col">
-                    <span>Perfil Cliente</span>
+                    <span>Portal del Cliente</span>
                 </div>
                 <div class="col text-end">
-                    <span><a href="/" class="btn-salir"><i class="bi bi-geo-alt-fill"></i>&nbsp Interval</a></span>
+                    <a href="#" class="btn btn-header" id="btnCerrarSesionCliente">
+                        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                    </a>
                 </div>
             </div>
-        </div>
+        </header>
 
-        {{!-- Area reactiva administrador  --}}
-        <div class="row">
-            <div class="col">
-                <div id="contenedorReactivo">
-                    {{!-- Aqui se reenderiza todo  --}}
-                    <span>Yo me despliego cuando incias sesion </span>
-                </div>
+        <div class="main-scroll-wrapper">
+            <div id="contenedorReactivo">
 
-                {{!-- Templates  --}}
-                <template id="templateContactos">
-                    <div class="bg-danger">
-                        <span class="mis-contactos"></span>
+                {{!-- ============================================================ --}}
+                {{!-- VISTA INICIAL: DASHBOARD                                  --}}
+                {{!-- ============================================================ --}}
+                <main id="dashboard" class="vista-scroll text-start">
+                    {{!-- Bienvenida y acción principal --}}
+                    <div class="seccion-cabecera">
+                        <div class="seccion-cabecera__titulo">
+                            <h5 id="dashboardBienvenida"><i class="bi bi-person-wave"></i> Bienvenido, Juan</h5>
+                            <small class="seccion-cabecera__subtitulo">Aquí puedes gestionar tus autos, citas y servicios.</small>
+                        </div>
+                        <div class="seccion-cabecera__acciones">
+                            <a href="#citasCliente" class="btn btn-primario btn-sm" id="btnSolicitarCitaDashboardCliente">
+                                <i class="bi bi-calendar-plus"></i> Solicitar cita
+                            </a>
+                        </div>
                     </div>
-                </template>
-                <template id="templateGaleria">
-                    <div class="bg-danger">
-                        <span class="mi-galeria"></span>
+
+                    <div class="row g-3 dashboard-client-layout vista-row-altura">
+                        {{!-- Área principal: citas, vehículos, historial y promociones --}}
+                        <div class="col-lg-9 d-flex flex-column gap-3">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <section class="panel-tabla panel-tabla--compact h-100">
+                                        <div class="panel-tabla__header">
+                                            <h2 class="panel-tabla__titulo"><i class="bi bi-calendar-check"></i> Mis citas</h2>
+                                            <a href="#citasCliente" class="btn btn-sm btn-outline-primary">Ver citas</a>
+                                        </div>
+                                        <div class="panel-tabla__body">
+                                            <div class="p-3 rounded-3 bg-light">
+                                                <span class="small text-muted d-block">PRÓXIMO SERVICIO</span>
+                                                <strong class="d-block mt-1">Cambio de aceite programado</strong>
+                                                <div class="d-flex flex-wrap gap-2 mt-2">
+                                                    <span class="badge rounded-pill text-bg-light"><i class="bi bi-calendar3"></i> Fecha pendiente</span>
+                                                    <span class="badge rounded-pill text-bg-light"><i class="bi bi-clock"></i> Hora pendiente</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                                <div class="col-md-6">
+                                    <section class="panel-tabla panel-tabla--compact h-100">
+                                        <div class="panel-tabla__header">
+                                            <h2 class="panel-tabla__titulo"><i class="bi bi-car-front"></i> Mis carros</h2>
+                                            <a href="#vehiculosCliente" class="btn btn-sm btn-outline-primary">Ver carros</a>
+                                        </div>
+                                        <div class="panel-tabla__body">
+                                            <div class="d-flex align-items-center gap-3 p-2 rounded-3 bg-light">
+                                                <i class="bi bi-car-front-fill fs-1 text-primary"></i>
+                                                <div class="min-w-0">
+                                                    <strong class="d-block">Vehículo registrado</strong>
+                                                    <span class="small text-muted d-block">Marca y modelo</span>
+                                                    <span class="small text-muted d-block">Placa: --</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <section class="panel-tabla panel-tabla--compact h-100 text-center">
+                                        <div class="panel-tabla__body align-items-center justify-content-center">
+                                            <i class="bi bi-calendar2-plus fs-2 text-primary mb-2"></i>
+                                            <h2 class="h6 fw-bold">Reserva una cita</h2>
+                                            <p class="small text-muted">Elige el momento que mejor te convenga para visitar el taller.</p>
+                                            <a href="#citasCliente" class="btn btn-primario btn-sm" id="btnReservarCitaDashboardCliente">
+                                                Reservar
+                                            </a>
+                                        </div>
+                                    </section>
+                                </div>
+                                <div class="col-md-8">
+                                    <section class="panel-tabla panel-tabla--compact h-100">
+                                        <div class="panel-tabla__header">
+                                            <h2 class="panel-tabla__titulo"><i class="bi bi-clock-history"></i> Mi historial</h2>
+                                            <a href="#historialCliente" class="btn btn-sm btn-outline-primary">Ver historial completo</a>
+                                        </div>
+                                        <div class="panel-tabla__body">
+                                            <div class="panel-tabla__scroll">
+                                                <table class="table tabla-sistema tabla-sistema--compact tabla-sistema--center mb-0" id="tablaResumenHistorialCliente">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>N° DE ORDEN</th>
+                                                            <th>FECHA</th>
+                                                            <th>VEHÍCULO</th>
+                                                            <th>DESCRIPCIÓN</th>
+                                                            <th>ESTADO</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td colspan="5" class="text-center text-muted">Aún no hay servicios registrados.</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+
+                            {{!-- Promociones destacadas en la zona inferior --}}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <article class="panel-tabla panel-tabla--compact h-100">
+                                        <div class="panel-tabla__header">
+                                            <h2 class="panel-tabla__titulo"><i class="bi bi-stars"></i> Promoción destacada</h2>
+                                        </div>
+                                        <div class="panel-tabla__body d-flex flex-row align-items-center gap-3">
+                                            <i class="bi bi-droplet-half display-6 text-primary"></i>
+                                            <div class="flex-grow-1">
+                                                <p class="small mb-2">Consulta las promociones disponibles para el mantenimiento de tu vehículo.</p>
+                                                <a href="#cotizacionesCliente" class="btn btn-sm btn-primario">Ver promoción</a>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </div>
+                                <div class="col-md-6">
+                                    <article class="panel-tabla panel-tabla--compact h-100">
+                                        <div class="panel-tabla__header">
+                                            <h2 class="panel-tabla__titulo"><i class="bi bi-lightning-charge"></i> Recomendación del taller</h2>
+                                        </div>
+                                        <div class="panel-tabla__body d-flex flex-row align-items-center gap-3">
+                                            <i class="bi bi-battery-charging display-6 text-success"></i>
+                                            <div class="flex-grow-1">
+                                                <p class="small mb-2">Mantén al día la revisión de batería y sistema eléctrico.</p>
+                                                <a href="#citasCliente" class="btn btn-sm btn-primario">Solicitar revisión</a>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{!-- Columna lateral de anuncios --}}
+                        <aside class="col-lg-3 d-flex flex-column gap-3" aria-label="Promociones">
+                            <article class="panel-tabla panel-tabla--compact flex-grow-1">
+                                <div class="panel-tabla__body text-center align-items-center justify-content-center">
+                                    <span class="badge text-bg-primary mb-2">PROMOCIÓN</span>
+                                    <div class="display-5 fw-bold text-primary">20% <span class="fs-6">de descuento</span></div>
+                                    <i class="bi bi-droplet-half display-4 text-info my-2"></i>
+                                    <h2 class="h6 fw-bold">Cambio de aceite</h2>
+                                    <p class="small text-muted">Pregunta por las condiciones de esta promoción en tu próxima visita.</p>
+                                    <a href="#citasCliente" class="btn btn-sm btn-primario">Ver promoción</a>
+                                </div>
+                            </article>
+                            <article class="panel-tabla panel-tabla--compact flex-grow-1">
+                                <div class="panel-tabla__body text-center align-items-center justify-content-center">
+                                    <span class="badge text-bg-success mb-2">PROMOCIÓN</span>
+                                    <div class="display-5 fw-bold text-success">15% <span class="fs-6">de descuento</span></div>
+                                    <i class="bi bi-car-front display-4 text-warning my-2"></i>
+                                    <h2 class="h6 fw-bold">Alineación y balanceo</h2>
+                                    <p class="small text-muted">Consulta disponibilidad y detalles con el taller.</p>
+                                    <a href="#citasCliente" class="btn btn-sm btn-primario">Ver promoción</a>
+                                </div>
+                            </article>
+                        </aside>
                     </div>
-                </template>
+                </main>
             </div>
         </div>
     </section>
+
+    {{!-- ============================================================ --}}
+    {{!-- VISTA: CITAS                                                 --}}
+    {{!-- ============================================================ --}}
+    <template id="templateCitasCliente">
+        <section id="citasCliente" class="vista-scroll text-start">
+            <div class="seccion-cabecera">
+                <div class="seccion-cabecera__titulo">
+                    <h5><i class="bi bi-calendar-check"></i> Mis citas</h5>
+                    <small class="seccion-cabecera__subtitulo">Consulta tus citas y su estado.</small>
+                </div>
+                <div class="seccion-cabecera__acciones">
+                    <button type="button" class="btn btn-primario btn-sm" id="btnSolicitarCitaCliente">
+                        <i class="bi bi-plus-circle"></i> Solicitar cita
+                    </button>
+                </div>
+            </div>
+
+            <section class="panel-tabla">
+                <div class="panel-tabla__header">
+                    <h2 class="panel-tabla__titulo"><i class="bi bi-list-check"></i> Citas registradas</h2>
+                    <span class="pill-contador"><i class="bi bi-calendar3"></i> <span id="contadorCitasCliente">0</span> citas</span>
+                </div>
+                <div class="panel-tabla__body">
+                    <div class="panel-tabla__scroll">
+                        <table class="table tabla-sistema tabla-sistema--center mb-0" id="tablaCitasCliente">
+                            <thead>
+                                <tr>
+                                    <th>FECHA</th>
+                                    <th>HORA</th>
+                                    <th>VEHÍCULO</th>
+                                    <th>MOTIVO</th>
+                                    <th>ESTADO</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contenedorCitasCliente"></tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" id="estadoVacioCitasCliente">
+                            <i class="bi bi-calendar2-x fs-3 d-block mb-2"></i>
+                            <span>Aquí aparecerán tus citas.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </template>
+
+    {{!-- ============================================================ --}}
+    {{!-- VISTA: VEHÍCULOS                                             --}}
+    {{!-- ============================================================ --}}
+    <template id="templateVehiculosCliente">
+        <section id="vehiculosCliente" class="vista-scroll text-start">
+            <div class="seccion-cabecera">
+                <div class="seccion-cabecera__titulo">
+                    <h5><i class="bi bi-car-front"></i> Mis vehículos</h5>
+                    <small class="seccion-cabecera__subtitulo">Vehículos asociados a tu perfil.</small>
+                </div>
+                <span class="pill-contador"><i class="bi bi-car-front"></i> <span id="contadorVehiculosCliente">0</span> vehículos</span>
+            </div>
+
+            <section class="panel-tabla">
+                <div class="panel-tabla__header">
+                    <h2 class="panel-tabla__titulo"><i class="bi bi-list-ul"></i> Vehículos registrados</h2>
+                </div>
+                <div class="panel-tabla__body">
+                    <div class="panel-tabla__scroll">
+                        <table class="table tabla-sistema tabla-sistema--center mb-0" id="tablaVehiculosPortalCliente">
+                            <thead>
+                                <tr>
+                                    <th>PLACA</th>
+                                    <th>MARCA / MODELO</th>
+                                    <th>AÑO</th>
+                                    <th>COLOR</th>
+                                    <th>ESTADO</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contenedorVehiculosPortalCliente"></tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" id="estadoVacioVehiculosCliente">
+                            <i class="bi bi-car-front fs-3 d-block mb-2"></i>
+                            <span>Aquí aparecerán tus vehículos registrados.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </template>
+
+    {{!-- ============================================================ --}}
+    {{!-- VISTA: COTIZACIONES                                          --}}
+    {{!-- ============================================================ --}}
+    <template id="templateCotizacionesCliente">
+        <section id="cotizacionesCliente" class="vista-scroll text-start">
+            <div class="seccion-cabecera">
+                <div class="seccion-cabecera__titulo">
+                    <h5><i class="bi bi-receipt"></i> Mis cotizaciones</h5>
+                    <small class="seccion-cabecera__subtitulo">Revisa los servicios y productos propuestos para tus vehículos.</small>
+                </div>
+                <span class="pill-contador"><i class="bi bi-file-earmark-text"></i> <span id="contadorCotizacionesCliente">0</span> cotizaciones</span>
+            </div>
+
+            <section class="panel-tabla">
+                <div class="panel-tabla__header">
+                    <h2 class="panel-tabla__titulo"><i class="bi bi-card-list"></i> Cotizaciones recibidas</h2>
+                    <div class="panel-tabla__acciones">
+                        <select class="form-select form-select-sm" id="filtroEstadoCotizacionCliente" aria-label="Filtrar cotizaciones por estado">
+                            <option value="todas">Todos los estados</option>
+                            <option value="pendiente">Pendientes</option>
+                            <option value="aprobada">Aprobadas</option>
+                            <option value="rechazada">Rechazadas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="panel-tabla__body">
+                    <div class="panel-tabla__scroll">
+                        <table class="table tabla-sistema tabla-sistema--center mb-0" id="tablaCotizacionesCliente">
+                            <thead>
+                                <tr>
+                                    <th>N°</th>
+                                    <th>FECHA</th>
+                                    <th>VEHÍCULO</th>
+                                    <th>DESCRIPCIÓN</th>
+                                    <th>TOTAL</th>
+                                    <th>ESTADO</th>
+                                    <th>DETALLE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contenedorCotizacionesCliente"></tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" id="estadoVacioCotizacionesCliente">
+                            <i class="bi bi-receipt fs-3 d-block mb-2"></i>
+                            <span>Aquí aparecerán tus cotizaciones.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </template>
+
+    {{!-- ============================================================ --}}
+    {{!-- VISTA: HISTORIAL                                             --}}
+    {{!-- ============================================================ --}}
+    <template id="templateHistorialCliente">
+        <section id="historialCliente" class="vista-scroll text-start">
+            <div class="seccion-cabecera">
+                <div class="seccion-cabecera__titulo">
+                    <h5><i class="bi bi-clock-history"></i> Historial de servicios</h5>
+                    <small class="seccion-cabecera__subtitulo">Consulta los trabajos realizados en tus vehículos.</small>
+                </div>
+                <span class="pill-contador"><i class="bi bi-tools"></i> <span id="contadorHistorialCliente">0</span> servicios</span>
+            </div>
+
+            <section class="panel-tabla">
+                <div class="panel-tabla__header">
+                    <h2 class="panel-tabla__titulo"><i class="bi bi-journal-text"></i> Servicios realizados</h2>
+                    <div class="input-group input-group-sm seccion-cabecera__buscar">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="search" class="form-control" id="buscarHistorialCliente" placeholder="Buscar por vehículo o servicio">
+                    </div>
+                </div>
+                <div class="panel-tabla__body">
+                    <div class="panel-tabla__scroll">
+                        <table class="table tabla-sistema tabla-sistema--center mb-0" id="tablaHistorialCliente">
+                            <thead>
+                                <tr>
+                                    <th>FECHA</th>
+                                    <th>ORDEN</th>
+                                    <th>VEHÍCULO</th>
+                                    <th>TRABAJO REALIZADO</th>
+                                    <th>ESTADO</th>
+                                    <th>DETALLE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contenedorHistorialCliente"></tbody>
+                        </table>
+                        <div class="text-center text-muted py-5" id="estadoVacioHistorialCliente">
+                            <i class="bi bi-clipboard2-check fs-3 d-block mb-2"></i>
+                            <span>Aquí aparecerá el historial de tus servicios.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </template>
+
+    {{!-- ============================================================ --}}
+    {{!-- VISTA: PERFIL                                                --}}
+    {{!-- ============================================================ --}}
+    <template id="templatePerfilCliente">
+        <section id="perfilCliente" class="vista-scroll text-start">
+            <div class="seccion-cabecera">
+                <div class="seccion-cabecera__titulo">
+                    <h5><i class="bi bi-person-circle"></i> Mi perfil</h5>
+                    <small class="seccion-cabecera__subtitulo">Consulta y actualiza tus datos de contacto.</small>
+                </div>
+            </div>
+
+            <div class="row g-3 vista-row-altura">
+                <div class="col-lg-4">
+                    <section class="panel-tabla text-center">
+                        <div class="panel-tabla__body align-items-center justify-content-center">
+                            <img src="/img/perfil.png" alt="Foto de perfil" class="rounded-circle mb-3" width="96" height="96">
+                            <h2 class="h6 fw-bold mb-1" id="perfilNombreResumenCliente">Nombre del cliente</h2>
+                            <p class="small text-muted mb-0" id="perfilDocumentoResumenCliente">Documento registrado</p>
+                            <span class="badge bg-success-subtle text-success mt-3">Cuenta activa</span>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-lg-8">
+                    <section class="panel-tabla">
+                        <div class="panel-tabla__header">
+                            <h2 class="panel-tabla__titulo"><i class="bi bi-person-vcard"></i> Datos personales</h2>
+                        </div>
+                        <div class="panel-tabla__body card-scroll">
+                            <form id="formPerfilCliente">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="input-style">
+                                            <input type="text" id="perfilNombresCliente" placeholder=" ">
+                                            <label for="perfilNombresCliente"><i class="bi bi-person"></i> Nombres</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-style">
+                                            <input type="text" id="perfilApellidosCliente" placeholder=" ">
+                                            <label for="perfilApellidosCliente"><i class="bi bi-person"></i> Apellidos</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-style">
+                                            <input type="email" id="perfilCorreoCliente" placeholder=" ">
+                                            <label for="perfilCorreoCliente"><i class="bi bi-envelope"></i> Correo</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-style">
+                                            <input type="tel" id="perfilTelefonoCliente" placeholder=" ">
+                                            <label for="perfilTelefonoCliente"><i class="bi bi-telephone"></i> Teléfono</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="input-style">
+                                            <input type="text" id="perfilDireccionCliente" placeholder=" ">
+                                            <label for="perfilDireccionCliente"><i class="bi bi-geo-alt"></i> Dirección</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end gap-2 mt-4">
+                                    <button type="reset" class="btn btn-cancelar">Cancelar</button>
+                                    <button type="button" class="btn btn-primario" id="btnGuardarPerfilCliente"><i class="bi bi-check-circle"></i> Guardar cambios</button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </template>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="/js/cliente.js"></script>

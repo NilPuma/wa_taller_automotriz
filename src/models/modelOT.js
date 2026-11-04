@@ -31,7 +31,7 @@ const listarOrdenes = async (filtros = {}) => {
             v.placa,
             v.marca,
             v.modelo,
-            v.\`año\` AS anio,
+            v.\`anio\` AS anio,
             s.nombre AS sucursal_nombre,
             GROUP_CONCAT(DISTINCT CONCAT(pm.nombres, ' ', COALESCE(pm.apellidos, '')) SEPARATOR ', ') AS mecanicos,
             GROUP_CONCAT(DISTINCT mot.id_mecanico) AS ids_mecanicos
@@ -108,7 +108,7 @@ const listarOrdenesPorMecanico = async (idMecanico, estado = null) => {
             v.placa,
             v.marca,
             v.modelo,
-            v.\`año\` AS anio
+            v.\`anio\` AS anio
         FROM ORDENES_TRABAJO ot
         INNER JOIN PERSONAS p       ON p.id_persona  = ot.id_persona
         INNER JOIN VEHICULOS v      ON v.id_vehiculo = ot.id_vehiculo
@@ -159,7 +159,7 @@ const buscarOrdenPorId = async (idOrden) => {
             v.vin,
             v.marca,
             v.modelo,
-            v.\`año\` AS anio,
+            v.\`anio\` AS anio,
             v.color,
             v.tipo_combustible,
             s.nombre AS sucursal_nombre,
@@ -207,7 +207,7 @@ const buscarOrdenConDetalle = async (idOrden) => {
             v.vin,
             v.marca,
             v.modelo,
-            v.\`año\` AS anio,
+            v.\`anio\` AS anio,
             v.color,
             v.tipo_combustible,
             s.nombre AS sucursal_nombre,
@@ -297,9 +297,10 @@ const cotizacionYaUsada = async (idCotizacion) => {
 // (cabecera + detalles + mecánicos + descuento de stock, transacción)
 // ======================================================
 const registrarOrden = async (datos) => {
-    const {
+    let {
         id_cita = null,
         id_cotizacion = null,
+        crear_cita_automatica = false,
         id_persona,
         id_sucursal,
         id_vehiculo,
@@ -314,6 +315,62 @@ const registrarOrden = async (datos) => {
 
     try {
         await conn.beginTransaction();
+
+        // Valida la cita seleccionada dentro de la transacción para evitar reutilizarla.
+        if (id_cita) {
+            const [citasOrigen] = await conn.query(
+                `SELECT c.id_cita, c.id_persona, c.id_sucursal, c.id_vehiculo, c.estado,
+                        EXISTS (SELECT 1 FROM ORDENES_TRABAJO ot WHERE ot.id_cita = c.id_cita) AS tiene_ot
+                 FROM CITAS c WHERE c.id_cita = ? FOR UPDATE`,
+                [id_cita]
+            );
+            const citaOrigen = citasOrigen[0];
+            if (!citaOrigen || Number(citaOrigen.id_persona) !== Number(id_persona) ||
+                Number(citaOrigen.id_sucursal) !== Number(id_sucursal) || Number(citaOrigen.id_vehiculo) !== Number(id_vehiculo) ||
+                citaOrigen.estado === 'CANCELADA' || Number(citaOrigen.tiene_ot) === 1) {
+                const error = new Error('La cita ya no está disponible para crear esta orden');
+                error.code = 'CITA_NO_DISPONIBLE_OT';
+                throw error;
+            }
+        }
+
+        // Valida la cotización seleccionada y evita usar una no aprobada o ya vinculada.
+        if (id_cotizacion) {
+            const [cotizacionesOrigen] = await conn.query(
+                `SELECT c.id_cotizacion, c.id_persona, c.id_sucursal, c.id_vehiculo, c.estado,
+                        EXISTS (SELECT 1 FROM ORDENES_TRABAJO ot WHERE ot.id_cotizacion = c.id_cotizacion) AS tiene_ot
+                 FROM COTIZACIONES c WHERE c.id_cotizacion = ? FOR UPDATE`,
+                [id_cotizacion]
+            );
+            const cotizacionOrigen = cotizacionesOrigen[0];
+            if (!cotizacionOrigen || Number(cotizacionOrigen.id_persona) !== Number(id_persona) ||
+                Number(cotizacionOrigen.id_sucursal) !== Number(id_sucursal) || Number(cotizacionOrigen.id_vehiculo) !== Number(id_vehiculo) ||
+                cotizacionOrigen.estado !== 'APROBADA' || Number(cotizacionOrigen.tiene_ot) === 1) {
+                const error = new Error('La cotización ya no está disponible para crear esta orden');
+                error.code = 'COTIZACION_NO_DISPONIBLE_OT';
+                throw error;
+            }
+        }
+
+        // Crea una cita de ingreso atendida dentro de la transacción para una OT directa.
+        if (crear_cita_automatica) {
+            const [ordenesActivas] = await conn.query(
+                "SELECT id_orden_trabajo FROM ORDENES_TRABAJO WHERE id_vehiculo = ? AND estado IN (?, ?) LIMIT 1 FOR UPDATE",
+                [id_vehiculo, 'PENDIENTE', 'EN PROCESO']
+            );
+
+            if (ordenesActivas.length > 0) {
+                const error = new Error('El vehículo ya tiene una orden de trabajo activa');
+                error.code = 'VEHICULO_CON_ORDEN_ACTIVA';
+                throw error;
+            }
+
+            const [resultadoCita] = await conn.query(
+                "INSERT INTO CITAS (id_persona, id_sucursal, id_vehiculo, fecha_cita, hora_cita, motivo, estado) VALUES (?, ?, ?, CURDATE(), CURTIME(), ?, ?)",
+                [id_persona, id_sucursal, id_vehiculo, observacion, 'ATENDIDA']
+            );
+            id_cita = resultadoCita.insertId;
+        }
 
         // 1) Insertar cabecera
         const sqlCab = `
@@ -376,7 +433,7 @@ const registrarOrden = async (datos) => {
         }
 
         await conn.commit();
-        return { id_orden_trabajo: idOrden };
+        return { id_orden_trabajo: idOrden, id_cita };
     } catch (error) {
         await conn.rollback();
         throw error;

@@ -9,7 +9,7 @@ const listarMecanicos = async (busqueda = null, idSucursal = null) => {
             m.id_mecanico,
             m.id_persona,
             m.especialidad,
-            m.horario,
+            NULL AS horario,
             m.estado,
             m.fecha_modificacion,
             p.tipo_documento,
@@ -64,7 +64,7 @@ const listarMecanicosPorSucursal = async (idSucursal) => {
             m.id_mecanico,
             m.id_persona,
             m.especialidad,
-            m.horario,
+            NULL AS horario,
             m.estado,
             p.nombres,
             p.apellidos,
@@ -95,7 +95,7 @@ const buscarMecanicoPorId = async (idMecanico) => {
             m.id_mecanico,
             m.id_persona,
             m.especialidad,
-            m.horario,
+            NULL AS horario,
             m.estado,
             m.fecha_modificacion,
             p.tipo_documento,
@@ -139,15 +139,14 @@ const buscarMecanicoPorPersona = async (idPersona) => {
 const registrarMecanico = async (datos) => {
     const sql = `
         INSERT INTO MECANICOS
-        (id_persona, especialidad, horario, estado)
-        VALUES (?, ?, ?, ?)
+        (id_persona, especialidad, estado)
+        VALUES (?, ?, ?)
     `;
 
     try {
         const [result] = await poolDB.query(sql, [
             datos.id_persona,
             datos.especialidad || null,
-            datos.horario || null,
             datos.estado || 'ACTIVO'
         ]);
         return result;
@@ -163,7 +162,6 @@ const actualizarMecanico = async (idMecanico, datos) => {
     const sql = `
         UPDATE MECANICOS SET
             especialidad = ?,
-            horario      = ?,
             estado       = ?,
             fecha_modificacion = CURDATE()
         WHERE id_mecanico = ?
@@ -172,7 +170,6 @@ const actualizarMecanico = async (idMecanico, datos) => {
     try {
         const [result] = await poolDB.query(sql, [
             datos.especialidad || null,
-            datos.horario || null,
             datos.estado || 'ACTIVO',
             idMecanico
         ]);

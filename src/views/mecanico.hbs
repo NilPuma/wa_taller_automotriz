@@ -265,7 +265,10 @@
                         <div class="input-group input-group-sm seccion-cabecera__buscar">
                             <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
                             <input type="text" class="form-control form-control-sm" id="inputBuscarOrden"
-                                   placeholder="Buscar por orden, placa o cliente...">
+                                   placeholder="Buscar orden o cliente; placa para crear OT...">
+                            <button type="button" class="btn btn-outline-primary" id="btnBuscarVehiculoOT" title="Buscar vehículo por placa">
+                                <i class="bi bi-car-front"></i>
+                            </button>
                         </div>
 
                         <button type="button" class="btn btn-primario btn-sm" id="btnAbrirModalOrden">
@@ -275,8 +278,6 @@
                 </div>
 
                 <div class="row g-3 vista-row-altura">
-
-                    {{!-- LISTA LATERAL --}}
                     <div class="col-lg-3">
                         <div class="panel-tabla panel-tabla--compact h-100">
                             <div class="panel-tabla__header">
@@ -285,7 +286,8 @@
                                 </h5>
                             </div>
                             <div class="panel-tabla__body">
-                                <div class="lista-ordenes-consumo card-scroll" id="contenedorListaOrdenes"></div>
+                                <div class="lista-ordenes-consumo card-scroll" id="contenedorListaOrdenes">
+                                </div>
 
                                 {{! Paginador de órdenes }}
                                 <div class="paginador-wrap flex-shrink-0 mt-2" id="contenedorPaginacionOrdenes">
@@ -307,167 +309,141 @@
 
                                     <div class="selector-por-pagina-wrap">
                                         <span class="input-group-text bg-white" title="Registros por página">
-                                            <i class="bi bi-list-ol"></i>
+                                        <i class="bi bi-list-ol"></i>
                                         </span>
                                         <select class="form-select form-select-sm selector-por-pagina"
-                                                data-vista="ordenes"
-                                                aria-label="Registros por página">
-                                            <option value="5" selected>5</option>
-                                            <option value="10">10</option>
-                                            <option value="25">25</option>
-                                            <option value="50">50</option>
-                                            <option value="100">100</option>
-                                        </select>
-                                    </div>
+                                        data-vista="ordenes"
+                                        aria-label="Registros por página">
+                                        <option value="5" selected>5</option>
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    {{!-- DETALLE --}}
-                    <div class="col-lg-5">
-                        <div class="panel-tabla panel-tabla--compact h-100">
-                            <div class="panel-tabla__header">
-                                <h5 class="panel-tabla__titulo">
-                                    <i class="bi bi-info-circle"></i> Detalle de Orden
-                                </h5>
-                                <div class="panel-tabla__acciones d-none" id="contenedorAccionesOrden">
-                                    <button type="button" class="btn btn-sm btn-primario cambiar-estado-orden d-none" data-estado="EN PROCESO" title="Iniciar trabajo">
-                                        <i class="bi bi-play-fill"></i> Iniciar
-                                    </button>
-                                </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="panel-tabla panel-tabla--compact h-100 ordenes-panel-principal">
+                        <div class="panel-tabla__header">
+                            <h5 class="panel-tabla__titulo">
+                                <i class="bi bi-info-circle"></i> Detalle de Orden
+                            </h5>
+                            <div class="panel-tabla__acciones d-none" id="contenedorAccionesOrden">
+                                <button type="button" class="btn btn-sm btn-primario cambiar-estado-orden d-none" data-estado="EN PROCESO" title="Iniciar trabajo">
+                                    <i class="bi bi-play-fill"></i> Iniciar
+                                </button>
                             </div>
-                            <div class="panel-tabla__body">
-                                <div class="panel-tabla__scroll p-1">
-
-                                    <div id="contenedorInfoOrden" class="small mb-3 d-none">
-                                        <div class="row g-2 mb-3">
-                                            <div class="col-6 col-md-4">
-                                                <span class="text-muted d-block small">N° ORDEN</span>
-                                                <strong id="consumoOrdenCodigo">--</strong>
-                                            </div>
-                                            <div class="col-6 col-md-4">
-                                                <span class="text-muted d-block small">ESTADO</span>
-                                                <span id="consumoOrdenEstado" class="badge bg-secondary">--</span>
-                                            </div>
-                                            <div class="col-6 col-md-4">
-                                                <span class="text-muted d-block small">FECHA</span>
-                                                <span id="consumoOrdenFecha">--</span>
-                                            </div>
-                                            <div class="col-6 col-md-6">
-                                                <span class="text-muted d-block small">CLIENTE</span>
-                                                <strong id="consumoOrdenCliente">--</strong>
-                                            </div>
-                                            <div class="col-6 col-md-6">
-                                                <span class="text-muted d-block small">DOCUMENTO</span>
-                                                <span id="consumoOrdenDocumento">--</span>
-                                            </div>
-                                            <div class="col-6 col-md-6">
-                                                <span class="text-muted d-block small">VEHÍCULO / PLACA</span>
-                                                <span id="consumoOrdenVehiculo">--</span>
-                                            </div>
-                                            <div class="col-6 col-md-6">
-                                                <span class="text-muted d-block small">MECÁNICO</span>
-                                                <span id="consumoOrdenMecanico">--</span>
-                                            </div>
-                                            <div class="col-12">
-                                                <span class="text-muted d-block small">SERVICIO</span>
-                                                <span id="consumoOrdenServicio">--</span>
-                                            </div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <span class="text-muted d-block small">DESCRIPCIÓN</span>
-                                            <p id="consumoOrdenDescripcion" class="mb-0 small">--</p>
-                                        </div>
-                                    </div>
-
-                                    <div id="contenedorVacioOrden" class="text-center text-muted py-5">
-                                        <i class="bi bi-clipboard fs-3 d-block mb-2"></i>
-                                        <small>Seleccione una orden para ver su detalle y registrar los repuestos utilizados</small>
-                                    </div>
-
-                                    {{!-- EVIDENCIAS --}}
-                                    <div id="contenedorEvidencias" class="d-none mt-3 pt-3 border-top">
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <h6 class="fw-bold mb-0">
-                                                <i class="bi bi-images"></i> Evidencias
-                                                <span class="badge bg-secondary ms-1" id="contadorEvidencias">0</span>
-                                            </h6>
-                                            <button type="button" class="btn btn-primario btn-sm" id="btnSubirEvidencias"
-                                                    title="Subir evidencias">
-                                                <i class="bi bi-cloud-arrow-up"></i> Subir
-                                            </button>
-                                            <input type="file" id="inputEvidencias" class="d-none" accept="image/*" multiple>
-                                        </div>
-
-                                        <div class="row g-2 mb-3">
-                                            <div class="col-12">
-                                                <div class="input-style">
-                                                    <input type="text" class="form-control" id="inputTituloEvidencia" placeholder=" ">
-                                                    <label for="inputTituloEvidencia"><i class="bi bi-card-heading"></i> Título</label>
-                                                </div>
-                                            </div>
-                                            <div class="col-12">
-                                                <div class="input-style">
-                                                    <textarea class="form-control" id="textareaDescripcionEvidencia" rows="2" placeholder=" "></textarea>
-                                                    <label for="textareaDescripcionEvidencia"><i class="bi bi-pencil-square"></i> Descripción</label>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div id="contenedorVacioEvidencias" class="text-center text-muted py-3">
-                                            <i class="bi bi-image fs-3 d-block mb-1"></i>
-                                            <small>Aún no hay evidencias registradas para esta orden</small>
-                                        </div>
-
-                                        <div id="albumEvidencias" class="album-evidencias d-none"></div>
-
-                                        <div id="contenedorFooterEvidencias" class="d-none mt-3">
-                                            <button type="button" class="btn btn-primario w-100" id="btnGuardarEvidencias">
-                                                <i class="bi bi-save"></i> GUARDAR EVIDENCIAS
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                </div>
+                            <div class="panel-tabla__acciones d-none" id="contenedorAccionCrearOrdenDirecta">
+                                <button type="button" class="btn btn-sm btn-primario" id="btnCrearOrdenDesdeVehiculo">
+                                    <i class="bi bi-clipboard-plus"></i> Crear OT
+                                </button>
                             </div>
                         </div>
-                    </div>
+                        <div class="panel-tabla__body">
+                            <div class="panel-tabla__scroll ordenes-panel-scroll p-2">
 
-                    {{!-- CONSUMO --}}
-                    <div class="col-lg-4">
-                        <div class="panel-tabla panel-tabla--compact h-100">
-                            <div class="panel-tabla__header">
-                                <h5 class="panel-tabla__titulo">
-                                    <i class="bi bi-cart"></i> Consumo
-                                </h5>
-                                <div class="panel-tabla__acciones">
-                                    <span class="pill-contador" id="pillTotalConsumo">S/ 0.00</span>
+
+                                <div id="contenedorVehiculoBuscadoOT" class="panel-vehiculo-ot d-none">
+                                    <div class="panel-vehiculo-ot__resumen">
+                                        <span class="panel-vehiculo-ot__icono"><i class="bi bi-car-front"></i></span>
+                                        <div class="panel-vehiculo-ot__datos">
+                                            <div><span>CLIENTE</span><strong id="vehiculoBuscadoCliente">--</strong>
+                                            </div>
+                                            <div><span>VEHÍCULO</span><strong id="vehiculoBuscadoDescripcion">--</strong>
+                                            </div>
+                                        </div>
+                                        <span class="panel-vehiculo-ot__placa" id="vehiculoBuscadoPlaca">--</span>
+                                    </div>
+                                    <div class="panel-origen-ot">
+                                        <strong class="panel-origen-ot__titulo">Origen disponible</strong>
+                                        <div id="listaOrigenesVehiculoOT" class="panel-origen-ot__opciones">
+                                        </div>
+                                        <div id="mensajeSinOrigenVehiculoOT" class="panel-origen-ot__vacio d-none">
+                                            <i class="bi bi-info-circle"></i>
+                                            <span>Sin cita ni cotización disponible. Se registrará una cita de ingreso al crear la OT.</span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="panel-tabla__body">
 
-                                <div id="contenedorVacioConsumo" class="text-center text-muted py-5">
-                                    <i class="bi bi-box fs-3 d-block mb-2"></i>
-                                    <small>Seleccione una orden para registrar productos y servicios utilizados</small>
+                                <div id="contenedorInfoOrden" class="small mb-3 d-none">
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-6 col-md-4">
+                                            <span class="text-muted d-block small">N° ORDEN</span>
+                                            <strong id="consumoOrdenCodigo">--</strong>
+                                        </div>
+                                        <div class="col-6 col-md-4">
+                                            <span class="text-muted d-block small">ESTADO</span>
+                                            <span id="consumoOrdenEstado" class="badge bg-secondary">--</span>
+                                        </div>
+                                        <div class="col-6 col-md-4">
+                                            <span class="text-muted d-block small">FECHA</span>
+                                            <span id="consumoOrdenFecha">--</span>
+                                        </div>
+                                        <div class="col-6 col-md-6">
+                                            <span class="text-muted d-block small">CLIENTE</span>
+                                            <strong id="consumoOrdenCliente">--</strong>
+                                        </div>
+                                        <div class="col-6 col-md-6">
+                                            <span class="text-muted d-block small">DOCUMENTO</span>
+                                            <span id="consumoOrdenDocumento">--</span>
+                                        </div>
+                                        <div class="col-6 col-md-6">
+                                            <span class="text-muted d-block small">VEHÍCULO / PLACA</span>
+                                            <span id="consumoOrdenVehiculo">--</span>
+                                        </div>
+                                        <div class="col-6 col-md-6">
+                                            <span class="text-muted d-block small">MECÁNICO</span>
+                                            <span id="consumoOrdenMecanico">--</span>
+                                        </div>
+                                        <div class="col-12">
+                                            <span class="text-muted d-block small">SERVICIO</span>
+                                            <span id="consumoOrdenServicio">--</span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div id="contenedorConsumoActivo" class="d-none flex-grow-1 d-flex flex-column min-h-0">
+                                <div id="contenedorVacioOrden" class="text-center text-muted py-5">
+                                    <i class="bi bi-clipboard fs-3 d-block mb-2"></i>
+                                    <small>Seleccione una orden para ver su detalle y registrar los repuestos utilizados</small>
+                                </div>
 
-                                    {{!-- BLOQUE DE BÚSQUEDA --}}
-                                    <div id="contenedorListasDisponiblesOT" class="d-none flex-shrink-0">
-                                        <div class="row g-2 mb-2 flex-shrink-0">
+                                {{!-- EVIDENCIAS --}}
 
-                                            <div class="col-6">
-                                                <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-tools"></i> SERVICIOS</h6>
-                                                <div class="input-group input-group-sm mb-2">
-                                                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                                    <input type="text" class="form-control form-control-sm" id="inputBuscarServicioOT"
-                                                           placeholder="Buscar...">
-                                                </div>
-                                                <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
-                                                     id="contenedorResultadosServiciosOT">
-                                                    <div id="listaServiciosOT"></div>
+
+
+                                <section class="ordenes-bloque-consumo">
+                                    <div class="panel-tabla__header">
+                                        <h5 class="panel-tabla__titulo">
+                                            <i class="bi bi-cart"></i> Consumo
+                                        </h5>
+                                    </div>
+
+
+                                    <div id="contenedorVacioConsumo" class="text-center text-muted py-5">
+                                        <i class="bi bi-box fs-3 d-block mb-2"></i>
+                                        <small>Seleccione una orden para registrar productos y servicios utilizados</small>
+                                    </div>
+
+                                    <div id="contenedorConsumoActivo" class="d-none flex-grow-1 d-flex flex-column min-h-0">
+
+                                        {{!-- BLOQUE DE BÚSQUEDA --}}
+                                        <div id="contenedorListasDisponiblesOT" class="d-none flex-shrink-0">
+                                            <div class="row g-2 mb-2 flex-shrink-0">
+
+                                                <div class="col-6">
+                                                    <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-tools"></i> SERVICIOS</h6>
+                                                    <div class="input-group input-group-sm mb-2">
+                                                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                                        <input type="text" class="form-control form-control-sm" id="inputBuscarServicioOT"
+                                                        placeholder="Buscar...">
+                                                    </div>
+                                                    <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
+                                                    id="contenedorResultadosServiciosOT">
+                                                    <div id="listaServiciosOT">
+                                                    </div>
                                                     <div id="contenedorVacioServiciosOT" class="text-center text-muted py-3 d-none">
                                                         <small>No se encontraron coincidencias</small>
                                                     </div>
@@ -479,58 +455,146 @@
                                                 <div class="input-group input-group-sm mb-2">
                                                     <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
                                                     <input type="text" class="form-control form-control-sm" id="inputBuscarProductoOT"
-                                                           placeholder="Buscar...">
+                                                    placeholder="Buscar...">
                                                 </div>
                                                 <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
-                                                     id="contenedorResultadosProductosOT">
-                                                    <div id="listaProductosOT"></div>
-                                                    <div id="contenedorVacioProductosOT" class="text-center text-muted py-3 d-none">
-                                                        <small>No se encontraron coincidencias</small>
-                                                    </div>
+                                                id="contenedorResultadosProductosOT">
+                                                <div id="listaProductosOT">
+                                                </div>
+                                                <div id="contenedorVacioProductosOT" class="text-center text-muted py-3 d-none">
+                                                    <small>No se encontraron coincidencias</small>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <hr class="my-2 flex-shrink-0">
                                     </div>
 
-                                    <div id="contenedorVacioItemsConsumo" class="text-center text-muted py-3 flex-shrink-0">
-                                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                        <small>No hay items agregados</small>
-                                    </div>
+                                    <hr class="my-2 flex-shrink-0">
+                                </div>
 
-                                    <div id="contenedorTablaConsumo" class="d-none flex-grow-1 card-scroll card-scroll--flex border rounded">
-                                        <table class="table tabla-sistema style-tabla tabla-sistema--compact border-0 mb-0" id="tablaItemsConsumo">
-                                            <thead class="sticky-top">
-                                                <tr>
-                                                    <th class="small">Tipo</th>
-                                                    <th class="small">Descripción</th>
-                                                    <th class="small text-center w-50">Cant.</th>
-                                                    <th class="small text-end">P. Unit.</th>
-                                                    <th class="small text-end">Subtotal</th>
-                                                    <th class="small text-center"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="contenedorItemsConsumo"></tbody>
-                                        </table>
-                                    </div>
+                                <div id="contenedorVacioItemsConsumo" class="text-center text-muted py-3 flex-shrink-0">
+                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                    <small>No hay items agregados</small>
+                                </div>
 
-                                    <div id="contenedorFooterConsumo" class="d-none mt-2 pt-2 border-top flex-shrink-0">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="fw-bold small">TOTAL</span>
-                                            <span class="fw-bold small" id="contenedorTotalConsumo">S/ 0.00</span>
-                                        </div>
-                                        <button type="button" class="btn btn-primario w-100 cambiar-estado-orden d-none" data-estado="FINALIZADA" id="btnFinalizarOrden" title="Finalizar orden">
-                                            <i class="bi bi-check-lg"></i> FINALIZAR ORDEN
-                                        </button>
-                                        <small class="d-block text-muted text-center mt-1" id="indicadorAutoguardadoConsumo"></small>
-                                    </div>
+                                <div id="contenedorTablaConsumo" class="d-none flex-grow-1 card-scroll card-scroll--flex border rounded">
+                                    <table class="table tabla-sistema style-tabla tabla-sistema--compact border-0 mb-0" id="tablaItemsConsumo">
+                                        <thead class="sticky-top">
+                                            <tr>
+                                                <th class="small">Tipo</th>
+                                                <th class="small">Descripción</th>
+                                                <th class="small text-center w-50">Cant.</th>
+                                                <th class="small text-end">P. Unit.</th>
+                                                <th class="small text-end">Subtotal</th>
+                                                <th class="small text-center"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="contenedorItemsConsumo"></tbody>
+                                    </table>
+                                </div>
 
+
+
+                            </div>
+
+                        </section>
+                        <div id="contenedorEvidencias" class="ordenes-bloque-evidencias d-none">
+
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="fw-bold mb-0">
+                                    <i class="bi bi-images"></i> Evidencias
+                                    <span class="badge bg-secondary ms-1" id="contadorEvidencias">0</span>
+                                </h6>
+                                <button type="button" class="btn btn-primario btn-sm" id="btnSubirEvidencias"
+                                title="Subir evidencias">
+                                <i class="bi bi-cloud-arrow-up"></i> Subir
+                            </button>
+                            <input type="file" id="inputEvidencias" accept="image/*" class="d-none" accept="image/*" multiple>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-12">
+                                <div class="input-style">
+                                    <input type="text" class="form-control" id="inputTituloEvidencia" placeholder=" ">
+                                    <label for="inputTituloEvidencia"><i class="bi bi-card-heading"></i> Título</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="input-style">
+                                    <textarea class="form-control" id="textareaDescripcionEvidencia" rows="2" placeholder=" "></textarea>
+                                    <label for="textareaDescripcionEvidencia"><i class="bi bi-pencil-square"></i> Descripción</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="contenedorVacioEvidencias" class="text-center text-muted py-3">
+                            <i class="bi bi-image fs-3 d-block mb-1"></i>
+                            <small>Aún no hay evidencias registradas para esta orden</small>
+                        </div>
+
+                        <div id="albumEvidencias" class="album-evidencias d-none">
+                        </div>
+
+                        <div id="contenedorFooterEvidencias" class="d-none mt-3">
+                            <button type="button" class="btn btn-primario w-100" id="btnGuardarEvidencias">
+                                <i class="bi bi-save"></i> GUARDAR EVIDENCIAS
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                </div>
+                </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="panel-tabla panel-tabla--compact resumen-sticky flex-grow-1 min-h-0">
+                        <div class="panel-tabla__header">
+                            <h5 class="panel-tabla__titulo">
+                                <i class="bi bi-clipboard-check"></i> Resumen
+                            </h5>
+                        </div>
+                        <div class="panel-tabla__body">
+                            <div class="card-scroll">
+                                <div class="resumen-totales mb-3 flex-shrink-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small text-muted">Subtotal:</span>
+                                        <span class="small fw-semibold" id="resumenSubtotalOT">S/ 0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small text-muted">IGV (18%):</span>
+                                        <span class="small fw-semibold" id="resumenIGVOT">S/ 0.00</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-success-subtle p-3 rounded mb-3 flex-shrink-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">TOTAL</span>
+                                        <span class="fw-bold fs-5 text-success" id="resumenTotalConsumo">S/ 0.00</span>
+                                    </div>
+                                </div>
+
+                                <div id="contenedorObservacionOrdenActual" class="mb-3 flex-shrink-0 d-none">
+                                    <div class="input-style">
+                                        <textarea class="form-control" id="consumoOrdenDescripcion" rows="4" placeholder=" " readonly></textarea>
+                                        <label for="consumoOrdenDescripcion"><i class="bi bi-pencil-square"></i> Observaciones / Detalles</label>
+                                    </div>
+                                </div>
+
+                                <div id="contenedorObservacionOrdenDirecta" class="mb-3 flex-shrink-0 d-none">
+                                    <div class="input-style">
+                                        <textarea class="form-control" id="textareaObservacionOrdenDirecta" rows="4" placeholder=" "></textarea>
+                                        <label for="textareaObservacionOrdenDirecta"><i class="bi bi-pencil-square"></i> Observaciones / Detalles</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    <div id="contenedorFooterConsumo" class="d-none mt-3 flex-shrink-0">
+                        <button type="button" class="btn btn-primario w-100 cambiar-estado-orden d-none" data-estado="FINALIZADA" id="btnFinalizarOrden" title="Finalizar orden">
+                            <i class="bi bi-check-lg"></i> FINALIZAR ORDEN
+                        </button>
+                        <small class="d-block text-muted text-center mt-1" id="indicadorAutoguardadoConsumo"></small>
+                    </div>
+                </div>
                 </div>
             </div>
         </template>
@@ -917,7 +981,7 @@
 
                     {{!-- COLUMNA DERECHA: Resumen --}}
                     <div class="col-lg-3">
-                        <div class="panel-tabla panel-tabla--compact resumen-sticky h-100">
+                        <div class="panel-tabla panel-tabla--compact resumen-sticky flex-grow-1 min-h-0">
                             <div class="panel-tabla__header">
                                 <h5 class="panel-tabla__titulo">
                                     <i class="bi bi-clipboard-check"></i> Resumen
@@ -974,6 +1038,9 @@
                                     <div class="mt-auto flex-shrink-0">
                                         <button type="button" class="btn btn-primario w-100 mb-2" id="btnGenerarCotizacion">
                                             <i class="bi bi-file-earmark-pdf"></i> GENERAR COTIZACIÓN
+                                        </button>
+                                        <button type="button" class="btn btn-outline-primary w-100 mb-2" id="btnAgendarCitaCotizacion" disabled>
+                                            <i class="bi bi-calendar-plus"></i> Agendar cita desde cotización seleccionada
                                         </button>
                                         <button type="button" class="btn btn-cancelar w-100" id="btnLimpiarCotizacion">
                                             <i class="bi bi-eraser"></i> Limpiar Todo
@@ -1185,44 +1252,20 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="formNuevaOrden">
+                    <form id="formNuevaOrden" novalidate>
                         <div class="row g-3">
-                            <div class="col-md-12">
-                                <div class="input-style">
-                                    <select class="form-select" id="selectOrigenOrden" required>
-                                        <option value="CITA" selected>Una Cita (inicia en blanco)</option>
-                                        <option value="COTIZACION">Una Cotización Aprobada (hereda repuestos)</option>
-                                    </select>
-                                    <label for="selectOrigenOrden"><i class="bi bi-diagram-3"></i> Crear Orden desde</label>
-                                </div>
-                                <small class="text-muted">La orden de trabajo debe originarse de una cita o de una cotización.</small>
-                            </div>
-
-                            <div class="col-md-12" id="wrapperSelectCita">
-                                <div class="input-style">
-                                    <select class="form-select" id="selectCitaOrden">
-                                        <option value="" selected disabled>Seleccione una cita activa</option>
-                                    </select>
-                                    <label for="selectCitaOrden"><i class="bi bi-calendar-check"></i> Cita Asociada</label>
-                                </div>
-                                <small class="text-muted">Solo se muestran citas que aún no tienen orden de trabajo.</small>
-                            </div>
-
-                            <div class="col-md-12 d-none" id="wrapperSelectCotizacion">
-                                <div class="input-style">
-                                    <select class="form-select" id="selectCotizacionOrden">
-                                        <option value="" selected disabled>Seleccione una cotización</option>
-                                    </select>
-                                    <label for="selectCotizacionOrden"><i class="bi bi-file-earmark-text"></i> Cotización Aprobada</label>
-                                </div>
-                                <small class="text-muted">Los repuestos y servicios de la cotización se cargarán automáticamente.</small>
-                            </div>
-
                             <div class="col-12">
-                                <div class="input-style">
-                                    <textarea class="form-control" id="textareaDescripcion" name="descripcion" rows="3" placeholder=" "></textarea>
-                                    <label for="textareaDescripcion"><i class="bi bi-pencil-square"></i> Observación General</label>
-                                </div>
+                                <p class="small text-muted mb-0">Selecciona una cita, una cotización aprobada o ambas. Si eliges ambas, deben corresponder al mismo vehículo, cliente y sucursal.</p>
+                            </div>
+                            <div class="col-md-6" id="wrapperSelectCita">
+                                <label class="form-label small fw-semibold" for="selectCitaOrden">Cita (opcional)</label>
+                                <select class="form-select" id="selectCitaOrden"><option value="" selected>Sin cita</option></select>
+                                <small class="text-muted">Solo citas activas sin orden.</small>
+                            </div>
+                            <div class="col-md-6" id="wrapperSelectCotizacion">
+                                <label class="form-label small fw-semibold" for="selectCotizacionOrden">Cotización aprobada (opcional)</label>
+                                <select class="form-select" id="selectCotizacionOrden"><option value="" selected>Sin cotización</option></select>
+                                <small class="text-muted">Sus servicios y productos se cargarán en la OT.</small>
                             </div>
                         </div>
                     </form>
@@ -1325,12 +1368,19 @@
 
                     <hr>
 
-                    <h6 class="fw-bold mb-3"><i class="bi bi-box-seam"></i> Repuestos Consumidos</h6>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                        <h6 class="fw-bold mb-0" id="tituloConsumoHistorial"><i class="bi bi-receipt"></i> Detalle del consumo</h6>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Filtrar conceptos del ticket">
+                            <button type="button" class="btn btn-outline-primary filtro-ticket-historial active" data-filtro-ticket="general">General</button>
+                            <button type="button" class="btn btn-outline-primary filtro-ticket-historial" data-filtro-ticket="servicios">Servicios</button>
+                            <button type="button" class="btn btn-outline-primary filtro-ticket-historial" data-filtro-ticket="productos">Productos</button>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table tabla-sistema style-tabla tabla-sistema--compact border-0 mb-0" id="tablaVerHistorialConsumo">
                             <thead>
                                 <tr>
-                                    <th class="small">Repuesto</th>
+                                    <th class="small">Concepto</th>
                                     <th class="small text-center">Cant.</th>
                                     <th class="small text-end">P. Unit.</th>
                                     <th class="small text-end">Subtotal</th>
@@ -1339,7 +1389,7 @@
                             <tbody id="contenedorVerHistorialConsumo"></tbody>
                             <tfoot class="table-light">
                                 <tr>
-                                    <td colspan="3" class="text-end fw-bold small">TOTAL:</td>
+                                    <td colspan="3" class="text-end fw-bold small">IMPORTE DEL FILTRO:</td>
                                     <td class="text-end fw-bold small" id="verHistorialTotalConsumo">S/ 0.00</td>
                                 </tr>
                             </tfoot>
@@ -1352,7 +1402,8 @@
                         <div id="albumEvidenciasHistorial" class="album-evidencias"></div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0">
+                <div class="modal-footer border-0 pt-0 flex-wrap">
+                    <button type="button" class="btn btn-primario" id="btnImprimirTicketHistorial" disabled><i class="bi bi-printer me-1"></i> Vista previa / imprimir</button>
                     <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
@@ -1368,7 +1419,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="formNuevaCita">
+                    <form id="formNuevaCita" novalidate>
+                        <div class="alert alert-info py-2 d-none" id="contextoCitaCotizacion" role="status"></div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="input-style">
@@ -1508,6 +1560,7 @@
                     <p id="verCitaMotivo" class="mb-0 small">--</p>
                 </div>
                 <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-primary" id="btnCrearCotizacionDesdeCita"><i class="bi bi-file-earmark-plus"></i> Crear cotización con estos datos</button>
                     <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
@@ -1523,7 +1576,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="formNuevoCliente">
+                    <form id="formNuevoCliente" novalidate>
                         <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-person"></i> DATOS DEL CLIENTE</h6>
                         <div class="row g-3 mb-3">
                             <div class="col-md-4">
@@ -1571,7 +1624,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="input-style">
-                                    <input type="text" class="form-control" id="inputTelefonoCliente" placeholder=" ">
+                                    <input type="text" class="form-control" id="inputTelefonoCliente" placeholder=" " inputmode="tel" autocomplete="tel">
                                     <label for="inputTelefonoCliente"><i class="bi bi-telephone"></i> Teléfono</label>
                                 </div>
                             </div>
@@ -1759,7 +1812,7 @@
                         <span class="text-muted d-block small">CLIENTE</span>
                         <strong id="nombreClienteVehiculo">--</strong>
                     </div>
-                    <form id="formNuevoVehiculo">
+                    <form id="formNuevoVehiculo" novalidate>
                         <input type="hidden" id="inputIdClienteVehiculo">
                         <input type="hidden" id="inputModoVehiculo" value="crear">
                         <input type="hidden" id="inputIdVehiculoEditar" value="">
@@ -1942,7 +1995,7 @@
             <td class="vehiculo-historial"></td>
             <td class="descripcion-historial small"></td>
             <td class="acciones-historial text-center">
-                <button class="btn btn-sm btn-primario btn-ver-historial" title="Ver detalle">
+                <button type="button" class="btn btn-sm btn-primario btn-ver-historial" title="Ver detalle" aria-label="Ver detalle de la orden">
                     <i class="bi bi-eye"></i>
                 </button>
             </td>
@@ -2160,6 +2213,38 @@
         <option value=""></option>
     </template>
 
+    {{!-- Modal para previsualizar y descargar un ticket de OT. --}}
+    <div class="modal fade modal-personalizado" id="modalTicketPDF" tabindex="-1" aria-labelledby="modalTicketPDFLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-ticket-pdf__dialog">
+            <div class="modal-content modal-ticket-pdf__contenido">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTicketPDFLabel">
+                        <i class="bi bi-file-earmark-pdf me-2"></i>Ticket de servicio
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div id="contenedorFiltrosTicketFinalizacion" class="d-none px-3 pt-3">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <small class="text-muted">Contenido del ticket</small>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Filtrar ticket de orden finalizada">
+                            <button type="button" class="btn btn-outline-primary filtro-ticket-finalizacion active" data-tipo="general">General</button>
+                            <button type="button" class="btn btn-outline-primary filtro-ticket-finalizacion" data-tipo="servicios">Servicios</button>
+                            <button type="button" class="btn btn-outline-primary filtro-ticket-finalizacion" data-tipo="productos">Productos</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body modal-ticket-pdf__body">
+                    <iframe id="iframeTicketPDF" src="about:blank" title="Vista previa del ticket PDF"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-primario" id="btnDescargarTicketPDF" disabled>
+                        <i class="bi bi-download me-1"></i> Descargar PDF
+                    </button>
+                    <button type="button" class="btn-cancelar" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <template id="templateOptionCotizacion">
         <option value=""></option>
     </template>
