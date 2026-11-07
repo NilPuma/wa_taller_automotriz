@@ -32,6 +32,9 @@ router.post('/api/login', controladorAuth.login);
 router.post('/api/logout', controladorAuth.logout);
 router.get('/api/listarPersonas', verificarToken, controladorPersona.listarPersonas);
 router.get('/api/listarUsuarios',verificarToken, controladorPersona.listarUsuarios);
+router.post('/api/registrarPersona', controladorPersona.registrarPersona);
+router.put('/api/editarPersona/:idPersona', controladorPersona.actualizarPersona);
+router.delete('/api/eliminarPersona/:idPersona', controladorPersona.eliminarPersona);
 
 
 module.exports = router;

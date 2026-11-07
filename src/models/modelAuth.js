@@ -11,7 +11,7 @@ const poolDB = require('../config_db/config_mysql');
 }; */
 const buscarUsuario = async (usuario) => {
 
-    const sql = `SELECT * FROM usuarios WHERE email = ? LIMIT 1`;
+    const sql = `SELECT * FROM usuarios WHERE usuario = ? LIMIT 1`;
 
     try {
         const [rows] = await poolDB.query(sql, [usuario]);

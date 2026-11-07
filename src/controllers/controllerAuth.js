@@ -23,7 +23,7 @@ const login = async (req, res) => {
             });
         }
         // 4. Verificar estado del usuario
-        if (usuarioBD.estado != 'activo') {
+        if (usuarioBD.estado.toLowerCase() != 'activo') {
             return res.status(403).json({
                 ok: false,
                 mensaje: 'El usuario se encuentra inactivo'

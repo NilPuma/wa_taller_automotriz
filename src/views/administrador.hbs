@@ -12,7 +12,7 @@
         </div>
         {{!-- Perfil --}}
         <div id="perfil">
-            <div id="foto"><img src="/img/perfil.png" alt=""></div>
+            <div id="foto"><img src="/img/admin.png" alt=""></div>
             <div id="nombre"><span>ADMINISTRADOR</span></div>
         </div>
         {{!-- Items --}}
@@ -116,7 +116,227 @@
                     {{!-- Aqui se reenderiza todo --}}
                 </div>
 
-                {{!-- Templates --}}
+                {{!-- TEMPLATES --}}
+                {{!-- Template: Dashboard --}}
+                <template id="templateDashboard">
+                    <div class="dashboard">
+                        {{!-- BANNER DE BIENVENIDA --}}
+                        <section class="dashboard-banner">
+                            <div class="dashboard-bienvenida">
+                                <span>Bienvenido,</span>
+                                <h2 id="dashboardNombreUsuario">Administrador</h2> 
+                                <p>
+                                    Desde aquí puedes gestionar Clientes, Vehiculos,
+                                    Productos, Ordenes, Reportes de manera rápida y segura.
+                                </p>
+                            </div>
+
+                            <div class="dashboard-logo">
+                                <img src="/img/logo.png" alt="" >
+                            </div>
+                        </section>
+
+                        {{!-- TARJETAS ESTADÍSTICAS --}}
+                        <section class="dashboard-estadisticas">
+
+                            <div class="dashboard-stat-card">
+                                <div class="stat-icon azul">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                                <div class="stat-contenido">
+                                    <h3 id="dashTotalPersonas">--</h3>
+                                    <p>Personas registradas</p>
+                                    <span>Registros del sistema</span>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-stat-card">
+                                <div class="stat-icon verde">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                </div>
+                                <div class="stat-contenido">
+                                    <h3 id="dashTotalCertificados">--</h3>
+                                    <p>Vehiculos Registrados</p>
+                                    <span>Detalles e historial</span>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-stat-card">
+                                <div class="stat-icon naranja">
+                                    <i class="bi bi-chat-left-dots"></i>
+                                </div>
+                                <div class="stat-contenido">
+                                    <h3 id="dashMensajesPendientes">--</h3>
+                                    <p>Citas pendientes</p>
+                                    <span>Por revisar</span>
+                                </div>
+                            </div>
+
+                            <div class="dashboard-stat-card">
+                                <div class="stat-icon morado">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                                <div class="stat-contenido">
+                                    <h3 id="dashTotalUsuarios">--</h3>
+                                    <p>Usuarios del sistema</p>
+                                    <span>Cuentas registradas</span>
+                                </div>
+                            </div>
+
+                        </section>
+
+                        {{!-- ACCIONES RÁPIDAS --}}
+                        <section class="dashboard-seccion">
+
+                            <h5 class="dashboard-seccion-titulo">
+                                <i class="bi bi-lightning-charge"></i>
+                                Acciones rápidas
+                            </h5>
+
+                            <div class="dashboard-acciones">
+
+                                <button class="dashboard-accion accion-azul"
+                                        type="button"
+                                        data-modulo="personas">
+                                    <div class="accion-icono">
+                                        <i class="bi bi-people"></i>
+                                    </div>
+                                    <div class="accion-texto">
+                                        <strong>Gestionar personas</strong>
+                                        <small>Ver, registrar y administrar personas.</small>
+                                    </div>
+                                    <i class="bi bi-chevron-right accion-flecha"></i>
+                                </button>
+
+                                <button class="dashboard-accion accion-verde"
+                                        type="button"
+                                        data-modulo="certificados">
+                                    <div class="accion-icono">
+                                        <i class="bi bi-file-earmark-text"></i>
+                                    </div>
+                                    <div class="accion-texto">
+                                        <strong>Gestionar Cotizaciones</strong>
+                                        <small>Consultar y administrar Cotizaciones.</small>
+                                    </div>
+                                    <i class="bi bi-chevron-right accion-flecha"></i>
+                                </button>
+
+                                <button class="dashboard-accion accion-naranja"
+                                        type="button"
+                                        data-modulo="mensajes">
+                                    <div class="accion-icono">
+                                        <i class="bi bi-chat-left-dots"></i>
+                                    </div>
+                                    <div class="accion-texto">
+                                        <strong>Ver citas</strong>
+                                        <small>Revisar citas pendientes</small>
+                                    </div>
+                                    <i class="bi bi-chevron-right accion-flecha"></i>
+                                </button>
+
+                                <button class="dashboard-accion accion-morado"
+                                        type="button"
+                                        data-modulo="usuarios">
+                                    <div class="accion-icono">
+                                        <i class="bi bi-person-gear"></i>
+                                    </div>
+                                    <div class="accion-texto">
+                                        <strong>Gestionar usuarios</strong>
+                                        <small>Administrar cuentas de acceso y roles.</small>
+                                    </div>
+                                    <i class="bi bi-chevron-right accion-flecha"></i>
+                                </button>
+
+                            </div>
+                        </section>
+
+                        {{!-- TABLAS DE ACTIVIDAD RECIENTE --}}
+                        <section class="dashboard-actividad">
+
+                            {{!-- MENSAJES --}}
+                            <div class="dashboard-seccion">
+
+                                <div class="dashboard-tabla-header">
+                                    <h5 class="dashboard-seccion-titulo">
+                                        <i class="bi bi-clock-history"></i>
+                                        Últimos Orndes de trabajo antedidas recibidos
+                                    </h5>
+
+                                    <button class="dashboard-ver-todos"
+                                            type="button"
+                                            data-modulo="mensajes">
+                                        Ver todos
+                                    </button>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table dashboard-tabla">
+                                        <thead>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Correo</th>
+                                                <th>Ciudad</th>
+                                                <th>Mensaje</th>
+                                                <th>Fecha</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dashTablaMensajes">
+                                            <tr>
+                                                <td colspan="5" class="text-center">
+                                                    Cargando mensajes...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                            {{!-- CERTIFICADOS --}}
+                            <div class="dashboard-seccion">
+
+                                <div class="dashboard-tabla-header">
+                                    <h5 class="dashboard-seccion-titulo">
+                                        <i class="bi bi-file-earmark-check"></i>
+                                        Últimas Citas registradas
+                                    </h5>
+
+                                    <button class="dashboard-ver-todos"
+                                            type="button"
+                                            data-modulo="certificados">
+                                        Ver todos
+                                    </button>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table dashboard-tabla">
+                                        <thead>
+                                            <tr>
+                                                <th>Código</th>
+                                                <th>Persona</th>
+                                                <th>Título</th>
+                                                <th>Fecha</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dashTablaCertificados">
+                                            <tr>
+                                                <td colspan="4" class="text-center">
+                                                    Cargando certificados...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+                </template>
+
+                {{!-- Template clientes --}}
                 <template id="templateContenedorClientes">
                     <div id="clientesAdmin" class="p-4 container">
                         {{!-- Card de Clientes --}}
@@ -170,7 +390,7 @@
                                                 {{!-- <td id="contenedorEstadoListar" class="text-center"></td> --}}
                                                 <td>
                                                     <div class="d-flex justify-content-center">
-                                                        <span id="verVehiculo" class="bi bi-car-front-fill text-danger"
+                                                        <span id="verVehiculo" class="bi bi-car-front-fill text-primary"
                                                             title="Ver certificados del cliente"></span>
                                                         <span id="editarPersona"
                                                             class="bi bi-pen-fill me-3 ms-3 text-secondary"
@@ -237,26 +457,35 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <div class="modal-body">
-                    <div class="input-style mb-3">
-                        <input id="documento" class="input-style-error" type="number" placeholder=" ">
-                        <label for="documento">
-                            <i class="bi bi-window-dock me-2"></i>N° Documento
-                        </label>
-                    </div>
-                    <div class="input-style mb-3">
-                        <input id="nombres" class="input-style-error" type="text" placeholder=" ">
-                        <label for="nombres">
-                            <i class="bi bi-person me-2"></i>Nombres
-                        </label>
-                    </div>
-                    <div class="input-style mb-3">
-                        <input id="apellidos" class="input-style-error" type="text" placeholder=" ">
-                        <label for="apellidos">
-                            <i class="bi bi-person me-2"></i>Apellidos
-                        </label>
-                    </div>
+                <div id="registroBody" class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <select id="tipoDocumento" name="tipo_documento" class="form-select select-style ">
+                                <option value="DNI" class="option-styles">DNI</option>
+                                <option value="RUC">RUC</option>
+                                <option value="CE">Carné de extranjería</option>
+                                <option value="PASAPORTE">Pasaporte</option>
+                            </select>
+                        </div>
 
+                        <div class="col-lg-6">
+                            <div class="input-style mb-3">
+                                <input id="documento" class="input-style-error" type="number" placeholder=" ">
+                                <label for="documento">
+                                    <i class="bi bi-window-dock me-2"></i>N° Documento
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="contenedorDatosCliente" class="row g-3">
+                        {{!-- Aqui se reenderiza campos por tipo de cliente --}}
+                    </div>
+                    <div class="input-style mb-3">
+                        <input id="direccion" class="input-style-error" type="text" placeholder=" ">
+                        <label for="direccion">
+                            <i class="bi bi-telephone me-2"></i>Dirección
+                        </label>
+                    </div>
                     <div class="input-style mb-3">
                         <input id="telefono" class="input-style-error" type="number" placeholder=" ">
                         <label for="telefono">
@@ -272,6 +501,21 @@
                 </div>
 
             </div>
+        </div>
+    </div>
+
+
+    <!-- Toast de notificaciones -->
+    <div id="toastContainer" class="toast-container-custom" aria-live="polite" aria-atomic="true">
+        <div id="toastCertificado" class="toast-personalizado" role="alert">
+            <i id="toastIcono" class="bi toast-icono"></i>
+            <div class="toast-contenido">
+                <p id="toastTitulo" class="toast-titulo mb-0"></p>
+                <p id="toastMensaje" class="toast-mensaje mb-0"></p>
+            </div>
+            <button type="button" id="toastCerrar" class="toast-cerrar" aria-label="Cerrar notificación">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
     </div>
 </div>
