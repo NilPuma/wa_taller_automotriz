@@ -130,7 +130,7 @@ const buscarOrdenConDetalle = async (req, res) => {
             });
         }
 
-        const orden = await model.buscarOrdenConDetalle(id);
+        const orden = await model.buscarOrdenConDetalle(id, req.operacionesImpuestos);
 
         if (!orden) {
             return res.status(404).json({

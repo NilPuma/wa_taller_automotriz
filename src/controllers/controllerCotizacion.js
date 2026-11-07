@@ -230,7 +230,8 @@ const registrarCotizacion = async (req, res) => {
             estado: 'PENDIENTE',
             validez: validez || null,
             fecha_cotizacion,
-            items: itemsValidados
+            items: itemsValidados,
+            operacionesImpuestos: req.operacionesImpuestos
         });
 
         return res.status(201).json({
@@ -361,7 +362,7 @@ const reemplazarDetallesCotizacion = async (req, res) => {
             });
         }
 
-        const resultado = await model.reemplazarDetallesCotizacion(id, itemsValidados);
+        const resultado = await model.reemplazarDetallesCotizacion(id, itemsValidados, req.operacionesImpuestos);
 
         return res.json({
             ok: true,

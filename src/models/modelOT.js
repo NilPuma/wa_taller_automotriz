@@ -1,6 +1,5 @@
 const poolDB = require('../config_db/config_mysql');
 const { toISODate } = require('../utils/fechas');
-
 // ======================================================
 // LISTAR ÓRDENES DE TRABAJO (con filtros opcionales)
 // ======================================================
@@ -183,7 +182,7 @@ const buscarOrdenPorId = async (idOrden) => {
 // ======================================================
 // BUSCAR ORDEN CON DETALLE COMPLETO (cabecera + detalles + mecánicos)
 // ======================================================
-const buscarOrdenConDetalle = async (idOrden) => {
+const buscarOrdenConDetalle = async (idOrden, operacionesImpuestos) => {
     const sqlCabecera = `
         SELECT
             ot.id_orden_trabajo,
@@ -263,9 +262,18 @@ const buscarOrdenConDetalle = async (idOrden) => {
 
         const [detRows] = await poolDB.query(sqlDetalles, [idOrden]);
         const [mecRows] = await poolDB.query(sqlMecanicos, [idOrden]);
+        const montoConIgv = operacionesImpuestos.sumarImportesIncluidos(detRows);
+        const totales = operacionesImpuestos.calcularDesgloseIgvIncluido(
+            montoConIgv,
+            Number(cabRows[0].sucursal_igv)
+        );
 
         return {
             ...cabRows[0],
+            subtotal: totales.subtotal,
+            igv: totales.igv,
+            tasa_igv: totales.tasa_igv,
+            total: totales.total,
             detalles: detRows,
             mecanicos: mecRows
         };

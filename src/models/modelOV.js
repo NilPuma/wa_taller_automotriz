@@ -1,6 +1,5 @@
 const poolDB = require('../config_db/config_mysql');
 const { toISODate } = require('../utils/fechas');
-
 // ======================================================
 // LISTAR ÓRDENES DE VENTA (con filtros opcionales)
 // ======================================================
@@ -179,7 +178,8 @@ const registrarOrdenVenta = async (datos) => {
         descuento = 0,
         fecha_atencion = null,
         estado = 'PENDIENTE',
-        items = []
+        items = [],
+        operacionesImpuestos
     } = datos;
 
     if (!Array.isArray(items) || items.length === 0) {
@@ -505,13 +505,11 @@ const emitirComprobante = async (datos) => {
         tipo_comprobante,
         serie,
         fecha_emision,
-        subtotal,
-        igv,
         descuento = 0,
-        total,
         estado = 'EMITIDO',
         observacion = null,
-        items = []
+        items = [],
+        operacionesImpuestos
     } = datos;
 
     // Validar XOR: exactamente uno de orden_trabajo u orden_venta
@@ -529,6 +527,23 @@ const emitirComprobante = async (datos) => {
 
     try {
         await conn.beginTransaction();
+
+        const [sucursalRows] = await conn.query(
+            'SELECT igv FROM SUCURSALES WHERE id_sucursal = ? LIMIT 1',
+            [id_sucursal]
+        );
+        if (sucursalRows.length === 0) {
+            throw new Error('La sucursal del comprobante no existe');
+        }
+
+        const importeConceptos = operacionesImpuestos.sumarImportesIncluidos(items);
+        const descuentoAplicado = operacionesImpuestos.redondearMonto(descuento);
+        if (descuentoAplicado < 0 || descuentoAplicado > importeConceptos) {
+            throw new Error('El descuento del comprobante no es válido');
+        }
+
+        const montoFinal = operacionesImpuestos.redondearMonto(importeConceptos - descuentoAplicado);
+        const totales = operacionesImpuestos.calcularDesgloseIgvIncluido(montoFinal, Number(sucursalRows[0].igv));
 
         // Calcular siguiente número dentro de la transacción
         const [numRows] = await conn.query(
@@ -551,7 +566,7 @@ const emitirComprobante = async (datos) => {
         const [resCab] = await conn.query(sqlCab, [
             id_persona, id_sucursal, id_orden_trabajo, id_orden_venta,
             tipo_comprobante, numero, serie, toISODate(fecha_emision),
-            subtotal, igv, descuento, total, estado, observacion
+            totales.subtotal, totales.igv, descuentoAplicado, totales.total, estado, observacion
         ]);
         const idComprobante = resCab.insertId;
 
@@ -572,7 +587,7 @@ const emitirComprobante = async (datos) => {
         );
 
         await conn.commit();
-        return { id_comprobante: idComprobante, numero, serie };
+        return { id_comprobante: idComprobante, numero, serie, totales };
     } catch (error) {
         await conn.rollback();
         throw error;

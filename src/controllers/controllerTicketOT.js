@@ -1,5 +1,4 @@
 const modelTicketOT = require('../models/modelTicketOT');
-const serviceTicketPDF = require('../services/serviceTicketPDF');
 
 // Valida que el parámetro de ruta sea un identificador entero positivo.
 const leerIdPositivo = (valor) => {
@@ -17,6 +16,7 @@ const responderErrorTicket = (res, error, mensajeGenerico) => {
         ORDEN_SIN_DETALLES: { status: 409, mensaje: 'La orden no tiene detalles para incluir en el ticket' },
         TICKET_SIN_ITEMS_TIPO: { status: 409, mensaje: 'La orden no tiene conceptos de ese tipo para incluir en el ticket' },
         TIPO_TICKET_INVALIDO: { status: 400, mensaje: 'El tipo de ticket solicitado no es válido' },
+        FORMATO_TICKET_INVALIDO: { status: 400, mensaje: 'El formato de ticket solicitado no es válido' },
         NUMERACION_TICKET_OCUPADA: { status: 503, mensaje: 'No se pudo asignar el número del ticket; vuelva a intentarlo' },
         TICKET_NO_ENCONTRADO: { status: 404, mensaje: 'Ticket no encontrado' }
     };
@@ -41,7 +41,11 @@ const emitirTicketOT = async (req, res) => {
     }
 
     try {
-        const ticket = await modelTicketOT.crearTicketDesdeOrden(idOrdenTrabajo);
+        const ticket = await modelTicketOT.crearTicketDesdeOrden(
+            idOrdenTrabajo,
+            req.usuario && req.usuario.id_usuario,
+            req.operacionesImpuestos
+        );
         return res.json({
             ok: true,
             mensaje: 'Ticket de orden de trabajo disponible',
@@ -99,34 +103,35 @@ const buscarTicketOTPorId = async (req, res) => {
     }
 };
 
-// Genera y envía el PDF de un ticket ya registrado.
+// Envía el PDF que preparó el middleware de descarga.
 const descargarTicketPDFOT = async (req, res) => {
-    const idTicket = leerIdPositivo(req.params.idTicket);
-    if (!idTicket) {
-        return res.status(400).json({
+    const archivo = res.locals.archivoTicketPDF;
+    if (!archivo) {
+        return res.status(500).json({
             ok: false,
-            mensaje: 'El identificador del ticket no es válido'
+            mensaje: 'No se pudo preparar el PDF del ticket'
         });
     }
 
-    try {
-        const tipo = String(req.query.tipo || 'general').toLowerCase();
-        const archivo = await serviceTicketPDF.generarPDFTicketOT(idTicket, tipo);
-        const nombreArchivo = String(archivo.nombreArchivo || 'ticket-ot.pdf')
-            .replace(/[^a-zA-Z0-9._-]/g, '_');
+    const nombreArchivo = String(archivo.nombreArchivo || 'ticket-ot.pdf')
+        .replace(/[^a-zA-Z0-9._-]/g, '_');
 
-        return res
-            .status(200)
-            .type('application/pdf')
-            .attachment(nombreArchivo)
-            .send(archivo.contenidoPDF);
-    } catch (error) {
-        return responderErrorTicket(res, error, 'Error al generar el PDF del ticket');
-    }
+    return res
+        .status(200)
+        .type('application/pdf')
+        .attachment(nombreArchivo)
+        .send(archivo.contenidoPDF);
 };
+
+// Conserva el formato de respuesta del controlador ante errores del middleware PDF.
+const manejarErrorTicketPDF = (error, req, res, next) => {
+    return responderErrorTicket(res, error, 'Error al generar el PDF del ticket');
+};
+
 module.exports = {
     emitirTicketOT,
     buscarTicketOTPorOrden,
     buscarTicketOTPorId,
-    descargarTicketPDFOT
+    descargarTicketPDFOT,
+    manejarErrorTicketPDF
 };

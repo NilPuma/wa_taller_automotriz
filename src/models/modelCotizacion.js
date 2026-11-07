@@ -1,6 +1,5 @@
 const poolDB = require('../config_db/config_mysql');
 const { toISODate } = require('../utils/fechas');
-
 // ======================================================
 // LISTAR COTIZACIONES (con filtros opcionales)
 // ======================================================
@@ -15,6 +14,9 @@ const listarCotizaciones = async (filtros = {}) => {
             c.id_vehiculo,
             c.observacion,
             c.monto_cotizacion,
+            c.subtotal,
+            c.igv,
+            c.tasa_igv,
             c.estado,
             c.validez,
             c.fecha_cotizacion,
@@ -89,6 +91,9 @@ const buscarCotizacionPorId = async (idCotizacion) => {
             c.id_vehiculo,
             c.observacion,
             c.monto_cotizacion,
+            c.subtotal,
+            c.igv,
+            c.tasa_igv,
             c.estado,
             c.validez,
             c.fecha_cotizacion,
@@ -140,6 +145,9 @@ const buscarCotizacionConDetalle = async (idCotizacion) => {
             c.id_vehiculo,
             c.observacion,
             c.monto_cotizacion,
+            c.subtotal,
+            c.igv,
+            c.tasa_igv,
             c.estado,
             c.validez,
             c.fecha_cotizacion,
@@ -220,7 +228,8 @@ const registrarCotizacion = async (datos) => {
         estado = 'PENDIENTE',
         validez = null,
         fecha_cotizacion,
-        items = []
+        items = [],
+        operacionesImpuestos
     } = datos;
 
     if (!Array.isArray(items) || items.length === 0) {
@@ -232,17 +241,24 @@ const registrarCotizacion = async (datos) => {
     try {
         await conn.beginTransaction();
 
-        // Calcular monto total (subtotal sin IGV, como en el mock)
-        const montoCotizacion = items.reduce(
-            (acc, it) => acc + (Number(it.subtotal) || 0),
-            0
+        const [sucursalRows] = await conn.query(
+            'SELECT igv FROM SUCURSALES WHERE id_sucursal = ? LIMIT 1',
+            [id_sucursal]
         );
+
+        if (sucursalRows.length === 0) {
+            throw new Error('La sucursal de la cotización no existe');
+        }
+
+        const tasaIgv = Number(sucursalRows[0].igv);
+        const montoConIgv = operacionesImpuestos.sumarImportesIncluidos(items);
+        const totales = operacionesImpuestos.calcularDesgloseIgvIncluido(montoConIgv, tasaIgv);
 
         const sqlCab = `
             INSERT INTO COTIZACIONES
             (id_persona, id_sucursal, id_vehiculo, observacion,
-             monto_cotizacion, estado, validez, fecha_cotizacion)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             monto_cotizacion, subtotal, igv, tasa_igv, estado, validez, fecha_cotizacion)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const [resCab] = await conn.query(sqlCab, [
@@ -250,7 +266,10 @@ const registrarCotizacion = async (datos) => {
             id_sucursal,
             id_vehiculo,
             observacion,
-            montoCotizacion,
+            totales.total,
+            totales.subtotal,
+            totales.igv,
+            totales.tasa_igv,
             estado,
             validez,
             toISODate(fecha_cotizacion)
@@ -278,7 +297,13 @@ const registrarCotizacion = async (datos) => {
 
         await conn.commit();
 
-        return { id_cotizacion: idCotizacion, monto_cotizacion: montoCotizacion };
+        return {
+            id_cotizacion: idCotizacion,
+            monto_cotizacion: totales.total,
+            subtotal: totales.subtotal,
+            igv: totales.igv,
+            tasa_igv: totales.tasa_igv
+        };
     } catch (error) {
         await conn.rollback();
         throw error;
@@ -318,7 +343,7 @@ const actualizarCotizacion = async (idCotizacion, datos) => {
 // ======================================================
 // REEMPLAZAR DETALLES (transacción: borra + inserta + recalcula monto)
 // ======================================================
-const reemplazarDetallesCotizacion = async (idCotizacion, items) => {
+const reemplazarDetallesCotizacion = async (idCotizacion, items, operacionesImpuestos) => {
     if (!Array.isArray(items) || items.length === 0) {
         throw new Error('La cotización debe tener al menos un item');
     }
@@ -333,10 +358,18 @@ const reemplazarDetallesCotizacion = async (idCotizacion, items) => {
             [idCotizacion]
         );
 
-        const montoCotizacion = items.reduce(
-            (acc, it) => acc + (Number(it.subtotal) || 0),
-            0
+        const [cotizacionRows] = await conn.query(
+            'SELECT tasa_igv FROM COTIZACIONES WHERE id_cotizacion = ? FOR UPDATE',
+            [idCotizacion]
         );
+
+        if (cotizacionRows.length === 0) {
+            throw new Error('Cotización no encontrada');
+        }
+
+        const tasaIgv = Number(cotizacionRows[0].tasa_igv);
+        const montoConIgv = operacionesImpuestos.sumarImportesIncluidos(items);
+        const totales = operacionesImpuestos.calcularDesgloseIgvIncluido(montoConIgv, tasaIgv);
 
         const values = items.map(it => [
             idCotizacion,
@@ -359,13 +392,22 @@ const reemplazarDetallesCotizacion = async (idCotizacion, items) => {
         await conn.query(
             `UPDATE COTIZACIONES SET
                 monto_cotizacion   = ?,
+                subtotal           = ?,
+                igv                = ?,
+                tasa_igv           = ?,
                 fecha_modificacion = CURDATE()
              WHERE id_cotizacion = ?`,
-            [montoCotizacion, idCotizacion]
+            [totales.total, totales.subtotal, totales.igv, totales.tasa_igv, idCotizacion]
         );
 
         await conn.commit();
-        return { id_cotizacion: idCotizacion, monto_cotizacion: montoCotizacion };
+        return {
+            id_cotizacion: idCotizacion,
+            monto_cotizacion: totales.total,
+            subtotal: totales.subtotal,
+            igv: totales.igv,
+            tasa_igv: totales.tasa_igv
+        };
     } catch (error) {
         await conn.rollback();
         throw error;

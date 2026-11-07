@@ -41,7 +41,6 @@ let listadoGeneralMecanicos      = [];
 let listadoGeneralInformes       = [];
 let listadoGeneralSucursales     = [];
 let listadoCitasSinOrden         = [];
-let listadoCotizacionesAprobadas = [];
 
 // Contexto
 let perfilActual   = null;
@@ -66,8 +65,11 @@ let ticketPDFActualURL           = null;
 let ticketPDFActualNombre        = 'ticket-ot.pdf';
 let ticketPDFActualComprobante   = null;
 let ticketPDFActualTipo          = 'general';
+let ticketPDFActualFormato       = '80mm';
 let ticketPDFCargando            = false;
 let detallesTicketHistorial      = [];
+let tipoComprobanteVisualActual = 'BOLETA';
+let ordenHistorialActual = null;
 let tipoTicketHistorialActual    = 'general';
 
 // Búsqueda local de servicios / productos
@@ -110,7 +112,6 @@ let _enviandoVehiculo   = false;
 let _enviandoCliente    = false;
 let _enviandoCita       = false;
 let _enviandoCotizacion = false;
-let _enviandoOrden      = false;
 let _enviandoConsumo    = false;
 let _enviandoEvidencias = false;
 
@@ -379,19 +380,6 @@ async function cargarCotizaciones() {
     }
 }
 
-// Carga cotizaciones aprobadas que se pueden asociar a una orden.
-async function cargarCotizacionesAprobadas() {
-    try {
-        const response = await axios.get("/api/listarCotizaciones", {
-            params: { estado: 'APROBADA' }
-        });
-        listadoCotizacionesAprobadas = [...(response.data.cotizaciones || [])];
-    } catch (error) {
-        console.error(error);
-        listadoCotizacionesAprobadas = [];
-    }
-}
-
 // Carga las citas disponibles para el módulo.
 async function cargarCitas() {
     try {
@@ -569,6 +557,49 @@ function setTexto(selector, valor) {
     if (el) el.textContent = valor;
 }
 
+// Redondea un importe a dos decimales para mantener los cálculos monetarios consistentes.
+function redondearImporte(valor) {
+    return Math.round((Number(valor || 0) + Number.EPSILON) * 100) / 100;
+}
+
+// Obtiene la tasa guardada en el registro o la tasa de la sucursal activa.
+function obtenerTasaIgv(registro = null) {
+    const valorTasaRegistro = registro && (registro.tasa_igv ?? registro.sucursal_igv);
+    if (valorTasaRegistro !== undefined && valorTasaRegistro !== null && valorTasaRegistro !== '') {
+        const tasaRegistro = Number(valorTasaRegistro);
+        if (Number.isFinite(tasaRegistro) && tasaRegistro >= 0) return tasaRegistro;
+    }
+
+    const tasaSucursal = Number(sucursalActual && sucursalActual.igv);
+    return Number.isFinite(tasaSucursal) && tasaSucursal >= 0 ? tasaSucursal : 18;
+}
+
+// Separa la base y el IGV cuando el importe recibido ya incluye el impuesto.
+function desglosarIgvIncluido(total, tasa) {
+    const importeTotal = redondearImporte(total);
+    const tasaIgv = Number(tasa) || 0;
+    const subtotal = tasaIgv > 0
+        ? redondearImporte(importeTotal / (1 + tasaIgv / 100))
+        : importeTotal;
+
+    return {
+        subtotal,
+        igv: redondearImporte(importeTotal - subtotal),
+        total: importeTotal,
+        tasa_igv: tasaIgv
+    };
+}
+
+// Suma los importes de los conceptos, que ya incluyen el IGV.
+function sumarImportesItems(items) {
+    return redondearImporte((items || []).reduce((total, item) => {
+        const cantidad = Number(item.cantidad || 0);
+        const precio = Number(item.precio_unitario || 0);
+        const importe = item.subtotal == null ? precio * cantidad : Number(item.subtotal);
+        return total + (Number.isFinite(importe) ? importe : 0);
+    }, 0));
+}
+
 // ============================================================
 // HELPERS MODALES
 // ============================================================
@@ -584,6 +615,57 @@ function cerrarModal(selector) {
     const el = document.querySelector(selector);
     if (!el) return;
     bootstrap.Modal.getOrCreateInstance(el).hide();
+}
+
+// Solicita confirmación mediante el modal compartido de la vista.
+var resolverConfirmacionModal = null;
+
+function confirmarAccionModal(opciones) {
+    const modal = document.getElementById('modalConfirmarAccion');
+    const titulo = document.getElementById('modalConfirmarAccionLabel');
+    const mensaje = document.getElementById('confirmarAccionMensaje');
+    const icono = document.getElementById('confirmarAccionIcono');
+    const botonConfirmar = document.getElementById('btnConfirmarAccion');
+
+    if (!modal || !titulo || !mensaje || !icono || !botonConfirmar) {
+        return Promise.resolve(false);
+    }
+
+    if (!modal.dataset.confirmacionPreparada) {
+        botonConfirmar.addEventListener('click', function () {
+            if (resolverConfirmacionModal) {
+                const resolver = resolverConfirmacionModal;
+                resolverConfirmacionModal = null;
+                resolver(true);
+            }
+            bootstrap.Modal.getOrCreateInstance(modal).hide();
+        });
+
+        modal.addEventListener('hidden.bs.modal', function () {
+            if (resolverConfirmacionModal) {
+                const resolver = resolverConfirmacionModal;
+                resolverConfirmacionModal = null;
+                resolver(false);
+            }
+        });
+
+        modal.dataset.confirmacionPreparada = 'true';
+    }
+
+    titulo.textContent = opciones.titulo || 'Confirmar acción';
+    mensaje.textContent = opciones.mensaje || '¿Desea continuar?';
+    botonConfirmar.textContent = opciones.textoConfirmar || 'Confirmar';
+    botonConfirmar.classList.toggle('btn-accion-peligro', opciones.peligro === true);
+    botonConfirmar.classList.toggle('btn-primario', opciones.peligro !== true);
+    icono.classList.toggle('text-danger', opciones.peligro === true);
+    icono.classList.toggle('text-primary', opciones.peligro !== true);
+    icono.classList.toggle('bi-exclamation-triangle', opciones.peligro === true);
+    icono.classList.toggle('bi-question-circle', opciones.peligro !== true);
+
+    return new Promise(function (resolve) {
+        resolverConfirmacionModal = resolve;
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    });
 }
 
 // ============================================================
@@ -821,8 +903,6 @@ function listarClientes(filtrados) {
         clone.querySelector('.correo-cliente').textContent = persona.correo;
 
         clone.querySelector('.btn-ver-cliente').dataset.id = persona.id_persona;
-        clone.querySelector('.btn-agregar-vehiculo-cliente').dataset.id = persona.id_persona;
-
         contenedorTablaClientes.appendChild(clone);
     });
 
@@ -1092,6 +1172,13 @@ document.addEventListener('change', function (event) {
     actualizarCamposTipoDocumentoCliente();
 });
 
+// Genera el correo automáticamente al ingresar el documento.
+document.addEventListener('input', function (event) {
+    const input = event.target.closest('#inputDocumentoCliente');
+    if (!input) return;
+    actualizarCorreoGeneradoCliente();
+});
+
 // Maneja el evento click del control #btnGuardarCliente.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('#btnGuardarCliente');
@@ -1109,20 +1196,25 @@ document.addEventListener('click', async function (event) {
     const apellidos = esRuc
         ? null
         : document.querySelector('#inputApellidosCliente').value.trim();
-    const correo = document.querySelector('#inputCorreoCliente').value.trim();
+    const correo = generarCorreoCliente(documento);
+    const password = 'innova123';
     const telefono = document.querySelector('#inputTelefonoCliente').value.trim();
     const direccion = document.querySelector('#inputDireccionCliente').value.trim();
     const chkVehiculo = document.querySelector('#chkVehiculoTambien').checked;
     if (_enviandoCliente) return;
 
-    if (!documento || !nombres || (!esRuc && !apellidos) || !correo || !telefono) {
-        const persona = esRuc ? 'razón social' : 'nombres, apellidos';
+    if (!documento || !nombres || (!esRuc && !apellidos) || !telefono) {
+        const persona = esRuc ? 'razón social' : 'nombres y apellidos';
         mostrarToast('advertencia', 'Campos Vacíos',
-            'Documento, ' + persona + ', correo y teléfono son obligatorios');
+            'Documento, ' + persona + ' y teléfono son obligatorios');
         return;
     }
 
-    const documentoValido = esRuc ? /^\d{11}$/.test(documento) : /^\d{8}$/.test(documento);
+    const documentoValido = tipoDocumento === 'DNI'
+        ? /^\d{8}$/.test(documento)
+        : tipoDocumento === 'RUC'
+            ? /^\d{11}$/.test(documento)
+            : true;
     if (!documentoValido) {
         mostrarToast('advertencia', 'Documento inválido',
             esRuc ? 'El RUC debe contener exactamente 11 dígitos.' : 'El DNI debe contener exactamente 8 dígitos.');
@@ -1145,7 +1237,8 @@ document.addEventListener('click', async function (event) {
             apellidos,
             correo,
             direccion,
-            telefono
+            telefono,
+            password
         });
 
         if (!res.data.ok) {
@@ -1227,18 +1320,6 @@ document.addEventListener('click', function (event) {
     abrirModalCrearVehiculo(persona);
 });
 
-// Maneja el evento click del control .btn-agregar-vehiculo-cliente.
-document.addEventListener('click', function (event) {
-    const boton = event.target.closest('.btn-agregar-vehiculo-cliente');
-    if (!boton) return;
-
-    const idPersona = boton.dataset.id;
-    const persona = listadoGeneralPersonas.find(p => p.id_persona == idPersona);
-    if (!persona) return;
-
-    abrirModalCrearVehiculo(persona);
-});
-
 // Maneja el evento click del control .btn-editar-vehiculo.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-editar-vehiculo');
@@ -1299,7 +1380,12 @@ document.addEventListener('click', async function (event) {
     const idVehiculo = boton.dataset.id;
     if (!idVehiculo) return;
 
-    const confirmar = confirm('¿Está seguro de eliminar este vehículo?');
+    const confirmar = await confirmarAccionModal({
+        titulo: 'Eliminar vehículo',
+        mensaje: '¿Está seguro de eliminar este vehículo?',
+        textoConfirmar: 'Eliminar',
+        peligro: true
+    });
     if (!confirmar) return;
 
     try {
@@ -1344,12 +1430,42 @@ document.addEventListener('keypress', function (event) {
 // ============================================================
 // HELPERS: NUEVO CLIENTE
 // ============================================================
-// Sincroniza los campos visibles y obligatorios con el tipo de documento elegido.
-function actualizarCamposTipoDocumentoCliente() {
-    const tipoDocumento = document.querySelector('#selectTipoDocumentoCliente');
-    if (!tipoDocumento) return;
+// Configuración de los tipos de documento aceptados.
+const CONFIGURACION_TIPOS_DOCUMENTO = {
+    DNI: { etiqueta: 'DNI (8 dígitos)', maxLength: 8, inputMode: 'numeric', pattern: '[0-9]*' },
+    RUC: { etiqueta: 'RUC (11 dígitos)', maxLength: 11, inputMode: 'numeric', pattern: '[0-9]*' },
+    CE: { etiqueta: 'Carnet de extranjería', inputMode: 'text' },
+    PASAPORTE: { etiqueta: 'Pasaporte', inputMode: 'text' },
+    OTRO: { etiqueta: 'Otro documento', inputMode: 'text' }
+};
 
-    const esRuc = tipoDocumento.value === 'RUC';
+// Genera el correo con el documento, siguiendo el flujo del administrador.
+function generarCorreoCliente(documento) {
+    const usuarioCorreo = String(documento || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9.-]/g, '')
+        .replace(/^[.-]+|[.-]+$/g, '');
+
+    return usuarioCorreo ? usuarioCorreo + '@innova.com' : '';
+}
+
+// Mantiene visible el correo que se enviará junto con el registro.
+function actualizarCorreoGeneradoCliente() {
+    const documento = document.querySelector('#inputDocumentoCliente');
+    const correo = document.querySelector('#inputCorreoCliente');
+    if (!documento || !correo) return;
+
+    correo.value = generarCorreoCliente(documento.value);
+}
+// Sincroniza los campos del formulario con el tipo de documento elegido.
+function actualizarCamposTipoDocumentoCliente() {
+    const selector = document.querySelector('#selectTipoDocumentoCliente');
+    if (!selector) return;
+
+    const tipoDocumento = selector.value;
+    const esRuc = tipoDocumento === 'RUC';
+    const configuracion = CONFIGURACION_TIPOS_DOCUMENTO[tipoDocumento] || CONFIGURACION_TIPOS_DOCUMENTO.OTRO;
     const camposNatural = document.querySelector('#camposClienteNatural');
     const camposJuridica = document.querySelector('#camposClienteJuridica');
     const documento = document.querySelector('#inputDocumentoCliente');
@@ -1360,14 +1476,27 @@ function actualizarCamposTipoDocumentoCliente() {
 
     if (camposNatural) camposNatural.classList.toggle('d-none', esRuc);
     if (camposJuridica) camposJuridica.classList.toggle('d-none', !esRuc);
-    if (documento) documento.maxLength = esRuc ? 11 : 8;
+    if (documento) {
+        if (configuracion.maxLength) {
+            documento.maxLength = configuracion.maxLength;
+        } else {
+            documento.removeAttribute('maxlength');
+        }
+        documento.inputMode = configuracion.inputMode;
+        if (configuracion.pattern) {
+            documento.setAttribute('pattern', configuracion.pattern);
+        } else {
+            documento.removeAttribute('pattern');
+        }
+    }
     if (labelDocumento) {
-        labelDocumento.innerHTML = '<i class="bi bi-card-text"></i> ' +
-            (esRuc ? 'RUC (11 dígitos)' : 'DNI (8 dígitos)');
+        labelDocumento.innerHTML = '<i class="bi bi-card-text"></i> ' + configuracion.etiqueta;
     }
     if (nombres) nombres.required = !esRuc;
     if (apellidos) apellidos.required = !esRuc;
     if (razonSocial) razonSocial.required = esRuc;
+
+    actualizarCorreoGeneradoCliente();
 }
 
 // Restablece los campos del formulario de cliente y vehículo.
@@ -1378,7 +1507,6 @@ function limpiarModalNuevoCliente() {
     document.querySelector('#inputApellidosCliente').value = '';
     document.querySelector('#inputRazonSocialCliente').value = '';
     actualizarCamposTipoDocumentoCliente();
-    document.querySelector('#inputCorreoCliente').value = '';
     document.querySelector('#inputTelefonoCliente').value = '';
     document.querySelector('#inputDireccionCliente').value = '';
 
@@ -1861,7 +1989,11 @@ document.addEventListener('click', async function (event) {
         }
     }
 
-    const confirmar = confirm('¿Desea confirmar (tomar) esta cita?');
+    const confirmar = await confirmarAccionModal({
+        titulo: 'Confirmar cita',
+        mensaje: '¿Desea confirmar (tomar) esta cita?',
+        textoConfirmar: 'Confirmar cita'
+    });
     if (!confirmar) return;
 
     try {
@@ -1897,7 +2029,12 @@ document.addEventListener('click', async function (event) {
         return;
     }
 
-    const confirmar = confirm('¿Está seguro de cancelar esta cita?');
+    const confirmar = await confirmarAccionModal({
+        titulo: 'Cancelar cita',
+        mensaje: '¿Está seguro de cancelar esta cita?',
+        textoConfirmar: 'Cancelar cita',
+        peligro: true
+    });
     if (!confirmar) return;
 
     try {
@@ -1939,7 +2076,12 @@ document.addEventListener('click', async function (event) {
         return;
     }
 
-    const confirmar = confirm('¿Está seguro de eliminar esta cita?');
+    const confirmar = await confirmarAccionModal({
+        titulo: 'Eliminar cita',
+        mensaje: '¿Está seguro de eliminar esta cita?',
+        textoConfirmar: 'Eliminar',
+        peligro: true
+    });
     if (!confirmar) return;
 
     try {
@@ -2240,7 +2382,10 @@ function poblarListaServiciosDisponibles() {
 
         clone.querySelector('.nombre-servicio').textContent = serv.nombre;
         clone.querySelector('.precio-servicio').textContent = 'S/ ' + precio.toFixed(2);
-        clone.querySelector('.btn-agregar-servicio-lista').dataset.id = serv.id_servicio;
+        const botonAgregar = clone.querySelector('.btn-agregar-servicio-lista');
+        botonAgregar.dataset.id = serv.id_servicio;
+        botonAgregar.setAttribute('aria-label', 'Agregar servicio ' + serv.nombre);
+        botonAgregar.title = 'Agregar servicio ' + serv.nombre;
 
         contenedor.appendChild(clone);
     });
@@ -2286,7 +2431,10 @@ function poblarListaProductosDisponibles() {
 
         clone.querySelector('.nombre-producto').textContent = prod.nombre;
         clone.querySelector('.precio-producto').textContent = 'S/ ' + precio.toFixed(2);
-        clone.querySelector('.btn-agregar-producto-lista').dataset.id = prod.id_producto;
+        const botonAgregar = clone.querySelector('.btn-agregar-producto-lista');
+        botonAgregar.dataset.id = prod.id_producto;
+        botonAgregar.setAttribute('aria-label', 'Agregar producto ' + prod.nombre);
+        botonAgregar.title = 'Agregar producto ' + prod.nombre;
 
         contenedor.appendChild(clone);
     });
@@ -2533,10 +2681,6 @@ document.addEventListener('click', async function (event) {
             mostrarToast('advertencia', 'Falta fecha', 'Seleccione una fecha para la cotización.');
             return;
         }
-        if (fechaCotizacion < fechaISO(new Date())) {
-            mostrarToast('advertencia', 'Fecha inválida', 'La fecha de la cotización no puede ser anterior a hoy.');
-            return;
-        }
         if (!itemsCotizacion.length) {
             mostrarToast('advertencia', 'Sin conceptos', 'Agregue al menos un servicio o producto.');
             return;
@@ -2547,12 +2691,6 @@ document.addEventListener('click', async function (event) {
         );
         if (!itemsValidos) {
             mostrarToast('advertencia', 'Ítems inválidos', 'Revise cantidades y precios de los conceptos agregados.');
-            return;
-        }
-
-        const validez = document.querySelector('#selectValidezCotizacion').value;
-        if (!['7', '15', '30', '60'].includes(validez)) {
-            mostrarToast('advertencia', 'Vigencia inválida', 'Seleccione una vigencia disponible para la cotización.');
             return;
         }
 
@@ -2575,7 +2713,6 @@ document.addEventListener('click', async function (event) {
             id_sucursal: sucursalActual.id_sucursal,
             id_vehiculo: idVehiculo,
             observacion,
-            validez: Number(validez),
             fecha_cotizacion: fechaCotizacion,
             items: itemsCotizacion.map(item => ({
                 id_producto: item.id_producto,
@@ -2725,7 +2862,6 @@ document.addEventListener('click', async function (event) {
         document.querySelector('#inputPlacaCotizacion').value = cot.placa || '';
         document.querySelector('#inputFechaCotizacion').value =
             cot.fecha_cotizacion ? fechaISO(new Date(cot.fecha_cotizacion)) : fechaISO(new Date());
-        document.querySelector('#selectValidezCotizacion').value = String(cot.validez || 7);
         document.querySelector('#textareaObservacionesCotizacion').value = cot.observacion || '';
 
         itemsCotizacion = (cot.items || []).map(it => ({
@@ -2801,15 +2937,15 @@ function aplicarFiltroCotizacion(filtro) {
 
 // Recalcula subtotales, impuestos y total de la cotización.
 function recalcularTotalesCotizacion() {
-    const subtotal = itemsCotizacion.reduce((acc, it) => acc + Number(it.subtotal || 0), 0);
-    const igv = subtotal * 0.18;
-    const total = subtotal + igv;
+    const totalConceptos = sumarImportesItems(itemsCotizacion);
+    const totales = desglosarIgvIncluido(totalConceptos, obtenerTasaIgv(cotizacionActual));
 
-    setTexto('#contenedorSubtotalCotizacion', 'S/ ' + subtotal.toFixed(2));
-    setTexto('#contenedorResumenSubtotal', 'S/ ' + subtotal.toFixed(2));
-    setTexto('#contenedorResumenIGV', 'S/ ' + igv.toFixed(2));
-    setTexto('#contenedorTotalFinalCotizacion', 'S/ ' + total.toFixed(2));
-    setTexto('#pillTotalCotizacion', 'S/ ' + total.toFixed(2));
+    setTexto('#contenedorSubtotalCotizacion', 'S/ ' + totales.total.toFixed(2));
+    setTexto('#contenedorResumenSubtotal', 'S/ ' + totales.subtotal.toFixed(2));
+    setTexto('#contenedorResumenIGV', 'S/ ' + totales.igv.toFixed(2));
+    setTexto('#contenedorTotalFinalCotizacion', 'S/ ' + totales.total.toFixed(2));
+    setTexto('#pillTotalCotizacion', 'S/ ' + totales.total.toFixed(2));
+    setTexto('#etiquetaIGVCotizacion', 'IGV (' + totales.tasa_igv + '%):');
 }
 
 // Muestra el cliente y vehículo asociados a la cotización.
@@ -2874,10 +3010,6 @@ function limpiarFormularioCotizacion() {
 
     const fecha = document.querySelector('#inputFechaCotizacion');
     if (fecha) fecha.value = fechaISO(new Date());
-
-    const validez = document.querySelector('#selectValidezCotizacion');
-    if (validez) validez.value = '7';
-
     const obs = document.querySelector('#textareaObservacionesCotizacion');
     if (obs) obs.value = '';
 
@@ -3306,6 +3438,8 @@ function poblarListaServiciosOT() {
 
         const boton = clone.querySelector('.btn-agregar-servicio-lista');
         boton.dataset.id = serv.id_servicio;
+        boton.setAttribute('aria-label', 'Agregar servicio ' + serv.nombre);
+        boton.title = 'Agregar servicio ' + serv.nombre;
         boton.classList.remove('btn-agregar-servicio-lista');
         boton.classList.add('btn-agregar-servicio-ot');
 
@@ -3356,6 +3490,8 @@ function poblarListaProductosOT() {
 
         const boton = clone.querySelector('.btn-agregar-producto-lista');
         boton.dataset.id = prod.id_producto;
+        boton.setAttribute('aria-label', 'Agregar producto ' + prod.nombre);
+        boton.title = 'Agregar producto ' + prod.nombre;
         boton.classList.remove('btn-agregar-producto-lista');
         boton.classList.add('btn-agregar-producto-ot');
 
@@ -3429,12 +3565,12 @@ function listarItemsOT() {
 
 // Recalcula los importes del consumo de la orden actual.
 function recalcularTotalesOT() {
-    const subtotal = itemsOT.reduce((acc, it) => acc + Number(it.subtotal || 0), 0);
-    const igv = subtotal * 0.18;
-    const total = subtotal + igv;
-    setTexto('#resumenSubtotalOT', 'S/ ' + subtotal.toFixed(2));
-    setTexto('#resumenIGVOT', 'S/ ' + igv.toFixed(2));
-    setTexto('#resumenTotalConsumo', 'S/ ' + total.toFixed(2));
+    const totalConceptos = sumarImportesItems(itemsOT);
+    const totales = desglosarIgvIncluido(totalConceptos, obtenerTasaIgv(ordenActual));
+    setTexto('#resumenSubtotalOT', 'S/ ' + totales.subtotal.toFixed(2));
+    setTexto('#resumenIGVOT', 'S/ ' + totales.igv.toFixed(2));
+    setTexto('#resumenTotalConsumo', 'S/ ' + totales.total.toFixed(2));
+    setTexto('#etiquetaIGVOT', 'IGV (' + totales.tasa_igv + '%):');
 }
 
 // ============================================================
@@ -3607,101 +3743,6 @@ function pintarEvidenciasOT() {
     if (ordenActual) aplicarReglasEstadoOrden(ordenActual);
 }
 
-// Prepara y muestra el formulario para crear una orden.
-async function abrirModalNuevaOrden() {
-    limpiarModalNuevaOrden();
-    await poblarSelectCitasOrden();
-    await poblarSelectCotizacionesOrden();
-    abrirModal('#modalNuevaOrden');
-}
-
-// Carga citas que se pueden asociar a una orden nueva.
-async function poblarSelectCitasOrden() {
-    const select = document.querySelector('#selectCitaOrden');
-    if (!select) return;
-
-    select.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
-    await cargarCitas();
-
-    const idCotizacion = document.querySelector('#selectCotizacionOrden')?.value;
-    const cot = listadoGeneralCotizaciones.find(item => Number(item.id_cotizacion) === Number(idCotizacion));
-    const disponibles = listadoGeneralCitas.filter(cita =>
-        Number(cita.id_sucursal) === Number(sucursalActual.id_sucursal) &&
-        ['PENDIENTE', 'CONFIRMADA', 'ATENDIDA'].includes(String(cita.estado || '').toUpperCase()) &&
-        Number(cita.tiene_ot) !== 1 && !citaTieneOrden(cita.id_cita) &&
-        (!cot || (Number(cita.id_vehiculo) === Number(cot.id_vehiculo) && Number(cita.id_persona) === Number(cot.id_persona) && Number(cita.id_sucursal) === Number(cot.id_sucursal)))
-    );
-
-    const templateOption = document.querySelector('#templateOptionCita').content;
-    disponibles.forEach(cita => {
-        const clone = templateOption.cloneNode(true);
-        const option = clone.querySelector('option');
-        option.value = cita.id_cita;
-        option.textContent = '#' + cita.id_cita + ' · ' + (cita.fecha_cita ? formatearFecha(cita.fecha_cita) : '—') + ' ' + (cita.hora_cita || '') + ' · ' + (cita.placa || '') + ' · ' + (cita.cliente_nombres || '') + ' ' + (cita.cliente_apellidos || '');
-        select.appendChild(clone);
-    });
-}
-
-// Carga cotizaciones que se pueden asociar a una orden nueva.
-async function poblarSelectCotizacionesOrden() {
-    const select = document.querySelector('#selectCotizacionOrden');
-    if (!select) return;
-
-    const opciones = select.querySelectorAll('option:not(:first-child)');
-    opciones.forEach(o => o.remove());
-
-    await cargarCotizacionesAprobadas();
-
-    const idCita = document.querySelector('#selectCitaOrden')?.value;
-    const cita = listadoGeneralCitas.find(item => Number(item.id_cita) === Number(idCita));
-    const disponibles = listadoCotizacionesAprobadas.filter(cot => !cot.tiene_ot && Number(cot.id_sucursal) === Number(sucursalActual.id_sucursal) && (!cita ||
-        (Number(cot.id_vehiculo) === Number(cita.id_vehiculo) && Number(cot.id_persona) === Number(cita.id_persona) && Number(cot.id_sucursal) === Number(cita.id_sucursal))));
-
-    const templateOption = document.querySelector('#templateOptionCotizacion').content;
-
-    disponibles.forEach(cot => {
-        const clone = templateOption.cloneNode(true);
-        const option = clone.querySelector('option');
-        option.value = cot.id_cotizacion;
-        option.textContent =
-            `COT-${String(cot.id_cotizacion).padStart(4, '0')} · ${cot.placa || ''} · ${cot.cliente_nombres || ''} ${cot.cliente_apellidos || ''}`.trim();
-        select.appendChild(clone);
-    });
-}
-
-// Mantiene las opciones de cita y cotización compatibles al cambiar la selección.
-document.addEventListener('change', async function (event) {
-    if (event.target.closest('#selectCitaOrden')) {
-        const selectCot = document.querySelector('#selectCotizacionOrden');
-        const seleccion = selectCot ? selectCot.value : '';
-        await poblarSelectCotizacionesOrden();
-        if (selectCot && Array.from(selectCot.options).some(option => option.value === seleccion)) selectCot.value = seleccion;
-    } else if (event.target.closest('#selectCotizacionOrden')) {
-        const selectCita = document.querySelector('#selectCitaOrden');
-        const seleccion = selectCita ? selectCita.value : '';
-        await poblarSelectCitasOrden();
-        if (selectCita && Array.from(selectCita.options).some(option => option.value === seleccion)) selectCita.value = seleccion;
-    }
-});
-
-// Restablece los campos del formulario de orden.
-function limpiarModalNuevaOrden() {
-    const selectCita = document.querySelector('#selectCitaOrden');
-    if (selectCita) selectCita.value = '';
-
-    const selectCot = document.querySelector('#selectCotizacionOrden');
-    if (selectCot) selectCot.value = '';
-
-    const desc = document.querySelector('#textareaDescripcion');
-    if (desc) desc.value = '';
-
-    const wrapCita = document.querySelector('#wrapperSelectCita');
-    if (wrapCita) wrapCita.classList.remove('d-none');
-
-    const wrapCot = document.querySelector('#wrapperSelectCotizacion');
-    if (wrapCot) wrapCot.classList.remove('d-none');
-}
-
 // Maneja el evento click del control .filtro-orden.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.filtro-orden');
@@ -3729,6 +3770,8 @@ document.addEventListener('input', function (event) {
 function pintarOrigenesVehiculoOT(vehiculo) {
     const contenedor = document.querySelector('#listaOrigenesVehiculoOT');
     const mensajeVacio = document.querySelector('#mensajeSinOrigenVehiculoOT');
+    const avisoCotizacionPendiente = document.querySelector('#avisoCotizacionPendienteOT');
+    const textoCotizacionPendiente = document.querySelector('#textoCotizacionPendienteOT');
     const botonCrear = document.querySelector('#btnCrearOrdenDesdeVehiculo');
     const contenedorAccionCrear = document.querySelector('#contenedorAccionCrearOrdenDirecta');
     if (!contenedor) return;
@@ -3747,6 +3790,22 @@ function pintarOrigenesVehiculoOT(vehiculo) {
             String(cotizacion.estado || '').toUpperCase() === 'APROBADA' &&
             Number(cotizacion.tiene_ot) !== 1)
         .sort((a, b) => Number(b.id_cotizacion) - Number(a.id_cotizacion));
+    const cotizacionesPendientes = listadoGeneralCotizaciones
+        .filter(cotizacion => Number(cotizacion.id_vehiculo) === Number(vehiculo.id_vehiculo) &&
+            Number(cotizacion.id_sucursal) === sucursalId &&
+            String(cotizacion.estado || '').toUpperCase() === 'PENDIENTE' &&
+            Number(cotizacion.tiene_ot) !== 1)
+        .sort((a, b) => Number(b.id_cotizacion) - Number(a.id_cotizacion));
+
+    if (avisoCotizacionPendiente && textoCotizacionPendiente) {
+        const codigos = cotizacionesPendientes
+            .map(cotizacion => 'COT-' + String(cotizacion.id_cotizacion).padStart(4, '0'));
+        textoCotizacionPendiente.textContent = cotizacionesPendientes.length
+            ? 'Hay ' + (cotizacionesPendientes.length > 1 ? 'cotizaciones pendientes' : 'una cotización pendiente') +
+                ' (' + codigos.join(', ') + '). Debe aprobarse antes de incorporar sus servicios y productos a la OT.'
+            : '';
+        avisoCotizacionPendiente.classList.toggle('d-none', cotizacionesPendientes.length === 0);
+    }
 
     const agregarOpcion = (tipo, registro, seleccionada) => {
         const id = tipo === 'CITA' ? registro.id_cita : registro.id_cotizacion;
@@ -3828,6 +3887,7 @@ async function buscarVehiculoParaNuevaOrden() {
         const respuesta = await axios.get('/api/buscarVehiculoPorPlaca/' + encodeURIComponent(placa));
         const vehiculo = respuesta.data && respuesta.data.vehiculo;
         if (!respuesta.data.ok || !vehiculo) throw new Error('No se encontró un vehículo con esa placa.');
+        await Promise.all([cargarCitas(), cargarCotizaciones()]);
 
         if (ordenActual) {
             await flushAutoguardadoConsumo();
@@ -4031,15 +4091,19 @@ async function obtenerTicketOT(idOrden) {
 }
 
 // Carga el PDF dentro del modal para verlo y descargarlo desde la misma página.
-async function mostrarPDFTicketOT(idComprobante, tipo = 'general', mostrarFiltrosFinalizacion = false) {
+async function mostrarPDFTicketOT(idComprobante, tipo = 'general', mostrarFiltrosFinalizacion = false, formato = ticketPDFActualFormato) {
     const modal = document.querySelector('#modalTicketPDF');
     const visor = document.querySelector('#iframeTicketPDF');
     const botonDescargar = document.querySelector('#btnDescargarTicketPDF');
+    const selectorFormato = document.querySelector('#contenedorFormatoTicket');
     const filtrosFinalizacion = document.querySelector('#contenedorFiltrosTicketFinalizacion');
 
     if (!modal || !visor || !botonDescargar) throw new Error('No se encontró la ventana del ticket en la página.');
 
-    const respuesta = await axios.get('/api/descargarTicketPDFOT/' + idComprobante, { params: { tipo }, responseType: 'blob' });
+    const respuesta = await axios.get('/api/descargarTicketPDFOT/' + idComprobante, {
+        params: { tipo, formato },
+        responseType: 'blob'
+    });
     const archivo = new Blob([respuesta.data], { type: 'application/pdf' });
     const urlArchivo = URL.createObjectURL(archivo);
     const disposicion = respuesta.headers && respuesta.headers['content-disposition'];
@@ -4049,9 +4113,16 @@ async function mostrarPDFTicketOT(idComprobante, tipo = 'general', mostrarFiltro
     ticketPDFActualURL = urlArchivo;
     ticketPDFActualComprobante = idComprobante;
     ticketPDFActualTipo = tipo;
-    ticketPDFActualNombre = coincidencia ? coincidencia[1] : 'ticket-ot-' + idComprobante + '-' + tipo + '.pdf';
+    ticketPDFActualFormato = formato;
+    ticketPDFActualNombre = coincidencia ? coincidencia[1] : 'ticket-ot-' + idComprobante + '-' + tipo + '-' + formato + '.pdf';
     visor.src = urlArchivo;
     botonDescargar.disabled = false;
+    if (selectorFormato) selectorFormato.classList.remove('d-none');
+    document.querySelectorAll('.filtro-formato-ticket').forEach(boton => {
+        const seleccionado = boton.dataset.formato === formato;
+        boton.classList.toggle('active', seleccionado);
+        boton.setAttribute('aria-pressed', String(seleccionado));
+    });
     if (filtrosFinalizacion) filtrosFinalizacion.classList.toggle('d-none', !mostrarFiltrosFinalizacion);
     if (mostrarFiltrosFinalizacion) {
         document.querySelectorAll('.filtro-ticket-finalizacion').forEach(boton => {
@@ -4060,6 +4131,31 @@ async function mostrarPDFTicketOT(idComprobante, tipo = 'general', mostrarFiltro
     }
     bootstrap.Modal.getOrCreateInstance(modal).show();
 }
+
+// Cambia el tamaño de página manteniendo el contenido seleccionado del ticket.
+document.addEventListener('click', async function (event) {
+    const boton = event.target.closest('.filtro-formato-ticket');
+    if (!boton || !ticketPDFActualComprobante || ticketPDFCargando) return;
+
+    const formato = boton.dataset.formato || '80mm';
+    if (formato === ticketPDFActualFormato) return;
+
+    const filtrosFinalizacion = document.querySelector('#contenedorFiltrosTicketFinalizacion');
+    const mostrarFiltrosFinalizacion = Boolean(filtrosFinalizacion && !filtrosFinalizacion.classList.contains('d-none'));
+    ticketPDFCargando = true;
+    document.querySelectorAll('.filtro-formato-ticket').forEach(item => { item.disabled = true; });
+
+    try {
+        await mostrarPDFTicketOT(ticketPDFActualComprobante, ticketPDFActualTipo, mostrarFiltrosFinalizacion, formato);
+    } catch (error) {
+        console.error(error);
+        const mensaje = error.response && error.response.data && error.response.data.mensaje;
+        mostrarToast('error', 'No se pudo cambiar el formato', mensaje || error.message || 'Inténtalo nuevamente.');
+    } finally {
+        ticketPDFCargando = false;
+        document.querySelectorAll('.filtro-formato-ticket').forEach(item => { item.disabled = false; });
+    }
+});
 
 // Habilita solo los formatos que tienen conceptos en la orden recién finalizada.
 function prepararFiltrosTicketFinalizacion(ticket) {
@@ -4108,10 +4204,19 @@ function limpiarTicketPDFActual() {
     if (visor) visor.src = 'about:blank';
     if (botonDescargar) botonDescargar.disabled = true;
     const filtrosFinalizacion = document.querySelector('#contenedorFiltrosTicketFinalizacion');
+    const selectorFormato = document.querySelector('#contenedorFormatoTicket');
     if (filtrosFinalizacion) filtrosFinalizacion.classList.add('d-none');
+    if (selectorFormato) selectorFormato.classList.add('d-none');
     ticketPDFActualComprobante = null;
     ticketPDFActualTipo = 'general';
+    ticketPDFActualFormato = '80mm';
     ticketPDFCargando = false;
+    document.querySelectorAll('.filtro-formato-ticket').forEach(boton => {
+        const seleccionado = boton.dataset.formato === '80mm';
+        boton.classList.toggle('active', seleccionado);
+        boton.setAttribute('aria-pressed', String(seleccionado));
+        boton.disabled = false;
+    });
 
     if (ticketPDFActualURL) {
         const urlAnterior = ticketPDFActualURL;
@@ -4162,7 +4267,12 @@ document.addEventListener('click', async function (event) {
     const mensaje = nuevoEstado === 'FINALIZADA'
         ? '¿Finalizar esta orden? Ya no podrá modificar el consumo.'
         : `¿Cambiar el estado de la orden a "${nuevoEstado}"?`;
-    const confirmar = confirm(mensaje);
+    const confirmar = await confirmarAccionModal({
+        titulo: nuevoEstado === 'FINALIZADA' ? 'Finalizar orden' : 'Cambiar estado de orden',
+        mensaje: mensaje,
+        textoConfirmar: nuevoEstado === 'FINALIZADA' ? 'Finalizar orden' : 'Cambiar estado',
+        peligro: nuevoEstado === 'FINALIZADA'
+    });
     if (!confirmar) return;
 
     // Si vamos a finalizar, asegurar que el consumo esté persistido
@@ -4202,88 +4312,6 @@ document.addEventListener('click', async function (event) {
         if (error.response) {
             mostrarToast('error', 'Error', error.response.data.mensaje);
         }
-    }
-});
-
-// Maneja el evento click del control #btnAbrirModalOrden.
-document.addEventListener('click', function (event) {
-    const boton = event.target.closest('#btnAbrirModalOrden');
-    if (!boton) return;
-
-    abrirModalNuevaOrden();
-});
-
-// Maneja el evento click del control #btnGuardarOrden.
-document.addEventListener('click', async function (event) {
-    const boton = event.target.closest('#btnGuardarOrden');
-    if (!boton) return;
-
-    if (_enviandoOrden) return;
-    _enviandoOrden = true;
-
-    try {
-        const idCita = document.querySelector('#selectCitaOrden').value;
-        const idCotizacion = document.querySelector('#selectCotizacionOrden').value;
-        const observacion = document.querySelector('#textareaDescripcion').value.trim();
-        if (!idCita && !idCotizacion) {
-            mostrarToast('advertencia', 'Falta origen', 'Seleccione una cita, una cotización aprobada o ambas.');
-            return;
-        }
-
-        const body = { observacion, fecha_atencion: fechaISO(new Date()), ids_mecanicos: mecanicoActual ? [mecanicoActual.id_mecanico] : [], items: [] };
-        let cita = null;
-        let cot = null;
-
-        if (idCita) {
-            const resCita = await axios.get('/api/buscarCitaPorId/' + idCita);
-            if (!resCita.data.ok || !resCita.data.cita) { mostrarToast('error', 'Error', 'No se pudo cargar la cita'); return; }
-            cita = resCita.data.cita;
-            body.id_cita = Number(cita.id_cita);
-        }
-        if (idCotizacion) {
-            const resCot = await axios.get('/api/buscarCotizacionConDetalle/' + idCotizacion);
-            if (!resCot.data.ok || !resCot.data.cotizacion) { mostrarToast('error', 'Error', 'No se pudo cargar la cotización'); return; }
-            cot = resCot.data.cotizacion;
-            body.id_cotizacion = Number(cot.id_cotizacion);
-            body.items = (cot.items || []).map(it => ({ id_producto: it.id_producto, id_servicio: it.id_servicio, cantidad: Number(it.cantidad), precio_unitario: Number(it.precio_unitario), observacion: it.observacion || null }));
-        }
-
-        const origen = cita || cot;
-        if (cita && cot && (Number(cita.id_vehiculo) !== Number(cot.id_vehiculo) || Number(cita.id_persona) !== Number(cot.id_persona) || Number(cita.id_sucursal) !== Number(cot.id_sucursal))) {
-            mostrarToast('advertencia', 'Orígenes distintos', 'La cita y la cotización deben pertenecer al mismo vehículo, cliente y sucursal.');
-            return;
-        }
-        body.id_persona = Number(origen.id_persona);
-        body.id_sucursal = Number(origen.id_sucursal || sucursalActual.id_sucursal);
-        body.id_vehiculo = Number(origen.id_vehiculo);
-        if (!body.observacion) body.observacion = (cita && cita.motivo) || (cot && cot.observacion) || '';
-
-        const res = await axios.post('/api/registrarOrden', body);
-
-        if (!res.data.ok) {
-            mostrarToast('error', 'Error', res.data.mensaje);
-            return;
-        }
-
-        mostrarToast('exito', 'Correcto', 'Orden creada correctamente');
-
-        await cargarOrdenes();
-        await cargarCotizaciones();
-        await cargarCitas();
-        listarOrdenes();
-
-        cerrarModal('#modalNuevaOrden');
-        limpiarModalNuevaOrden();
-
-        await cargarOrdenActual(res.data.id_orden_trabajo);
-
-    } catch (error) {
-        console.error(error);
-        if (error.response) {
-            mostrarToast('error', 'Error', error.response.data.mensaje);
-        }
-    } finally {
-        _enviandoOrden = false;
     }
 });
 
@@ -4556,7 +4584,12 @@ document.addEventListener('click', async function (event) {
     const idEvidencia = boton.dataset.id;
     if (!idEvidencia) return;
 
-    const confirmar = confirm('¿Eliminar esta evidencia?');
+    const confirmar = await confirmarAccionModal({
+        titulo: 'Eliminar evidencia',
+        mensaje: '¿Eliminar esta evidencia?',
+        textoConfirmar: 'Eliminar',
+        peligro: true
+    });
     if (!confirmar) return;
 
     try {
@@ -4729,6 +4762,7 @@ function listarHistorial(filtradas) {
             `${orden.placa || ''} · ${orden.marca || ''} ${orden.modelo || ''}`.trim();
         clone.querySelector('.descripcion-historial').textContent = orden.observacion || '—';
         clone.querySelector('.btn-ver-historial').dataset.id = orden.id_orden_trabajo;
+        clone.querySelector('.btn-vista-comprobante-historial').dataset.id = orden.id_orden_trabajo;
 
         contenedor.appendChild(clone);
     });
@@ -4790,7 +4824,6 @@ function renderDetallesTicketHistorial() {
     });
 
     contenedor.innerHTML = '';
-    let total = 0;
     items.forEach(item => {
         const cantidad = Number(item.cantidad || 0);
         const precio = Number(item.precio_unitario || 0);
@@ -4800,7 +4833,6 @@ function renderDetallesTicketHistorial() {
         clone.querySelector('.cantidad-consumo').textContent = cantidad;
         clone.querySelector('.precio-consumo').textContent = 'S/ ' + precio.toFixed(2);
         clone.querySelector('.subtotal-consumo').textContent = 'S/ ' + subtotal.toFixed(2);
-        total += subtotal;
         contenedor.appendChild(clone);
     });
 
@@ -4810,7 +4842,12 @@ function renderDetallesTicketHistorial() {
         contenedor.appendChild(fila);
     }
 
-    setTexto('#verHistorialTotalConsumo', 'S/ ' + total.toFixed(2));
+    const totalConceptos = sumarImportesItems(items);
+    const totales = desglosarIgvIncluido(totalConceptos, obtenerTasaIgv(ordenHistorialActual));
+    setTexto('#verHistorialSubtotalConsumo', 'S/ ' + totales.subtotal.toFixed(2));
+    setTexto('#verHistorialIgvConsumo', 'S/ ' + totales.igv.toFixed(2));
+    setTexto('#verHistorialTotalConsumo', 'S/ ' + totales.total.toFixed(2));
+    setTexto('#etiquetaIGVHistorial', 'IGV (' + totales.tasa_igv + '%):');
     if (botonImprimir) botonImprimir.disabled = items.length === 0;
 }
 
@@ -4860,6 +4897,135 @@ document.addEventListener('click', async function (event) {
         renderDetallesTicketHistorial();
     }
 });
+function formatearMontoComprobanteVisual(valor) {
+    return 'S/ ' + Number(valor || 0).toFixed(2);
+}
+
+// Actualiza solo la muestra visual; no crea ni modifica comprobantes.
+function renderVistaPreviaComprobanteVisual() {
+    const orden = ordenHistorialActual;
+    if (!orden) return;
+
+    const esFactura = tipoComprobanteVisualActual === 'FACTURA';
+    const nombreCliente = [orden.cliente_nombres, orden.cliente_apellidos].filter(Boolean).join(' ').trim() || '—';
+    const campoRucFactura = document.querySelector('#campoRucFacturaVisual');
+    const inputRucFactura = document.querySelector('#inputRucFacturaVisual');
+    const rucClienteRegistrado = String(orden.tipo_documento || '').trim().toUpperCase() === 'RUC';
+    const rucRegistradoValido = rucClienteRegistrado && /^\d{11}$/.test(String(orden.documento || '').trim());
+    const rucFactura = rucRegistradoValido
+        ? String(orden.documento || '').trim()
+        : String(inputRucFactura ? inputRucFactura.value : '').trim();
+    const rucFacturaValido = /^\d{11}$/.test(rucFactura);
+    const nombreVehiculo = [orden.marca, orden.modelo].filter(Boolean).join(' ') || '—';
+    const items = orden.detalles || [];
+    const totalReferencial = Number(orden.total ?? sumarImportesItems(items));
+    const totales = desglosarIgvIncluido(totalReferencial, obtenerTasaIgv(orden));
+    const emisor = sucursalActual || {};
+
+    document.querySelector('#previewEmisorComprobante').textContent = orden.sucursal_nombre || emisor.nombre || 'Taller';
+    document.querySelector('#previewRucEmisor').textContent = emisor.ruc || 'No disponible en esta vista';
+    document.querySelector('#previewDireccionEmisor').textContent = emisor.direccion || '';
+    document.querySelector('#previewTipoComprobante').textContent = esFactura ? 'FACTURA' : 'BOLETA DE VENTA';
+    document.querySelector('#previewSerieNumero').textContent = (esFactura ? 'F001' : 'B001') + '-00000000';
+    document.querySelector('#previewClienteComprobante').textContent = nombreCliente;
+    document.querySelector('#previewEtiquetaDocumento').textContent = esFactura ? 'RUC:' : (orden.tipo_documento || 'Documento:') + ':';
+    document.querySelector('#previewDocumentoComprobante').textContent = esFactura
+        ? (rucFacturaValido ? rucFactura : 'Ingrese un RUC válido')
+        : (orden.documento || '—');
+    document.querySelector('#previewFechaComprobante').textContent = formatearFecha(fechaISO(new Date()));
+    document.querySelector('#previewOrdenComprobante').textContent = 'OT-' + String(orden.id_orden_trabajo || '').padStart(4, '0');
+    document.querySelector('#previewVehiculoComprobante').textContent = [orden.placa, nombreVehiculo].filter(Boolean).join(' · ') || '—';
+
+    const avisoRuc = document.querySelector('#avisoRucFacturaVisual');
+    campoRucFactura.classList.toggle('d-none', !esFactura || rucRegistradoValido);
+    if (inputRucFactura) inputRucFactura.required = esFactura && !rucRegistradoValido;
+    const botonFactura = document.querySelector('.btn-tipo-comprobante-visual[data-tipo-comprobante-visual="FACTURA"]');
+    botonFactura.disabled = false;
+    botonFactura.title = '';
+    avisoRuc.classList.toggle('d-none', !esFactura || rucFacturaValido);
+
+    const contenedorItems = document.querySelector('#contenedorItemsComprobanteVisual');
+    contenedorItems.innerHTML = '';
+    items.forEach(item => {
+        const fila = document.createElement('tr');
+        const valores = [
+            Number(item.cantidad || 0),
+            item.descripcion || item.observacion || 'Concepto de OT',
+            formatearMontoComprobanteVisual(item.precio_unitario),
+            formatearMontoComprobanteVisual(item.subtotal)
+        ];
+        valores.forEach((valor, indice) => {
+            const celda = document.createElement('td');
+            celda.textContent = valor;
+            if (indice > 1) celda.classList.add('text-end');
+            fila.appendChild(celda);
+        });
+        contenedorItems.appendChild(fila);
+    });
+    if (items.length === 0) {
+        const fila = document.createElement('tr');
+        const celda = document.createElement('td');
+        celda.colSpan = 4;
+        celda.textContent = 'La orden no tiene conceptos registrados.';
+        fila.appendChild(celda);
+        contenedorItems.appendChild(fila);
+    }
+
+    document.querySelector('#previewSubtotalComprobante').textContent = formatearMontoComprobanteVisual(totales.subtotal);
+    document.querySelector('#previewIgvComprobante').textContent = formatearMontoComprobanteVisual(totales.igv);
+    document.querySelector('#previewTotalComprobante').textContent = formatearMontoComprobanteVisual(totales.total);
+
+    document.querySelectorAll('.btn-tipo-comprobante-visual').forEach(boton => {
+        const seleccionado = boton.dataset.tipoComprobanteVisual === tipoComprobanteVisualActual;
+        boton.classList.toggle('active', seleccionado);
+        boton.setAttribute('aria-pressed', String(seleccionado));
+    });
+}
+
+document.addEventListener('click', function (event) {
+    const selectorTipo = event.target.closest('.btn-tipo-comprobante-visual');
+    if (!selectorTipo || selectorTipo.disabled) return;
+    tipoComprobanteVisualActual = selectorTipo.dataset.tipoComprobanteVisual || 'BOLETA';
+    renderVistaPreviaComprobanteVisual();
+});
+
+document.addEventListener('input', function (event) {
+    const input = event.target.closest('#inputRucFacturaVisual');
+    if (!input) return;
+    renderVistaPreviaComprobanteVisual();
+});
+
+document.addEventListener('click', async function (event) {
+    const boton = event.target.closest('.btn-vista-comprobante-historial');
+    if (!boton) return;
+
+    const idOrden = boton.dataset.id;
+    if (!idOrden) return;
+
+    boton.disabled = true;
+    try {
+        const respuesta = await axios.get('/api/buscarOrdenConDetalle/' + idOrden);
+        if (!respuesta.data || !respuesta.data.ok || !respuesta.data.orden) {
+            mostrarToast('error', 'No se pudo cargar el ejemplo', 'No se encontraron los datos de la orden.');
+            return;
+        }
+
+        ordenHistorialActual = respuesta.data.orden;
+        tipoComprobanteVisualActual = 'BOLETA';
+        document.querySelector('#inputRucFacturaVisual').value = '';
+        renderVistaPreviaComprobanteVisual();
+        abrirModal('#modalVistaPreviaComprobante');
+    } catch (error) {
+        console.error('Error cargando datos para la vista previa del comprobante:', error);
+        const mensaje = error.response && error.response.data
+            ? error.response.data.mensaje
+            : 'No se pudo conectar con el servidor.';
+        mostrarToast('error', 'No se pudo abrir el ejemplo', mensaje);
+    } finally {
+        boton.disabled = false;
+    }
+});
+
 // Maneja el evento click del control .btn-ver-historial.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-ver-historial');
@@ -4876,6 +5042,7 @@ document.addEventListener('click', async function (event) {
         }
 
         const orden = res.data.orden;
+        ordenHistorialActual = orden;
         const modalHistorial = document.querySelector('#modalVerHistorial');
         if (modalHistorial) modalHistorial.dataset.idOrden = idOrden;
         tipoTicketHistorialActual = 'general';

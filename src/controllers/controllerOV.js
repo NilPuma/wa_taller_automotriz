@@ -235,7 +235,8 @@ const registrarVenta = async (req, res) => {
             descuento: Number(descuento) || 0,
             fecha_atencion: fecha_atencion || null,
             estado: 'PENDIENTE',
-            items: itemsValidados
+            items: itemsValidados,
+            operacionesImpuestos: req.operacionesImpuestos
         });
 
         return res.status(201).json({
@@ -444,8 +445,7 @@ const obtenerSiguienteNumero = async (req, res) => {
 //   id_persona, id_sucursal,
 //   id_orden_trabajo | id_orden_venta (uno solo),
 //   tipo_comprobante, serie, fecha_emision,
-//   subtotal, igv, descuento, total,
-//   observacion, items: []
+//   descuento, observacion, items: []
 // }
 // ======================================================
 const emitirComprobante = async (req, res) => {
@@ -458,10 +458,7 @@ const emitirComprobante = async (req, res) => {
             tipo_comprobante,
             serie,
             fecha_emision,
-            subtotal,
-            igv,
             descuento,
-            total,
             observacion,
             items
         } = req.body;
@@ -513,16 +510,11 @@ const emitirComprobante = async (req, res) => {
             });
         }
 
-        // Validar totales
-        const sub = Number(subtotal) || 0;
-        const igvNum = Number(igv) || 0;
-        const desc = Number(descuento) || 0;
-        const tot = Number(total) || 0;
-
-        if (sub < 0 || igvNum < 0 || desc < 0 || tot < 0) {
+        const descuentoAplicado = Number(descuento || 0);
+        if (!Number.isFinite(descuentoAplicado) || descuentoAplicado < 0) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Los montos no pueden ser negativos'
+                mensaje: 'El descuento no puede ser negativo'
             });
         }
 
@@ -535,11 +527,25 @@ const emitirComprobante = async (req, res) => {
                     mensaje: 'Cada item debe tener cantidad mayor a 0'
                 });
             }
+            if (!Number.isFinite(Number(it.precio_unitario)) || Number(it.precio_unitario) < 0) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: 'El precio unitario no es válido'
+                });
+            }
             itemsValidados.push({
                 cantidad: Number(it.cantidad),
                 precio_unitario: Number(it.precio_unitario),
                 subtotal: Number(it.precio_unitario) * Number(it.cantidad),
                 observacion: it.observacion || null
+            });
+        }
+
+        const montoConceptos = itemsValidados.reduce((acumulado, item) => acumulado + item.subtotal, 0);
+        if (descuentoAplicado > montoConceptos) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'El descuento no puede superar el importe de los conceptos'
             });
         }
 
@@ -551,13 +557,11 @@ const emitirComprobante = async (req, res) => {
             tipo_comprobante,
             serie,
             fecha_emision,
-            subtotal: sub,
-            igv: igvNum,
-            descuento: desc,
-            total: tot,
+            descuento: descuentoAplicado,
             estado: 'EMITIDO',
             observacion: observacion || null,
-            items: itemsValidados
+            items: itemsValidados,
+            operacionesImpuestos: req.operacionesImpuestos
         });
 
         return res.status(201).json({
@@ -565,7 +569,8 @@ const emitirComprobante = async (req, res) => {
             mensaje: 'Comprobante emitido correctamente',
             id_comprobante: resultado.id_comprobante,
             numero: resultado.numero,
-            serie: resultado.serie
+            serie: resultado.serie,
+            totales: resultado.totales
         });
 
     } catch (error) {

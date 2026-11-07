@@ -1,6 +1,5 @@
 const poolDB = require('../config_db/config_mysql');
 const { toISODate } = require('../utils/fechas');
-
 const TIPO_TICKET_OT = 'TICKET_OT';
 
 // Recupera la cabecera y las líneas del ticket asociado a un comprobante.
@@ -9,6 +8,7 @@ const buscarTicketCompleto = async (idComprobante, executor = poolDB) => {
         SELECT
             c.id_comprobante,
             c.id_orden_trabajo,
+            c.id_mecanico_emisor,
             c.id_persona,
             c.id_sucursal,
             c.tipo_comprobante,
@@ -22,11 +22,13 @@ const buscarTicketCompleto = async (idComprobante, executor = poolDB) => {
             p.tipo_documento,
             p.documento,
             TRIM(CONCAT_WS(' ', NULLIF(p.nombres, ''), NULLIF(p.apellidos, ''))) AS cliente_nombre,
+            TRIM(CONCAT_WS(' ', NULLIF(pm.nombres, ''), NULLIF(pm.apellidos, ''))) AS mecanico_emisor_nombre,
             v.placa,
             v.marca,
             v.modelo,
             ot.fecha_atencion,
             s.nombre AS sucursal_nombre,
+            s.logo_url AS sucursal_logo_url,
             s.direccion AS sucursal_direccion,
             s.telefono AS sucursal_telefono,
             s.ruc AS sucursal_ruc
@@ -35,6 +37,8 @@ const buscarTicketCompleto = async (idComprobante, executor = poolDB) => {
         INNER JOIN PERSONAS p ON p.id_persona = c.id_persona
         INNER JOIN VEHICULOS v ON v.id_vehiculo = ot.id_vehiculo
         INNER JOIN SUCURSALES s ON s.id_sucursal = c.id_sucursal
+        LEFT JOIN MECANICOS me ON me.id_mecanico = c.id_mecanico_emisor
+        LEFT JOIN PERSONAS pm ON pm.id_persona = me.id_persona
         WHERE c.id_comprobante = ?
           AND c.tipo_comprobante = ?
         LIMIT 1
@@ -82,7 +86,7 @@ const buscarTicketPorOrden = async (idOrdenTrabajo) => {
 };
 
 // Crea una sola vez el ticket interno a partir de una orden finalizada.
-const crearTicketDesdeOrden = async (idOrdenTrabajo) => {
+const crearTicketDesdeOrden = async (idOrdenTrabajo, idUsuarioEmisor = null, operacionesImpuestos) => {
     const conn = await poolDB.getConnection();
     let transaccionIniciada = false;
     let bloqueoNumeracionTomado = false;
@@ -155,9 +159,11 @@ const crearTicketDesdeOrden = async (idOrdenTrabajo) => {
                 v.marca,
                 v.modelo,
                 s.nombre AS sucursal_nombre,
+                s.logo_url AS sucursal_logo_url,
                 s.direccion AS sucursal_direccion,
                 s.telefono AS sucursal_telefono,
-                s.ruc AS sucursal_ruc
+                s.ruc AS sucursal_ruc,
+                s.igv AS sucursal_igv
             FROM ORDENES_TRABAJO ot
             INNER JOIN PERSONAS p ON p.id_persona = ot.id_persona
             INNER JOIN VEHICULOS v ON v.id_vehiculo = ot.id_vehiculo
@@ -167,6 +173,15 @@ const crearTicketDesdeOrden = async (idOrdenTrabajo) => {
         `;
         const [datosRows] = await conn.query(sqlDatos, [idOrdenTrabajo]);
         const datos = datosRows[0];
+        let idMecanicoEmisor = null;
+
+        if (idUsuarioEmisor) {
+            const [mecanicoRows] = await conn.query(
+                'SELECT m.id_mecanico FROM USUARIOS u INNER JOIN MECANICOS m ON m.id_persona = u.id_persona WHERE u.id_usuario = ? LIMIT 1',
+                [idUsuarioEmisor]
+            );
+            if (mecanicoRows.length > 0) idMecanicoEmisor = mecanicoRows[0].id_mecanico;
+        }
 
         const sqlItems = `
             SELECT
@@ -208,25 +223,28 @@ const crearTicketDesdeOrden = async (idOrdenTrabajo) => {
              WHERE id_orden_trabajo = ?`,
             [idOrdenTrabajo]
         );
-        const total = totalRows[0].total;
+        const montoConIgv = operacionesImpuestos.sumarImportesIncluidos([{ subtotal: totalRows[0].total }]);
+        const totales = operacionesImpuestos.calcularDesgloseIgvIncluido(montoConIgv, Number(datos.sucursal_igv));
 
-        // El ticket interno registra los importes de la OT sin emitir desglose tributario.
+        // Separa el IGV incluido en los importes de los conceptos de la OT.
         const [insertCabecera] = await conn.query(
             `INSERT INTO COMPROBANTES
-             (id_persona, id_sucursal, id_orden_trabajo, id_orden_venta,
+             (id_persona, id_sucursal, id_orden_trabajo, id_mecanico_emisor, id_orden_venta,
               tipo_comprobante, numero, serie, fecha_emision,
               subtotal, igv, descuento, total)
-             VALUES (?, ?, ?, NULL, ?, ?, ?, ?, ?, 0, 0, ?)`,
+             VALUES (?, ?, ?, ?, NULL, ?, ?, ?, ?, ?, ?, 0, ?)`,
             [
                 datos.id_persona,
                 datos.id_sucursal,
                 idOrdenTrabajo,
+                idMecanicoEmisor,
                 TIPO_TICKET_OT,
                 numero,
                 serie,
                 toISODate(new Date()),
-                total,
-                total
+                totales.subtotal,
+                totales.igv,
+                totales.total
             ]
         );
 

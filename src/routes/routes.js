@@ -6,6 +6,8 @@ const router = express.Router();
 // ==========================================================
 const { verificarToken, verificarVista } = require('../middleware/authMiddleware');
 const { upload: uploadEvidencias } = require('../middleware/evidenciaMiddleware');
+const { prepararTicketPDF } = require('../middleware/ticketPDFMiddleware');
+const { prepararOperacionesImpuestos } = require('../middleware/impuestoMiddleware');
 
 // ==========================================================
 // CONTROLLERS
@@ -194,9 +196,9 @@ router.get('/api/listarCotizaciones', controllerCotizacion.listarCotizaciones);
 router.get('/api/buscarCotizacionConDetalle/:id', controllerCotizacion.buscarCotizacionConDetalle);
 router.get('/api/buscarCotizacionPorId/:id', controllerCotizacion.buscarCotizacionPorId);
 
-router.post('/api/registrarCotizacion', controllerCotizacion.registrarCotizacion);
+router.post('/api/registrarCotizacion', prepararOperacionesImpuestos, controllerCotizacion.registrarCotizacion);
 router.put('/api/editarCotizacion/:id', controllerCotizacion.actualizarCotizacion);
-router.put('/api/reemplazarDetallesCotizacion/:id', controllerCotizacion.reemplazarDetallesCotizacion);
+router.put('/api/reemplazarDetallesCotizacion/:id', prepararOperacionesImpuestos, controllerCotizacion.reemplazarDetallesCotizacion);
 router.patch('/api/actualizarEstadoCotizacion/:id', controllerCotizacion.actualizarEstadoCotizacion);
 router.delete('/api/eliminarCotizacion/:id', controllerCotizacion.eliminarCotizacion);
 
@@ -205,7 +207,7 @@ router.delete('/api/eliminarCotizacion/:id', controllerCotizacion.eliminarCotiza
 // ==========================================================
 router.get('/api/listarOrdenes', controllerOT.listarOrdenes);
 router.get('/api/listarOrdenesPorMecanico/:idMecanico', controllerOT.listarOrdenesPorMecanico);
-router.get('/api/buscarOrdenConDetalle/:id', controllerOT.buscarOrdenConDetalle);
+router.get('/api/buscarOrdenConDetalle/:id', prepararOperacionesImpuestos, controllerOT.buscarOrdenConDetalle);
 router.get('/api/buscarOrdenPorId/:id', controllerOT.buscarOrdenPorId);
 
 router.post('/api/registrarOrden', controllerOT.registrarOrden);
@@ -217,10 +219,15 @@ router.delete('/api/eliminarOrden/:id', controllerOT.eliminarOrden);
 // ==========================================================
 // API: TICKETS PDF DE ÓRDENES DE TRABAJO
 // ==========================================================
-router.post('/api/emitirTicketOT/:idOrden', controllerTicketOT.emitirTicketOT);
+router.post('/api/emitirTicketOT/:idOrden', prepararOperacionesImpuestos, controllerTicketOT.emitirTicketOT);
 router.get('/api/buscarTicketOTPorOrden/:idOrden', controllerTicketOT.buscarTicketOTPorOrden);
 router.get('/api/buscarTicketOTPorId/:idTicket', controllerTicketOT.buscarTicketOTPorId);
-router.get('/api/descargarTicketPDFOT/:idTicket', controllerTicketOT.descargarTicketPDFOT);
+router.get(
+    '/api/descargarTicketPDFOT/:idTicket',
+    prepararTicketPDF,
+    controllerTicketOT.descargarTicketPDFOT,
+    controllerTicketOT.manejarErrorTicketPDF
+);
 
 // ==========================================================
 // API: INFORMES + EVIDENCIAS
@@ -247,7 +254,7 @@ router.get('/api/listarVentasPorPersona/:idPersona', controllerOV.listarVentasPo
 router.get('/api/buscarOrdenVentaConDetalle/:id', controllerOV.buscarOrdenVentaConDetalle);
 router.get('/api/buscarOrdenVentaPorId/:id', controllerOV.buscarOrdenVentaPorId);
 
-router.post('/api/registrarVenta', controllerOV.registrarVenta);
+router.post('/api/registrarVenta', prepararOperacionesImpuestos, controllerOV.registrarVenta);
 router.patch('/api/actualizarEstadoOrdenVenta/:id', controllerOV.actualizarEstadoOrdenVenta);
 router.delete('/api/eliminarOrdenVenta/:id', controllerOV.eliminarOrdenVenta);
 
@@ -256,7 +263,7 @@ router.get('/api/listarComprobantes', controllerOV.listarComprobantes);
 router.get('/api/obtenerSiguienteNumero', controllerOV.obtenerSiguienteNumero);
 router.get('/api/buscarComprobantePorId/:id', controllerOV.buscarComprobantePorId);
 
-router.post('/api/emitirComprobante', controllerOV.emitirComprobante);
+router.post('/api/emitirComprobante', prepararOperacionesImpuestos, controllerOV.emitirComprobante);
 router.patch('/api/actualizarEstadoComprobante/:id', controllerOV.actualizarEstadoComprobante);
 
 // ==========================================================
