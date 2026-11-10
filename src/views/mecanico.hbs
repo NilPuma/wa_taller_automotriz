@@ -41,13 +41,6 @@
             </div>
             <div class="item-separator"></div>
             <div class="item">
-                <a href="#" id="btnMenuHistorial" role="button" aria-label="Ir a Historial">
-                    <div class="icono"><img src="/icons/historial.svg" alt=""></div>
-                    <div class="titulo"><span>Historial</span></div>
-                </a>
-            </div>
-            <div class="item-separator"></div>
-            <div class="item">
                 <a href="#" id="btnMenuCotizaciones" role="button" aria-label="Ir a Cotizaciones">
                     <div class="icono"><img src="/icons/dolar.svg" alt=""></div>
                     <div class="titulo"><span>Cotizaciones</span></div>
@@ -245,357 +238,418 @@
         {{!-- SECCIÓN: ÓRDENES DE TRABAJO                                  --}}
         {{!-- ============================================================ --}}
         <template id="templateContenedorOrdenes">
-            <div id="ordenes" class="vista-scroll text-start">
-
+            <div id="ordenes" class="vista-scroll text-start vista-registros-mecanico">
                 <div class="seccion-cabecera">
                     <div class="seccion-cabecera__titulo">
                         <h5><i class="bi bi-clipboard-check"></i> Órdenes de Trabajo</h5>
-                        <small class="seccion-cabecera__subtitulo">
-                            Inicia, registra consumo y finaliza las órdenes asignadas.
-                        </small>
+                        <small class="seccion-cabecera__subtitulo">Consulta órdenes pendientes, en proceso y finalizadas desde un solo listado.</small>
                     </div>
                     <div class="seccion-cabecera__acciones">
-                        <div class="btn-group btn-group-sm" role="group" aria-label="Filtros de órdenes">
-                            <button type="button" class="btn btn-sm filtro-orden active" data-filtro="todas">Todas</button>
-                            <button type="button" class="btn btn-sm filtro-orden" data-filtro="pendiente">Pendientes</button>
-                            <button type="button" class="btn btn-sm filtro-orden" data-filtro="proceso">En Proceso</button>
-                            <button type="button" class="btn btn-sm filtro-orden" data-filtro="finalizada">Finalizadas</button>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Filtrar órdenes">
+                            <button type="button" class="btn filtro-orden-listado active" data-filtro="todas">Todas</button>
+                            <button type="button" class="btn filtro-orden-listado" data-filtro="pendiente">Pendientes</button>
+                            <button type="button" class="btn filtro-orden-listado" data-filtro="proceso">En proceso</button>
+                            <button type="button" class="btn filtro-orden-listado" data-filtro="finalizada">Finalizadas</button>
                         </div>
-
                         <div class="input-group input-group-sm seccion-cabecera__buscar">
                             <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                            <input type="text" class="form-control form-control-sm" id="inputBuscarOrden"
-                                   placeholder="Buscar orden o cliente; placa para crear OT...">
-                            <button type="button" class="btn btn-outline-primary" id="btnBuscarVehiculoOT" title="Buscar vehículo por placa">
-                                <i class="bi bi-car-front"></i>
-                            </button>
+                            <input type="search" class="form-control" id="inputBuscarOrdenListado" placeholder="Buscar orden, cliente, placa o detalle" aria-label="Buscar órdenes">
                         </div>
-
-                    </div>
-                </div>
-
-                <div class="row g-3 vista-row-altura">
-                    <div class="col-lg-3">
-                        <div class="panel-tabla panel-tabla--compact h-100">
-                            <div class="panel-tabla__header">
-                                <h5 class="panel-tabla__titulo">
-                                    <i class="bi bi-clipboard-check"></i> Órdenes
-                                </h5>
-                            </div>
-                            <div class="panel-tabla__body">
-                                <div class="lista-ordenes-consumo card-scroll" id="contenedorListaOrdenes">
-                                </div>
-
-                                {{! Paginador de órdenes }}
-                                <div class="paginador-wrap flex-shrink-0 mt-2" id="contenedorPaginacionOrdenes">
-                                    <div class="paginador-info" id="infoRangoOrdenes">0–0 de 0</div>
-
-                                    <nav class="ordenes-paginacion">
-                                        <ul class="pagination pagination-sm mb-0">
-                                            <li class="page-item" id="liOrdenesPrev">
-                                                <a class="page-link" href="#" id="btnOrdenesPaginaAnterior" aria-label="Página anterior">&laquo;</a>
-                                            </li>
-                                            <li class="page-item active" id="liOrdenesPaginaActual">
-                                                <a class="page-link" href="#" id="btnOrdenesPaginaNumero">1</a>
-                                            </li>
-                                            <li class="page-item" id="liOrdenesNext">
-                                                <a class="page-link" href="#" id="btnOrdenesPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
-                                            </li>
-                                        </ul>
-                                    </nav>
-
-                                    <div class="selector-por-pagina-wrap">
-                                        <span class="input-group-text bg-white" title="Registros por página">
-                                        <i class="bi bi-list-ol"></i>
-                                        </span>
-                                        <select class="form-select form-select-sm selector-por-pagina"
-                                        data-vista="ordenes"
-                                        aria-label="Registros por página">
-                                        <option value="5" selected>5</option>
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-5">
-                    <div class="panel-tabla panel-tabla--compact h-100 ordenes-panel-principal">
-                        <div class="panel-tabla__header">
-                            <h5 class="panel-tabla__titulo">
-                                <i class="bi bi-info-circle"></i> Detalle de Orden
-                            </h5>
-                            <div class="panel-tabla__acciones d-none" id="contenedorAccionesOrden">
-                                <button type="button" class="btn btn-sm btn-primario cambiar-estado-orden d-none" data-estado="EN PROCESO" title="Iniciar trabajo">
-                                    <i class="bi bi-play-fill"></i> Iniciar
-                                </button>
-                            </div>
-                            <div class="panel-tabla__acciones d-none" id="contenedorAccionCrearOrdenDirecta">
-                                <button type="button" class="btn btn-sm btn-primario" id="btnCrearOrdenDesdeVehiculo">
-                                    <i class="bi bi-clipboard-plus"></i> Crear OT
-                                </button>
-                            </div>
-                        </div>
-                        <div class="panel-tabla__body">
-                            <div class="panel-tabla__scroll ordenes-panel-scroll p-2">
-
-
-                                <div id="contenedorVehiculoBuscadoOT" class="panel-vehiculo-ot d-none">
-                                    <div class="panel-vehiculo-ot__resumen">
-                                        <span class="panel-vehiculo-ot__icono"><i class="bi bi-car-front"></i></span>
-                                        <div class="panel-vehiculo-ot__datos">
-                                            <div><span class="panel-vehiculo-ot__etiqueta">CLIENTE</span><span class="panel-vehiculo-ot__valor" id="vehiculoBuscadoCliente">--</span>
-                                            </div>
-                                            <div><span class="panel-vehiculo-ot__etiqueta">VEHÍCULO</span><span class="panel-vehiculo-ot__valor" id="vehiculoBuscadoDescripcion">--</span>
-                                            </div>
-                                        </div>
-                                        <span class="panel-vehiculo-ot__placa" id="vehiculoBuscadoPlaca">--</span>
-                                    </div>
-                                    <div class="panel-origen-ot">
-                                        <strong class="panel-origen-ot__titulo">Origen disponible</strong>
-                                        <div id="listaOrigenesVehiculoOT" class="panel-origen-ot__opciones">
-                                        </div>
-                                        <div id="avisoCotizacionPendienteOT" class="alert alert-warning py-2 px-3 mb-0 small d-none" role="status" aria-live="polite">
-                                            <i class="bi bi-exclamation-triangle me-1"></i>
-                                            <span id="textoCotizacionPendienteOT"></span>
-                                        </div>
-                                        <div id="mensajeSinOrigenVehiculoOT" class="panel-origen-ot__vacio d-none">
-                                            <i class="bi bi-info-circle"></i>
-                                            <span>Sin cita ni cotización disponible. Se registrará una cita de ingreso al crear la OT.</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div id="contenedorInfoOrden" class="small mb-3 d-none">
-                                    <div class="row g-2 mb-2">
-                                        <div class="col-6 col-md-4">
-                                            <span class="campo-mecanico__etiqueta d-block small">N° ORDEN</span>
-                                            <span class="campo-mecanico__valor" id="consumoOrdenCodigo">--</span>
-                                        </div>
-                                        <div class="col-6 col-md-4">
-                                            <span class="campo-mecanico__etiqueta d-block small">ESTADO</span>
-                                            <span id="consumoOrdenEstado" class="badge bg-secondary">--</span>
-                                        </div>
-                                        <div class="col-6 col-md-4">
-                                            <span class="campo-mecanico__etiqueta d-block small">FECHA</span>
-                                            <span id="consumoOrdenFecha" class="campo-mecanico__valor">--</span>
-                                        </div>
-                                        <div class="col-6 col-md-6">
-                                            <span class="campo-mecanico__etiqueta d-block small">CLIENTE</span>
-                                            <span class="campo-mecanico__valor" id="consumoOrdenCliente">--</span>
-                                        </div>
-                                        <div class="col-6 col-md-6">
-                                            <span class="campo-mecanico__etiqueta d-block small">DOCUMENTO</span>
-                                            <span id="consumoOrdenDocumento" class="campo-mecanico__valor">--</span>
-                                        </div>
-                                        <div class="col-6 col-md-6">
-                                            <span class="campo-mecanico__etiqueta d-block small">VEHÍCULO / PLACA</span>
-                                            <span id="consumoOrdenVehiculo" class="campo-mecanico__valor">--</span>
-                                        </div>
-                                        <div class="col-6 col-md-6">
-                                            <span class="campo-mecanico__etiqueta d-block small">MECÁNICO</span>
-                                            <span id="consumoOrdenMecanico" class="campo-mecanico__valor">--</span>
-                                        </div>
-                                        <div class="col-12">
-                                            <span class="campo-mecanico__etiqueta d-block small">SERVICIO</span>
-                                            <span id="consumoOrdenServicio" class="campo-mecanico__valor">--</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div id="contenedorVacioOrden" class="text-center text-muted py-5">
-                                    <i class="bi bi-clipboard fs-3 d-block mb-2"></i>
-                                    <small>Seleccione una orden para ver su detalle y registrar los repuestos utilizados</small>
-                                </div>
-
-                                {{!-- EVIDENCIAS --}}
-
-
-
-                                <section class="ordenes-bloque-consumo">
-                                    <div class="panel-tabla__header">
-                                        <h5 class="panel-tabla__titulo">
-                                            <i class="bi bi-cart"></i> Consumo
-                                        </h5>
-                                    </div>
-
-
-                                    <div id="contenedorVacioConsumo" class="text-center text-muted py-5">
-                                        <i class="bi bi-box fs-3 d-block mb-2"></i>
-                                        <small>Seleccione una orden para registrar productos y servicios utilizados</small>
-                                    </div>
-
-                                    <div id="contenedorConsumoActivo" class="d-none flex-grow-1 d-flex flex-column min-h-0">
-
-                                        {{!-- BLOQUE DE BÚSQUEDA --}}
-                                        <div id="contenedorListasDisponiblesOT" class="d-none flex-shrink-0">
-                                            <div class="row g-2 mb-2 flex-shrink-0">
-
-                                                <div class="col-6">
-                                                    <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-tools"></i> SERVICIOS</h6>
-                                                    <div class="input-group input-group-sm mb-2">
-                                                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                                        <input type="text" class="form-control form-control-sm" id="inputBuscarServicioOT"
-                                                        placeholder="Buscar...">
-                                                    </div>
-                                                    <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
-                                                    id="contenedorResultadosServiciosOT">
-                                                    <div id="listaServiciosOT">
-                                                    </div>
-                                                    <div id="contenedorVacioServiciosOT" class="text-center text-muted py-3 d-none">
-                                                        <small>No se encontraron coincidencias</small>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-6">
-                                                <h6 class="fw-bold small text-success mb-2"><i class="bi bi-box-seam"></i> PRODUCTOS</h6>
-                                                <div class="input-group input-group-sm mb-2">
-                                                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                                    <input type="text" class="form-control form-control-sm" id="inputBuscarProductoOT"
-                                                    placeholder="Buscar...">
-                                                </div>
-                                                <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
-                                                id="contenedorResultadosProductosOT">
-                                                <div id="listaProductosOT">
-                                                </div>
-                                                <div id="contenedorVacioProductosOT" class="text-center text-muted py-3 d-none">
-                                                    <small>No se encontraron coincidencias</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr class="my-2 flex-shrink-0">
-                                </div>
-
-                                <div id="contenedorVacioItemsConsumo" class="text-center text-muted py-3 flex-shrink-0">
-                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                    <small>No hay items agregados</small>
-                                </div>
-
-                                <div id="contenedorTablaConsumo" class="d-none flex-grow-1 card-scroll card-scroll--flex border rounded">
-                                    <table class="table tabla-sistema style-tabla tabla-sistema--compact border-0 mb-0" id="tablaItemsConsumo">
-                                        <thead class="sticky-top">
-                                            <tr>
-                                                <th class="small">Tipo</th>
-                                                <th class="small">Descripción</th>
-                                                <th class="small text-center w-50">Cant.</th>
-                                                <th class="small text-end">P. Unit.</th>
-                                                <th class="small text-end">Subtotal</th>
-                                                <th class="small text-center"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="contenedorItemsConsumo"></tbody>
-                                    </table>
-                                </div>
-
-
-
-                            </div>
-
-                        </section>
-                        <div id="contenedorEvidencias" class="ordenes-bloque-evidencias d-none">
-
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <h6 class="fw-bold mb-0">
-                                    <i class="bi bi-images"></i> Evidencias
-                                    <span class="badge bg-secondary ms-1" id="contadorEvidencias">0</span>
-                                </h6>
-                                <button type="button" class="btn btn-primario btn-sm" id="btnSubirEvidencias"
-                                title="Subir evidencias">
-                                <i class="bi bi-cloud-arrow-up"></i> Subir
-                            </button>
-                            <input type="file" id="inputEvidencias" accept="image/*" class="d-none" accept="image/*" multiple>
-                        </div>
-
-                        <div class="row g-2 mb-3">
-                            <div class="col-12">
-                                <div class="input-style">
-                                    <input type="text" class="form-control" id="inputTituloEvidencia" placeholder=" ">
-                                    <label for="inputTituloEvidencia"><i class="bi bi-card-heading"></i> Título</label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="input-style">
-                                    <textarea class="form-control" id="textareaDescripcionEvidencia" rows="2" placeholder=" "></textarea>
-                                    <label for="textareaDescripcionEvidencia"><i class="bi bi-pencil-square"></i> Descripción</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="contenedorVacioEvidencias" class="text-center text-muted py-3">
-                            <i class="bi bi-image fs-3 d-block mb-1"></i>
-                            <small>Aún no hay evidencias registradas para esta orden</small>
-                        </div>
-
-                        <div id="albumEvidencias" class="album-evidencias d-none">
-                        </div>
-
-                        <div id="contenedorFooterEvidencias" class="d-none mt-3">
-                            <button type="button" class="btn btn-primario w-100" id="btnGuardarEvidencias">
-                                <i class="bi bi-save"></i> GUARDAR EVIDENCIAS
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-                </div>
-                </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="panel-tabla panel-tabla--compact resumen-sticky flex-grow-1 min-h-0">
-                        <div class="panel-tabla__header">
-                            <h5 class="panel-tabla__titulo">
-                                <i class="bi bi-clipboard-check"></i> Resumen
-                            </h5>
-                        </div>
-                        <div class="panel-tabla__body">
-                            <div class="card-scroll">
-                                <div class="resumen-totales mb-3 flex-shrink-0">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="small campo-mecanico__etiqueta">Subtotal:</span>
-                                        <span class="small fw-semibold" id="resumenSubtotalOT">S/ 0.00</span>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="small campo-mecanico__etiqueta" id="etiquetaIGVOT">IGV:</span>
-                                        <span class="small fw-semibold" id="resumenIGVOT">S/ 0.00</span>
-                                    </div>
-                                </div>
-
-                                <div class="bg-success-subtle p-3 rounded mb-3 flex-shrink-0">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="fw-bold">TOTAL</span>
-                                        <span class="fw-normal fs-5 text-success" id="resumenTotalConsumo">S/ 0.00</span>
-                                    </div>
-                                </div>
-
-                                <div id="contenedorObservacionOrdenActual" class="mb-3 flex-shrink-0 d-none">
-                                    <div class="input-style">
-                                        <textarea class="form-control" id="consumoOrdenDescripcion" rows="4" placeholder=" " readonly></textarea>
-                                        <label for="consumoOrdenDescripcion"><i class="bi bi-pencil-square"></i> Observaciones / Detalles</label>
-                                    </div>
-                                </div>
-
-                                <div id="contenedorObservacionOrdenDirecta" class="mb-3 flex-shrink-0 d-none">
-                                    <div class="input-style">
-                                        <textarea class="form-control" id="textareaObservacionOrdenDirecta" rows="4" placeholder=" "></textarea>
-                                        <label for="textareaObservacionOrdenDirecta"><i class="bi bi-pencil-square"></i> Observaciones / Detalles</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="contenedorFooterConsumo" class="d-none mt-3 flex-shrink-0">
-                        <button type="button" class="btn btn-primario w-100 cambiar-estado-orden d-none" data-estado="FINALIZADA" id="btnFinalizarOrden" title="Finalizar orden">
-                            <i class="bi bi-check-lg"></i> FINALIZAR ORDEN
+                        <button type="button" class="btn btn-primario" id="btnNuevaOrdenListado">
+                            <i class="bi bi-plus-lg me-1"></i>Nueva OT
                         </button>
-                        <small class="d-block text-muted text-center mt-1" id="indicadorAutoguardadoConsumo"></small>
                     </div>
                 </div>
+                <div class="panel-tabla">
+                    <div class="panel-tabla__header">
+                        <h5 class="panel-tabla__titulo"><i class="bi bi-list-ul"></i> Órdenes registradas</h5>
+                        <span class="badge bg-secondary" id="contadorOrdenesListado">0</span>
+                    </div>
+                    <div class="panel-tabla__body">
+                        <div class="table-responsive">
+                            <table class="table tabla-sistema mb-0">
+                                <thead>
+                                    <tr><th>Orden</th><th>Fecha</th><th>Cliente</th><th>Vehículo</th><th>Observaciones / detalles</th><th>Estado</th><th class="text-center">Acciones</th></tr>
+                                </thead>
+                                <tbody id="tablaOrdenesListado"></tbody>
+                            </table>
+                        </div>
+                        <div class="text-center text-muted py-4 d-none" id="vacioOrdenesListado">No hay órdenes que coincidan con la búsqueda.</div>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+                            <small class="text-muted" id="infoPaginacionOrdenesListado">0–0 de 0</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <select class="form-select form-select-sm" id="porPaginaOrdenesListado" aria-label="Órdenes por página" style="width:auto">
+                                    <option>5</option><option selected>10</option><option>25</option><option>50</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnOrdenesListadoAnterior" aria-label="Página anterior"><i class="bi bi-chevron-left"></i></button>
+                                <span class="small" id="paginaOrdenesListado">1 / 1</span>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnOrdenesListadoSiguiente" aria-label="Página siguiente"><i class="bi bi-chevron-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade modal-personalizado modal-registros-mecanico modal-ordenes-mecanico" id="modalGestionOrdenes" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalGestionOrdenesLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalGestionOrdenesLabel"><i class="bi bi-pencil-square me-2"></i>Gestión de Orden de Trabajo</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body"><div class="modal-ordenes-mecanico__contenido">
+                    <div class="seccion-cabecera">
+                                        <div class="seccion-cabecera__titulo">
+                                            <h5><i class="bi bi-clipboard-check"></i> Órdenes de Trabajo</h5>
+                                            <small class="seccion-cabecera__subtitulo">
+                                                Inicia, registra consumo y finaliza las órdenes asignadas.
+                                            </small>
+                                        </div>
+                                        <div class="seccion-cabecera__acciones">
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="Filtros de órdenes">
+                                                <button type="button" class="btn btn-sm filtro-orden active" data-filtro="todas">Todas</button>
+                                                <button type="button" class="btn btn-sm filtro-orden" data-filtro="pendiente">Pendientes</button>
+                                                <button type="button" class="btn btn-sm filtro-orden" data-filtro="proceso">En Proceso</button>
+                                                <button type="button" class="btn btn-sm filtro-orden" data-filtro="finalizada">Finalizadas</button>
+                                            </div>
+
+                                            <div class="input-group input-group-sm seccion-cabecera__buscar">
+                                                <input type="text" class="form-control" id="inputBuscarOrden"
+                                                       placeholder="Buscar orden o cliente; placa para crear OT...">
+                                                <button class="btn btn-primario" type="button" id="btnBuscarVehiculoOT" title="Buscar vehículo">
+                                                    <i class="bi bi-search"></i> Buscar vehículo
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3 vista-row-altura">
+                                        <div class="col-lg-3">
+                                            <div class="panel-tabla panel-tabla--compact h-100">
+                                                <div class="panel-tabla__header">
+                                                    <h5 class="panel-tabla__titulo">
+                                                        <i class="bi bi-clipboard-check"></i> Órdenes
+                                                    </h5>
+                                                </div>
+                                                <div class="panel-tabla__body">
+                                                    <div class="lista-ordenes-consumo card-scroll" id="contenedorListaOrdenes">
+                                                    </div>
+
+                                                    {{! Paginador de órdenes }}
+                                                    <div class="paginador-wrap flex-shrink-0 mt-2" id="contenedorPaginacionOrdenes">
+                                                        <div class="paginador-info" id="infoRangoOrdenes">0–0 de 0</div>
+
+                                                        <nav class="ordenes-paginacion">
+                                                            <ul class="pagination pagination-sm mb-0">
+                                                                <li class="page-item" id="liOrdenesPrev">
+                                                                    <a class="page-link" href="#" id="btnOrdenesPaginaAnterior" aria-label="Página anterior">&laquo;</a>
+                                                                </li>
+                                                                <li class="page-item active" id="liOrdenesPaginaActual">
+                                                                    <a class="page-link" href="#" id="btnOrdenesPaginaNumero">1</a>
+                                                                </li>
+                                                                <li class="page-item" id="liOrdenesNext">
+                                                                    <a class="page-link" href="#" id="btnOrdenesPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
+                                                                </li>
+                                                            </ul>
+                                                        </nav>
+
+                                                        <div class="selector-por-pagina-wrap">
+                                                            <span class="input-group-text bg-white" title="Registros por página">
+                                                            <i class="bi bi-list-ol"></i>
+                                                            </span>
+                                                            <select class="form-select form-select-sm selector-por-pagina"
+                                                            data-vista="ordenes"
+                                                            aria-label="Registros por página">
+                                                            <option value="5" selected>5</option>
+                                                            <option value="10">10</option>
+                                                            <option value="25">25</option>
+                                                            <option value="50">50</option>
+                                                            <option value="100">100</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <div class="panel-tabla panel-tabla--compact h-100 ordenes-panel-principal">
+                                            <div class="panel-tabla__header">
+                                                <h5 class="panel-tabla__titulo">
+                                                    <i class="bi bi-info-circle"></i> Detalle de Orden
+                                                </h5>
+                                                <div class="panel-tabla__acciones d-none" id="contenedorAccionesOrden">
+                                                    <button type="button" class="btn btn-sm btn-primario cambiar-estado-orden d-none" data-estado="EN PROCESO" title="Iniciar trabajo">
+                                                        <i class="bi bi-play-fill"></i> Iniciar
+                                                    </button>
+                                                </div>
+                                                <div class="panel-tabla__acciones d-none" id="contenedorAccionCrearOrdenDirecta">
+                                                    <button type="button" class="btn btn-sm btn-primario" id="btnCrearOrdenDesdeVehiculo">
+                                                        <i class="bi bi-clipboard-plus"></i> Crear OT
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="panel-tabla__body">
+                                                <div class="panel-tabla__scroll ordenes-panel-scroll p-2">
+
+
+                                                    <div id="contenedorVehiculoBuscadoOT" class="panel-vehiculo-ot d-none">
+                                                        <div class="panel-vehiculo-ot__resumen">
+                                                            <span class="panel-vehiculo-ot__icono"><i class="bi bi-car-front"></i></span>
+                                                            <div class="panel-vehiculo-ot__datos">
+                                                                <div><span class="panel-vehiculo-ot__etiqueta">CLIENTE</span><span class="panel-vehiculo-ot__valor" id="vehiculoBuscadoCliente">--</span>
+                                                                </div>
+                                                                <div><span class="panel-vehiculo-ot__etiqueta">VEHÍCULO</span><span class="panel-vehiculo-ot__valor" id="vehiculoBuscadoDescripcion">--</span>
+                                                                </div>
+                                                            </div>
+                                                            <span class="panel-vehiculo-ot__placa" id="vehiculoBuscadoPlaca">--</span>
+                                                        </div>
+                                                        <div class="panel-origen-ot">
+                                                            <strong class="panel-origen-ot__titulo">Origen disponible</strong>
+                                                            <div id="listaOrigenesVehiculoOT" class="panel-origen-ot__opciones">
+                                                            </div>
+                                                            <div id="avisoCotizacionPendienteOT" class="alert alert-warning py-2 px-3 mb-0 small d-none" role="status" aria-live="polite">
+                                                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                                                <span id="textoCotizacionPendienteOT"></span>
+                                                            </div>
+                                                            <div id="mensajeSinOrigenVehiculoOT" class="panel-origen-ot__vacio d-none">
+                                                                <i class="bi bi-info-circle"></i>
+                                                                <span>Sin cita ni cotización disponible. Se registrará una cita de ingreso al crear la OT.</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="contenedorInfoOrden" class="small mb-3 d-none">
+                                                        <div class="row g-2 mb-2">
+                                                            <div class="col-6 col-md-4">
+                                                                <span class="campo-mecanico__etiqueta d-block small">N° ORDEN</span>
+                                                                <span class="campo-mecanico__valor" id="consumoOrdenCodigo">--</span>
+                                                            </div>
+                                                            <div class="col-6 col-md-4">
+                                                                <span class="campo-mecanico__etiqueta d-block small">ESTADO</span>
+                                                                <span id="consumoOrdenEstado" class="badge bg-secondary">--</span>
+                                                            </div>
+                                                            <div class="col-6 col-md-4">
+                                                                <span class="campo-mecanico__etiqueta d-block small">FECHA</span>
+                                                                <span id="consumoOrdenFecha" class="campo-mecanico__valor">--</span>
+                                                            </div>
+                                                            <div class="col-6 col-md-6">
+                                                                <span class="campo-mecanico__etiqueta d-block small">CLIENTE</span>
+                                                                <span class="campo-mecanico__valor" id="consumoOrdenCliente">--</span>
+                                                            </div>
+                                                            <div class="col-6 col-md-6">
+                                                                <span class="campo-mecanico__etiqueta d-block small">DOCUMENTO</span>
+                                                                <span id="consumoOrdenDocumento" class="campo-mecanico__valor">--</span>
+                                                            </div>
+                                                            <div class="col-6 col-md-6">
+                                                                <span class="campo-mecanico__etiqueta d-block small">VEHÍCULO / PLACA</span>
+                                                                <span id="consumoOrdenVehiculo" class="campo-mecanico__valor">--</span>
+                                                            </div>
+                                                            <div class="col-6 col-md-6">
+                                                                <span class="campo-mecanico__etiqueta d-block small">MECÁNICO</span>
+                                                                <span id="consumoOrdenMecanico" class="campo-mecanico__valor">--</span>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <span class="campo-mecanico__etiqueta d-block small">SERVICIO</span>
+                                                                <span id="consumoOrdenServicio" class="campo-mecanico__valor">--</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="contenedorVacioOrden" class="text-center text-muted py-5">
+                                                        <i class="bi bi-clipboard fs-3 d-block mb-2"></i>
+                                                        <small>Seleccione una orden para ver su detalle y registrar los repuestos utilizados</small>
+                                                    </div>
+
+                                                    {{!-- EVIDENCIAS --}}
+
+
+
+                                                    <section class="ordenes-bloque-consumo">
+                                                        <div class="panel-tabla__header">
+                                                            <h5 class="panel-tabla__titulo">
+                                                                <i class="bi bi-cart"></i> Consumo
+                                                            </h5>
+                                                        </div>
+
+
+                                                        <div id="contenedorVacioConsumo" class="text-center text-muted py-5">
+                                                            <i class="bi bi-box fs-3 d-block mb-2"></i>
+                                                            <small>Seleccione una orden para registrar productos y servicios utilizados</small>
+                                                        </div>
+
+                                                        <div id="contenedorConsumoActivo" class="d-none flex-grow-1 d-flex flex-column min-h-0">
+
+                                                            {{!-- BLOQUE DE BÚSQUEDA --}}
+                                                            <div id="contenedorListasDisponiblesOT" class="d-none flex-shrink-0">
+                                                                <div class="row g-2 mb-2 flex-shrink-0">
+
+                                                                    <div class="col-6">
+                                                                        <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-tools"></i> SERVICIOS</h6>
+                                                                        <div class="input-group input-group-sm mb-2">
+                                                                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                                                            <input type="text" class="form-control form-control-sm" id="inputBuscarServicioOT"
+                                                                            placeholder="Buscar...">
+                                                                        </div>
+                                                                        <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
+                                                                        id="contenedorResultadosServiciosOT">
+                                                                        <div id="listaServiciosOT">
+                                                                        </div>
+                                                                        <div id="contenedorVacioServiciosOT" class="text-center text-muted py-3 d-none">
+                                                                            <small>No se encontraron coincidencias</small>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-6">
+                                                                    <h6 class="fw-bold small text-success mb-2"><i class="bi bi-box-seam"></i> PRODUCTOS</h6>
+                                                                    <div class="input-group input-group-sm mb-2">
+                                                                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                                                        <input type="text" class="form-control form-control-sm" id="inputBuscarProductoOT"
+                                                                        placeholder="Buscar...">
+                                                                    </div>
+                                                                    <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
+                                                                    id="contenedorResultadosProductosOT">
+                                                                    <div id="listaProductosOT">
+                                                                    </div>
+                                                                    <div id="contenedorVacioProductosOT" class="text-center text-muted py-3 d-none">
+                                                                        <small>No se encontraron coincidencias</small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <hr class="my-2 flex-shrink-0">
+                                                    </div>
+
+                                                    <div id="contenedorVacioItemsConsumo" class="text-center text-muted py-3 flex-shrink-0">
+                                                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                                        <small>No hay items agregados</small>
+                                                    </div>
+
+                                                    <div id="contenedorTablaConsumo" class="d-none flex-grow-1 card-scroll card-scroll--flex border rounded">
+                                                        <table class="table tabla-sistema style-tabla tabla-sistema--compact border-0 mb-0" id="tablaItemsConsumo">
+                                                            <thead class="sticky-top">
+                                                                <tr>
+                                                                    <th class="small">Tipo</th>
+                                                                    <th class="small">Descripción</th>
+                                                                    <th class="small text-center w-50">Cant.</th>
+                                                                    <th class="small text-end">P. Unit.</th>
+                                                                    <th class="small text-end">Subtotal</th>
+                                                                    <th class="small text-center"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="contenedorItemsConsumo"></tbody>
+                                                        </table>
+                                                    </div>
+
+
+
+                                                </div>
+
+                                            </section>
+                                            <div id="contenedorEvidencias" class="ordenes-bloque-evidencias d-none">
+
+                                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                                    <h6 class="fw-bold mb-0">
+                                                        <i class="bi bi-images"></i> Evidencias
+                                                        <span class="badge bg-secondary ms-1" id="contadorEvidencias">0</span>
+                                                    </h6>
+                                                    <button type="button" class="btn btn-primario btn-sm" id="btnSubirEvidencias"
+                                                    title="Subir evidencias">
+                                                    <i class="bi bi-cloud-arrow-up"></i> Subir
+                                                </button>
+                                                <input type="file" id="inputEvidencias" accept="image/*" class="d-none" accept="image/*" multiple>
+                                            </div>
+
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-12">
+                                                    <div class="input-style">
+                                                        <input type="text" class="form-control" id="inputTituloEvidencia" placeholder=" ">
+                                                        <label for="inputTituloEvidencia"><i class="bi bi-card-heading"></i> Título</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="input-style">
+                                                        <textarea class="form-control" id="textareaDescripcionEvidencia" rows="2" placeholder=" "></textarea>
+                                                        <label for="textareaDescripcionEvidencia"><i class="bi bi-pencil-square"></i> Descripción</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div id="contenedorVacioEvidencias" class="text-center text-muted py-3">
+                                                <i class="bi bi-image fs-3 d-block mb-1"></i>
+                                                <small>Aún no hay evidencias registradas para esta orden</small>
+                                            </div>
+
+                                            <div id="albumEvidencias" class="album-evidencias d-none">
+                                            </div>
+
+                                            <div id="contenedorFooterEvidencias" class="d-none mt-3">
+                                                <button type="button" class="btn btn-primario w-100" id="btnGuardarEvidencias">
+                                                    <i class="bi bi-save"></i> GUARDAR EVIDENCIAS
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="panel-tabla panel-tabla--compact resumen-sticky flex-grow-1 min-h-0">
+                                            <div class="panel-tabla__header">
+                                                <h5 class="panel-tabla__titulo">
+                                                    <i class="bi bi-clipboard-check"></i> Resumen
+                                                </h5>
+                                            </div>
+                                            <div class="panel-tabla__body">
+                                                <div class="card-scroll">
+                                                    <div class="resumen-totales mb-3 flex-shrink-0">
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <span class="small campo-mecanico__etiqueta">Subtotal:</span>
+                                                            <span class="small fw-semibold" id="resumenSubtotalOT">S/ 0.00</span>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <span class="small campo-mecanico__etiqueta" id="etiquetaIGVOT">IGV:</span>
+                                                            <span class="small fw-semibold" id="resumenIGVOT">S/ 0.00</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="bg-success-subtle p-3 rounded mb-3 flex-shrink-0">
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <span class="fw-bold">TOTAL</span>
+                                                            <span class="fw-normal fs-5 text-success" id="resumenTotalConsumo">S/ 0.00</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="contenedorObservacionOrdenActual" class="mb-3 flex-shrink-0 d-none">
+                                                        <div class="input-style">
+                                                            <textarea class="form-control" id="consumoOrdenDescripcion" rows="4" placeholder=" " readonly></textarea>
+                                                            <label for="consumoOrdenDescripcion"><i class="bi bi-pencil-square"></i> Observaciones / Detalles</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="contenedorObservacionOrdenDirecta" class="mb-3 flex-shrink-0 d-none">
+                                                        <div class="input-style">
+                                                            <textarea class="form-control" id="textareaObservacionOrdenDirecta" rows="4" placeholder=" "></textarea>
+                                                            <label for="textareaObservacionOrdenDirecta"><i class="bi bi-pencil-square"></i> Observaciones / Detalles</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="contenedorFooterConsumo" class="d-none mt-3 flex-shrink-0">
+                                            <button type="button" class="btn btn-primario w-100 cambiar-estado-orden d-none" data-estado="FINALIZADA" id="btnFinalizarOrden" title="Finalizar orden">
+                                                <i class="bi bi-check-lg"></i> FINALIZAR ORDEN
+                                            </button>
+                                            <small class="d-block text-muted text-center mt-1" id="indicadorAutoguardadoConsumo"></small>
+                                        </div>
+                                    </div>
+                                    </div>
+
+                            </div></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </template>
@@ -648,399 +702,373 @@
         </template>
 
         {{!-- ============================================================ --}}
-        {{!-- SECCIÓN: HISTORIAL                                           --}}
-        {{!-- ============================================================ --}}
-        <template id="templateContenedorHistorial">
-            <div id="historial" class="vista-scroll text-start">
-
-                <div class="seccion-cabecera">
-                    <div class="seccion-cabecera__titulo">
-                        <h5><i class="bi bi-clock-history"></i> Historial de Órdenes</h5>
-                        <small class="seccion-cabecera__subtitulo">
-                            Órdenes finalizadas con su detalle de consumo y evidencias.
-                        </small>
-                    </div>
-                    <div class="seccion-cabecera__acciones">
-                        <span class="pill-contador">
-                            <i class="bi bi-list-check"></i>
-                            <span id="contadorHistorial">0</span> resultados
-                        </span>
-                        <div class="input-group input-group-sm seccion-cabecera__buscar">
-                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                            <input type="text" class="form-control form-control-sm" id="inputBuscarHistorial"
-                                   placeholder="Buscar por orden, cliente o vehículo...">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="panel-tabla vista-row-altura">
-                    <div class="panel-tabla__header">
-                        <h5 class="panel-tabla__titulo">
-                            <i class="bi bi-clock-history"></i>
-                            Órdenes finalizadas
-                        </h5>
-                    </div>
-                    <div class="panel-tabla__body">
-                        <div class="panel-tabla__scroll">
-                            <table class="table tabla-sistema style-tabla tabla-sistema--center border-0 mb-0" id="tablaHistorial">
-                                <thead>
-                                    <tr>
-                                        <th class="ps-3">N° DE ORDEN</th>
-                                        <th>FECHA</th>
-                                        <th>CLIENTE</th>
-                                        <th>VEHÍCULO</th>
-                                        <th>DESCRIPCIÓN</th>
-                                        <th class="text-center">ACCIONES</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="contenedorTablaHistorial"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="panel-tabla__footer">
-                        <div class="paginador-wrap" id="contenedorPaginacionHistorial">
-                            <div class="paginador-info" id="infoRangoHistorial">0–0 de 0</div>
-
-                            <nav class="historial-paginacion">
-                                <ul class="pagination pagination-sm mb-0">
-                                    <li class="page-item" id="liHistorialPrev">
-                                        <a class="page-link" href="#" id="btnHistorialPaginaAnterior" aria-label="Página anterior">&laquo;</a>
-                                    </li>
-                                    <li class="page-item active" id="liHistorialPaginaActual">
-                                        <a class="page-link" href="#" id="btnHistorialPaginaNumero">1</a>
-                                    </li>
-                                    <li class="page-item" id="liHistorialNext">
-                                        <a class="page-link" href="#" id="btnHistorialPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
-                                    </li>
-                                </ul>
-                            </nav>
-
-                            <div class="selector-por-pagina-wrap">
-                                <span class="input-group-text bg-white" title="Registros por página">
-                                    <i class="bi bi-list-ol"></i>
-                                </span>
-                                <select class="form-select form-select-sm selector-por-pagina"
-                                        data-vista="historial"
-                                        aria-label="Registros por página">
-                                    <option value="5" selected>5</option>
-                                    <option value="10">10</option>
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        {{!-- ============================================================ --}}
         {{!-- SECCIÓN: COTIZACIONES                                        --}}
         {{!-- ============================================================ --}}
         <template id="templateContenedorCotizaciones">
-            <div id="cotizaciones" class="vista-scroll text-start">
-
+            <div id="cotizaciones" class="vista-scroll text-start vista-registros-mecanico">
                 <div class="seccion-cabecera">
                     <div class="seccion-cabecera__titulo">
                         <h5><i class="bi bi-file-earmark-text"></i> Cotizaciones</h5>
-                        <small class="seccion-cabecera__subtitulo">
-                            Crea, aprueba y rechaza cotizaciones de servicios y productos.
-                        </small>
+                        <small class="seccion-cabecera__subtitulo">Consulta y administra las cotizaciones registradas.</small>
                     </div>
                     <div class="seccion-cabecera__acciones">
-                        <div class="btn-group btn-group-sm" role="group" aria-label="Filtros de cotizaciones">
-                            <button type="button" class="btn btn-sm filtro-cotizacion active" data-filtro="todas">Todas</button>
-                            <button type="button" class="btn btn-sm filtro-cotizacion" data-filtro="aprobada">Aprobadas</button>
-                            <button type="button" class="btn btn-sm filtro-cotizacion" data-filtro="pendiente">Pendientes</button>
-                            <button type="button" class="btn btn-sm filtro-cotizacion" data-filtro="rechazada">Rechazadas</button>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Filtrar cotizaciones">
+                            <button type="button" class="btn filtro-cotizacion-listado active" data-filtro="todas">Todas</button>
+                            <button type="button" class="btn filtro-cotizacion-listado" data-filtro="aprobada">Aprobadas</button>
+                            <button type="button" class="btn filtro-cotizacion-listado" data-filtro="pendiente">Pendientes</button>
+                            <button type="button" class="btn filtro-cotizacion-listado" data-filtro="rechazada">Rechazadas</button>
                         </div>
-                        <div class="input-group input-group-sm cotizacion-buscar-vehiculo">
-                            <input type="text" class="form-control" id="inputPlacaCotizacion" placeholder="Placa del vehículo" aria-label="Placa del vehículo">
-                            <button class="btn btn-primario" type="button" id="btnBuscarPlaca" title="Buscar vehículo">
-                                <i class="bi bi-search"></i> Buscar vehículo
-                            </button>
+                        <div class="input-group input-group-sm seccion-cabecera__buscar">
+                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                            <input type="search" class="form-control" id="inputBuscarCotizacionListado" placeholder="Buscar código, cliente o placa" aria-label="Buscar cotizaciones">
+                        </div>
+                        <button type="button" class="btn btn-primario" id="btnNuevaCotizacionListado">
+                            <i class="bi bi-plus-lg me-1"></i>Nueva cotización
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-tabla">
+                    <div class="panel-tabla__header">
+                        <h5 class="panel-tabla__titulo"><i class="bi bi-list-ul"></i> Cotizaciones registradas</h5>
+                        <span class="badge bg-secondary" id="contadorCotizacionesListado">0</span>
+                    </div>
+                    <div class="panel-tabla__body">
+                        <div class="table-responsive">
+                            <table class="table tabla-sistema mb-0">
+                                <thead>
+                                    <tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Vehículo</th><th>Total</th><th>Estado</th><th class="text-center">Acciones</th></tr>
+                                </thead>
+                                <tbody id="tablaCotizacionesListado"></tbody>
+                            </table>
+                        </div>
+                        <div class="text-center text-muted py-4 d-none" id="vacioCotizacionesListado">No hay cotizaciones que coincidan con la búsqueda.</div>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+                            <small class="text-muted" id="infoPaginacionCotizacionesListado">0–0 de 0</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <select class="form-select form-select-sm" id="porPaginaCotizacionesListado" aria-label="Cotizaciones por página" style="width:auto">
+                                    <option>5</option><option selected>10</option><option>25</option><option>50</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnCotizacionesListadoAnterior" aria-label="Página anterior"><i class="bi bi-chevron-left"></i></button>
+                                <span class="small" id="paginaCotizacionesListado">1 / 1</span>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="btnCotizacionesListadoSiguiente" aria-label="Página siguiente"><i class="bi bi-chevron-right"></i></button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row g-3 vista-row-altura">
-
-                    {{!-- COLUMNA IZQUIERDA --}}
-                    <div class="col-lg-3">
-                        <div class="panel-tabla panel-tabla--compact h-100">
-                            <div class="panel-tabla__header">
-                                <h5 class="panel-tabla__titulo">
-                                    <i class="bi bi-file-earmark-text"></i> Cotizaciones
-                                </h5>
-                                <div class="panel-tabla__acciones">
-                                    <span class="badge bg-secondary" id="contadorCotizaciones">0</span>
-                                </div>
+                <div class="modal fade modal-personalizado modal-registros-mecanico modal-cotizaciones-mecanico" id="modalGestionCotizaciones" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalGestionCotizacionesLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalGestionCotizacionesLabel"><i class="bi bi-pencil-square me-2"></i>Gestión de Cotización</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                             </div>
-                            <div class="panel-tabla__body">
-                                <div class="placa-activa mb-3 p-2 rounded text-center flex-shrink-0">
-                                    <small class="text-muted d-block">Vehículo</small>
-                                    <span class="fs-5 text-uppercase" id="contenedorPlacaActiva">--</span>
-                                </div>
-
-                                <div class="lista-cotizaciones card-scroll flex-grow-1" id="contenedorListaCotizaciones"></div>
-
-                                <div class="paginador-wrap flex-shrink-0 mt-2" id="contenedorPaginacionCotizaciones">
-                                    <div class="paginador-info" id="infoRangoCotizaciones">0–0 de 0</div>
-
-                                    <nav class="cotizaciones-paginacion">
-                                        <ul class="pagination pagination-sm mb-0">
-                                            <li class="page-item" id="liCotizacionesPrev">
-                                                <a class="page-link" href="#" id="btnCotizacionesPaginaAnterior" aria-label="Página anterior">&laquo;</a>
-                                            </li>
-                                            <li class="page-item active" id="liCotizacionesPaginaActual">
-                                                <a class="page-link" href="#" id="btnCotizacionesPaginaNumero">1</a>
-                                            </li>
-                                            <li class="page-item" id="liCotizacionesNext">
-                                                <a class="page-link" href="#" id="btnCotizacionesPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
-                                            </li>
-                                        </ul>
-                                    </nav>
-
-                                    <div class="selector-por-pagina-wrap">
-                                        <span class="input-group-text bg-white" title="Registros por página">
-                                            <i class="bi bi-list-ol"></i>
-                                        </span>
-                                        <select class="form-select form-select-sm selector-por-pagina"
-                                                data-vista="cotizaciones"
-                                                aria-label="Registros por página">
-                                            <option value="5" selected>5</option>
-                                            <option value="10">10</option>
-                                            <option value="25">25</option>
-                                            <option value="50">50</option>
-                                            <option value="100">100</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div id="contenedorVacioPlaca" class="text-center text-muted py-4 d-none">
-                                    <i class="bi bi-car-front fs-3 d-block mb-2"></i>
-                                    <small>No hay cotizaciones disponibles</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{!-- COLUMNA CENTRAL --}}
-                    <div class="col-lg-6">
-                        <div class="d-flex flex-column h-100 gap-3">
-
-                            {{!-- CARD: Datos de Cotización --}}
-                            <div class="panel-tabla panel-tabla--compact flex-shrink-0">
-                                <div class="panel-tabla__body">
-                                    <div class="panel-tabla__scroll">
-
-                                        {{!-- ESTADO VACÍO --}}
-                                        <div id="contenedorVacioCliente" class="text-center text-muted py-3">
-                                            <i class="bi bi-search fs-4 d-block mb-1"></i>
-                                            <small>Busque una placa o seleccione una cotización</small>
+                            <div class="modal-body"><div class="modal-cotizaciones-mecanico__contenido">
+                    <div class="seccion-cabecera">
+                                        <div class="seccion-cabecera__titulo">
+                                            <h5><i class="bi bi-file-earmark-text"></i> Cotizaciones</h5>
+                                            <small class="seccion-cabecera__subtitulo">
+                                                Crea, aprueba y rechaza cotizaciones de servicios y productos.
+                                            </small>
                                         </div>
+                                        <div class="seccion-cabecera__acciones">
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="Filtros de cotizaciones">
+                                                <button type="button" class="btn btn-sm filtro-cotizacion active" data-filtro="todas">Todas</button>
+                                                <button type="button" class="btn btn-sm filtro-cotizacion" data-filtro="aprobada">Aprobadas</button>
+                                                <button type="button" class="btn btn-sm filtro-cotizacion" data-filtro="pendiente">Pendientes</button>
+                                                <button type="button" class="btn btn-sm filtro-cotizacion" data-filtro="rechazada">Rechazadas</button>
+                                            </div>
+                                            <div class="input-group input-group-sm cotizacion-buscar-vehiculo">
+                                                <input type="text" class="form-control" id="inputPlacaCotizacion" placeholder="Placa del vehículo" aria-label="Placa del vehículo">
+                                                <button class="btn btn-primario" type="button" id="btnBuscarPlaca" title="Buscar vehículo">
+                                                    <i class="bi bi-search"></i> Buscar vehículo
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                        {{!-- CLIENTE + VEHÍCULO --}}
-                                        <div id="contenedorInfoClienteCotizacion" class="d-none">
+                                    <div class="row g-3 vista-row-altura">
 
-                                            {{!-- CLIENTE: nombre + teléfono --}}
-                                            <div id="contenedorInfoVehiculoCotizacion-wrapper">
-                                                <h6 class="cotizacion-info__titulo cotizacion-info__titulo--cliente"><i class="bi bi-person-fill" aria-hidden="true"></i><span>Cliente</span></h6>
-                                                <div class="row g-2 mb-3">
-                                                    <div class="col-6">
-                                                        <span class="campo-mecanico__etiqueta d-block small">NOMBRE</span>
-                                                        <span id="clienteNombre" class="campo-mecanico__valor">--</span>
-                                                    </div>
-                                                    <div class="col-6">
-                                                        <span class="campo-mecanico__etiqueta d-block small">TELÉFONO</span>
-                                                        <span id="clienteTelefono" class="campo-mecanico__valor">--</span>
+                                        {{!-- COLUMNA IZQUIERDA --}}
+                                        <div class="col-lg-3">
+                                            <div class="panel-tabla panel-tabla--compact h-100">
+                                                <div class="panel-tabla__header">
+                                                    <h5 class="panel-tabla__titulo">
+                                                        <i class="bi bi-file-earmark-text"></i> Cotizaciones
+                                                    </h5>
+                                                    <div class="panel-tabla__acciones">
+                                                        <span class="badge bg-secondary" id="contadorCotizaciones">0</span>
                                                     </div>
                                                 </div>
+                                                <div class="panel-tabla__body">
+                                                    <div class="placa-activa mb-3 p-2 rounded text-center flex-shrink-0">
+                                                        <small class="text-muted d-block">Vehículo</small>
+                                                        <span class="fs-5 text-uppercase" id="contenedorPlacaActiva">--</span>
+                                                    </div>
 
-                                                {{!-- VEHÍCULO: placa, marca, año, vin, n°motor, n°chasis, observaciones --}}
-                                                <div id="contenedorInfoVehiculoCotizacion">
-                                                    <h6 class="cotizacion-info__titulo cotizacion-info__titulo--vehiculo"><i class="bi bi-car-front-fill" aria-hidden="true"></i><span>Vehículo</span></h6>
-                                                    <div class="row g-2">
-                                                        <div class="col-6 col-lg-4">
-                                                            <span class="campo-mecanico__etiqueta d-block small">PLACA</span>
-                                                            <span id="vehiculoPlaca" class="campo-mecanico__valor text-uppercase">--</span>
+                                                    <div class="lista-cotizaciones card-scroll flex-grow-1" id="contenedorListaCotizaciones"></div>
+
+                                                    <div class="paginador-wrap flex-shrink-0 mt-2" id="contenedorPaginacionCotizaciones">
+                                                        <div class="paginador-info" id="infoRangoCotizaciones">0–0 de 0</div>
+
+                                                        <nav class="cotizaciones-paginacion">
+                                                            <ul class="pagination pagination-sm mb-0">
+                                                                <li class="page-item" id="liCotizacionesPrev">
+                                                                    <a class="page-link" href="#" id="btnCotizacionesPaginaAnterior" aria-label="Página anterior">&laquo;</a>
+                                                                </li>
+                                                                <li class="page-item active" id="liCotizacionesPaginaActual">
+                                                                    <a class="page-link" href="#" id="btnCotizacionesPaginaNumero">1</a>
+                                                                </li>
+                                                                <li class="page-item" id="liCotizacionesNext">
+                                                                    <a class="page-link" href="#" id="btnCotizacionesPaginaSiguiente" aria-label="Página siguiente">&raquo;</a>
+                                                                </li>
+                                                            </ul>
+                                                        </nav>
+
+                                                        <div class="selector-por-pagina-wrap">
+                                                            <span class="input-group-text bg-white" title="Registros por página">
+                                                                <i class="bi bi-list-ol"></i>
+                                                            </span>
+                                                            <select class="form-select form-select-sm selector-por-pagina"
+                                                                    data-vista="cotizaciones"
+                                                                    aria-label="Registros por página">
+                                                                <option value="5" selected>5</option>
+                                                                <option value="10">10</option>
+                                                                <option value="25">25</option>
+                                                                <option value="50">50</option>
+                                                                <option value="100">100</option>
+                                                            </select>
                                                         </div>
-                                                        <div class="col-6 col-lg-4">
-                                                            <span class="campo-mecanico__etiqueta d-block small">MARCA / MODELO</span>
-                                                            <span id="vehiculoMarcaModelo" class="campo-mecanico__valor">--</span>
-                                                        </div>
-                                                        <div class="col-6 col-lg-4">
-                                                            <span class="campo-mecanico__etiqueta d-block small">AÑO</span>
-                                                            <span id="vehiculoAnio" class="campo-mecanico__valor">--</span>
-                                                        </div>
-                                                        <div class="col-6 col-lg-4">
-                                                            <span class="campo-mecanico__etiqueta d-block small">VIN</span>
-                                                            <span id="vehiculoVin" class="campo-mecanico__valor">--</span>
-                                                        </div>
-                                                        <div class="col-6 col-lg-4">
-                                                            <span class="campo-mecanico__etiqueta d-block small">N° MOTOR</span>
-                                                            <span id="vehiculoMotor" class="campo-mecanico__valor">--</span>
-                                                        </div>
-                                                        <div class="col-6 col-lg-4">
-                                                            <span class="campo-mecanico__etiqueta d-block small">N° CHASIS</span>
-                                                            <span id="vehiculoChasis" class="campo-mecanico__valor">--</span>
-                                                        </div>
-                                                        <div class="col-12">
-                                                            <span class="campo-mecanico__etiqueta d-block small">OBSERVACIONES</span>
-                                                            <span id="vehiculoObservaciones" class="campo-mecanico__valor">--</span>
-                                                        </div>
+                                                    </div>
+
+                                                    <div id="contenedorVacioPlaca" class="text-center text-muted py-4 d-none">
+                                                        <i class="bi bi-car-front fs-3 d-block mb-2"></i>
+                                                        <small>No hay cotizaciones disponibles</small>
                                                     </div>
                                                 </div>
                                             </div>
-
                                         </div>
 
-                                    </div>
-                                </div>
-                            </div>
+                                        {{!-- COLUMNA CENTRAL --}}
+                                        <div class="col-lg-6">
+                                            <div class="d-flex flex-column h-100 gap-3">
 
-                            {{!-- CARD: Servicios y Productos --}}
-                            <div class="panel-tabla panel-tabla--compact flex-grow-1 min-h-0">
-                                <div class="panel-tabla__header">
-                                    <h6 class="panel-tabla__titulo">
-                                        <i class="bi bi-cart"></i> Servicios y Productos
-                                    </h6>
-                                    <div class="panel-tabla__acciones">
-                                        <span class="pill-contador" id="pillTotalCotizacion">S/ 0.00</span>
-                                    </div>
-                                </div>
-                                <div class="panel-tabla__body">
+                                                {{!-- CARD: Datos de Cotización --}}
+                                                <div class="panel-tabla panel-tabla--compact flex-shrink-0">
+                                                    <div class="panel-tabla__body">
+                                                        <div class="panel-tabla__scroll">
 
-                                    <div class="row g-2 mb-2 flex-shrink-0">
-                                        <div class="col-6">
-                                            <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-tools"></i> SERVICIOS</h6>
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                                <input type="text" class="form-control form-control-sm" id="inputBuscarServicioCotizacion"
-                                                       placeholder="Buscar...">
-                                            </div>
-                                            <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
-                                                 id="contenedorResultadosServiciosCotizacion">
-                                                <div id="listaServiciosDisponibles"></div>
-                                                <div id="contenedorVacioServiciosDisponibles" class="text-center text-muted py-3 d-none">
-                                                    <small>No se encontraron coincidencias</small>
+                                                            {{!-- ESTADO VACÍO --}}
+                                                            <div id="contenedorVacioCliente" class="text-center text-muted py-3">
+                                                                <i class="bi bi-search fs-4 d-block mb-1"></i>
+                                                                <small>Busque una placa o seleccione una cotización</small>
+                                                            </div>
+
+                                                            {{!-- CLIENTE + VEHÍCULO --}}
+                                                            <div id="contenedorInfoClienteCotizacion" class="d-none">
+
+                                                                {{!-- CLIENTE: nombre + teléfono --}}
+                                                                <div id="contenedorInfoVehiculoCotizacion-wrapper">
+                                                                    <h6 class="cotizacion-info__titulo cotizacion-info__titulo--cliente"><i class="bi bi-person-fill" aria-hidden="true"></i><span>Cliente</span></h6>
+                                                                    <div class="row g-2 mb-3">
+                                                                        <div class="col-6">
+                                                                            <span class="campo-mecanico__etiqueta d-block small">NOMBRE</span>
+                                                                            <span id="clienteNombre" class="campo-mecanico__valor">--</span>
+                                                                        </div>
+                                                                        <div class="col-6">
+                                                                            <span class="campo-mecanico__etiqueta d-block small">TELÉFONO</span>
+                                                                            <span id="clienteTelefono" class="campo-mecanico__valor">--</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {{!-- VEHÍCULO: placa, marca, año, vin, n°motor, n°chasis, observaciones --}}
+                                                                    <div id="contenedorInfoVehiculoCotizacion">
+                                                                        <h6 class="cotizacion-info__titulo cotizacion-info__titulo--vehiculo"><i class="bi bi-car-front-fill" aria-hidden="true"></i><span>Vehículo</span></h6>
+                                                                        <div class="row g-2">
+                                                                            <div class="col-6 col-lg-4">
+                                                                                <span class="campo-mecanico__etiqueta d-block small">PLACA</span>
+                                                                                <span id="vehiculoPlaca" class="campo-mecanico__valor text-uppercase">--</span>
+                                                                            </div>
+                                                                            <div class="col-6 col-lg-4">
+                                                                                <span class="campo-mecanico__etiqueta d-block small">MARCA / MODELO</span>
+                                                                                <span id="vehiculoMarcaModelo" class="campo-mecanico__valor">--</span>
+                                                                            </div>
+                                                                            <div class="col-6 col-lg-4">
+                                                                                <span class="campo-mecanico__etiqueta d-block small">AÑO</span>
+                                                                                <span id="vehiculoAnio" class="campo-mecanico__valor">--</span>
+                                                                            </div>
+                                                                            <div class="col-6 col-lg-4">
+                                                                                <span class="campo-mecanico__etiqueta d-block small">VIN</span>
+                                                                                <span id="vehiculoVin" class="campo-mecanico__valor">--</span>
+                                                                            </div>
+                                                                            <div class="col-6 col-lg-4">
+                                                                                <span class="campo-mecanico__etiqueta d-block small">N° MOTOR</span>
+                                                                                <span id="vehiculoMotor" class="campo-mecanico__valor">--</span>
+                                                                            </div>
+                                                                            <div class="col-6 col-lg-4">
+                                                                                <span class="campo-mecanico__etiqueta d-block small">N° CHASIS</span>
+                                                                                <span id="vehiculoChasis" class="campo-mecanico__valor">--</span>
+                                                                            </div>
+                                                                            <div class="col-12">
+                                                                                <span class="campo-mecanico__etiqueta d-block small">OBSERVACIONES</span>
+                                                                                <span id="vehiculoObservaciones" class="campo-mecanico__valor">--</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {{!-- CARD: Servicios y Productos --}}
+                                                <div class="panel-tabla panel-tabla--compact flex-grow-1 min-h-0">
+                                                    <div class="panel-tabla__header">
+                                                        <h6 class="panel-tabla__titulo">
+                                                            <i class="bi bi-cart"></i> Servicios y Productos
+                                                        </h6>
+                                                        <div class="panel-tabla__acciones">
+                                                            <span class="pill-contador" id="pillTotalCotizacion">S/ 0.00</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-tabla__body">
+
+                                                        <div class="row g-2 mb-2 flex-shrink-0">
+                                                            <div class="col-6">
+                                                                <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-tools"></i> SERVICIOS</h6>
+                                                                <div class="input-group input-group-sm mb-2">
+                                                                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                                                    <input type="text" class="form-control form-control-sm" id="inputBuscarServicioCotizacion"
+                                                                           placeholder="Buscar...">
+                                                                </div>
+                                                                <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
+                                                                     id="contenedorResultadosServiciosCotizacion">
+                                                                    <div id="listaServiciosDisponibles"></div>
+                                                                    <div id="contenedorVacioServiciosDisponibles" class="text-center text-muted py-3 d-none">
+                                                                        <small>No se encontraron coincidencias</small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <h6 class="fw-bold small text-success mb-2"><i class="bi bi-box-seam"></i> PRODUCTOS</h6>
+                                                                <div class="input-group input-group-sm mb-2">
+                                                                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                                                    <input type="text" class="form-control form-control-sm" id="inputBuscarProductoCotizacion"
+                                                                           placeholder="Buscar...">
+                                                                </div>
+                                                                <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
+                                                                     id="contenedorResultadosProductosCotizacion">
+                                                                    <div id="listaProductosDisponibles"></div>
+                                                                    <div id="contenedorVacioProductosDisponibles" class="text-center text-muted py-3 d-none">
+                                                                        <small>No se encontraron coincidencias</small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <hr class="my-2 flex-shrink-0">
+
+                                                        <div id="contenedorVacioItemsCotizacion" class="text-center text-muted py-3 d-none flex-shrink-0">
+                                                            <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                                            <small>No hay items agregados</small>
+                                                        </div>
+
+                                                        <div id="contenedorTablaItemsCotizacion"
+                                                             class="tabla-items-container card-scroll card-scroll--flex border rounded flex-grow-1 d-none">
+                                                            <table class="table tabla-sistema style-tabla tabla-sistema--compact border-0 mb-0" id="tablaItemsCotizacion">
+                                                                <thead class="sticky-top">
+                                                                    <tr>
+                                                                        <th class="small">Tipo</th>
+                                                                        <th class="small">Descripción</th>
+                                                                        <th class="small text-center w-50">Cant.</th>
+                                                                        <th class="small text-end">P. Unit.</th>
+                                                                        <th class="small text-end">Subtotal</th>
+                                                                        <th class="small text-center"></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="contenedorItemsCotizacion"></tbody>
+                                                                <tfoot class="table-light">
+                                                                    <tr>
+                                                                        <td colspan="4" class="text-end fw-bold small">IMPORTE (IGV incluido):</td>
+                                                                        <td class="text-end small campo-mecanico__valor" id="contenedorSubtotalCotizacion">S/ 0.00</td>
+                                                                        <td></td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-6">
-                                            <h6 class="fw-bold small text-success mb-2"><i class="bi bi-box-seam"></i> PRODUCTOS</h6>
-                                            <div class="input-group input-group-sm mb-2">
-                                                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                                <input type="text" class="form-control form-control-sm" id="inputBuscarProductoCotizacion"
-                                                       placeholder="Buscar...">
-                                            </div>
-                                            <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
-                                                 id="contenedorResultadosProductosCotizacion">
-                                                <div id="listaProductosDisponibles"></div>
-                                                <div id="contenedorVacioProductosDisponibles" class="text-center text-muted py-3 d-none">
-                                                    <small>No se encontraron coincidencias</small>
+
+                                        {{!-- COLUMNA DERECHA: Resumen --}}
+                                        <div class="col-lg-3">
+                                            <div class="panel-tabla panel-tabla--compact resumen-sticky flex-grow-1 min-h-0">
+                                                <div class="panel-tabla__header">
+                                                    <h5 class="panel-tabla__titulo">
+                                                        <i class="bi bi-clipboard-check"></i> Resumen
+                                                    </h5>
+                                                </div>
+                                                <div class="panel-tabla__body">
+                                                    <div class="card-scroll">
+
+                                                        <div class="resumen-totales mb-3 flex-shrink-0">
+                                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                <span class="small campo-mecanico__etiqueta">Subtotal:</span>
+                                                                <span class="small campo-mecanico__valor" id="contenedorResumenSubtotal">S/ 0.00</span>
+                                                            </div>
+                                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                <span class="small campo-mecanico__etiqueta" id="etiquetaIGVCotizacion">IGV:</span>
+                                                                <span class="small campo-mecanico__valor" id="contenedorResumenIGV">S/ 0.00</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="bg-success-subtle p-3 rounded mb-3 flex-shrink-0">
+                                                            <div class="d-flex justify-content-between align-items-center resumen-total-cotizacion">
+                                                                <span class="fw-bold">TOTAL</span>
+                                                                <span class="fw-normal fs-5 text-success" id="contenedorTotalFinalCotizacion">S/ 0.00</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row g-2 mb-3 flex-shrink-0">
+                                                            <div class="col-12 col-md-6">
+                                                                <div class="input-style">
+                                                                    <input type="date" class="form-control" id="inputFechaCotizacion" placeholder=" " readonly aria-readonly="true">
+                                                                    <label for="inputFechaCotizacion"><i class="bi bi-calendar3"></i> Fecha de emisión</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mb-3 flex-shrink-0">
+                                                            <div class="input-style">
+                                                                <textarea class="form-control" id="textareaObservacionesCotizacion" rows="4" placeholder=" "></textarea>
+                                                                <label for="textareaObservacionesCotizacion"><i class="bi bi-pencil-square"></i> Observaciones / Detalles</label>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="mt-auto flex-shrink-0 acciones-resumen-cotizacion">
+                                                            <button type="button" class="btn btn-primario w-100" id="btnGenerarCotizacion">
+                                                                <i class="bi bi-file-earmark-pdf"></i> GENERAR COTIZACIÓN
+                                                            </button>
+                                                            <button type="button" class="btn btn-secundario-cotizacion w-100" id="btnAgendarCitaCotizacion" disabled>
+                                                                <i class="bi bi-calendar-plus"></i> Agendar cita desde cotización seleccionada
+                                                            </button>
+                                                            <button type="button" class="btn btn-cancelar w-100" id="btnLimpiarCotizacion">
+                                                                <i class="bi bi-eraser"></i> Limpiar Todo
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                     </div>
 
-                                    <hr class="my-2 flex-shrink-0">
-
-                                    <div id="contenedorVacioItemsCotizacion" class="text-center text-muted py-3 d-none flex-shrink-0">
-                                        <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                        <small>No hay items agregados</small>
-                                    </div>
-
-                                    <div id="contenedorTablaItemsCotizacion"
-                                         class="tabla-items-container card-scroll card-scroll--flex border rounded flex-grow-1 d-none">
-                                        <table class="table tabla-sistema style-tabla tabla-sistema--compact border-0 mb-0" id="tablaItemsCotizacion">
-                                            <thead class="sticky-top">
-                                                <tr>
-                                                    <th class="small">Tipo</th>
-                                                    <th class="small">Descripción</th>
-                                                    <th class="small text-center w-50">Cant.</th>
-                                                    <th class="small text-end">P. Unit.</th>
-                                                    <th class="small text-end">Subtotal</th>
-                                                    <th class="small text-center"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="contenedorItemsCotizacion"></tbody>
-                                            <tfoot class="table-light">
-                                                <tr>
-                                                    <td colspan="4" class="text-end fw-bold small">IMPORTE (IGV incluido):</td>
-                                                    <td class="text-end small campo-mecanico__valor" id="contenedorSubtotalCotizacion">S/ 0.00</td>
-                                                    <td></td>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
+                            </div></div>
                         </div>
                     </div>
-
-                    {{!-- COLUMNA DERECHA: Resumen --}}
-                    <div class="col-lg-3">
-                        <div class="panel-tabla panel-tabla--compact resumen-sticky flex-grow-1 min-h-0">
-                            <div class="panel-tabla__header">
-                                <h5 class="panel-tabla__titulo">
-                                    <i class="bi bi-clipboard-check"></i> Resumen
-                                </h5>
-                            </div>
-                            <div class="panel-tabla__body">
-                                <div class="card-scroll">
-
-                                    <div class="resumen-totales mb-3 flex-shrink-0">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="small campo-mecanico__etiqueta">Subtotal:</span>
-                                            <span class="small campo-mecanico__valor" id="contenedorResumenSubtotal">S/ 0.00</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="small campo-mecanico__etiqueta" id="etiquetaIGVCotizacion">IGV:</span>
-                                            <span class="small campo-mecanico__valor" id="contenedorResumenIGV">S/ 0.00</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="bg-success-subtle p-3 rounded mb-3 flex-shrink-0">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fw-bold">TOTAL</span>
-                                            <span class="fw-normal fs-5 text-success" id="contenedorTotalFinalCotizacion">S/ 0.00</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="row g-2 mb-3 flex-shrink-0">
-                                        <div class="col-12 col-md-6">
-                                            <div class="input-style">
-                                                <input type="date" class="form-control" id="inputFechaCotizacion" placeholder=" " readonly aria-readonly="true">
-                                                <label for="inputFechaCotizacion"><i class="bi bi-calendar3"></i> Fecha de emisión</label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3 flex-shrink-0">
-                                        <div class="input-style">
-                                            <textarea class="form-control" id="textareaObservacionesCotizacion" rows="4" placeholder=" "></textarea>
-                                            <label for="textareaObservacionesCotizacion"><i class="bi bi-pencil-square"></i> Observaciones / Detalles</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-auto flex-shrink-0">
-                                        <button type="button" class="btn btn-primario w-100 mb-2" id="btnGenerarCotizacion">
-                                            <i class="bi bi-file-earmark-pdf"></i> GENERAR COTIZACIÓN
-                                        </button>
-                                        <button type="button" class="btn btn-primario w-100 mb-2" id="btnAgendarCitaCotizacion" disabled>
-                                            <i class="bi bi-calendar-plus"></i> Agendar cita desde cotización seleccionada
-                                        </button>
-                                        <button type="button" class="btn btn-cancelar w-100" id="btnLimpiarCotizacion">
-                                            <i class="bi bi-eraser"></i> Limpiar Todo
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </template>
@@ -1694,137 +1722,123 @@
                 <div class="modal-body">
                     <input type="hidden" id="inputIdClienteVer">
 
-                    <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-person"></i> DATOS DEL CLIENTE</h6>
-                    <div class="datos-modal-mecanico mb-3" id="datosClienteModal">
-                        <div class="datos-modal-mecanico__fila"><span>Documento:</span><span id="verClienteDocumento">--</span></div>
-                        <div class="datos-modal-mecanico__fila"><span>Tipo:</span><span id="verClienteTipoDocumento">--</span></div>
-                        <div class="datos-modal-mecanico__fila"><span>Estado:</span><span id="verClienteEstado" class="badge bg-secondary">--</span></div>
-                        <div class="datos-modal-mecanico__fila"><span>Nombre:</span><span id="verClienteNombre">--</span></div>
-                        <div class="datos-modal-mecanico__fila"><span>Teléfono:</span><span id="verClienteTelefono">--</span></div>
-                        <div class="datos-modal-mecanico__fila"><span>Correo:</span><span id="verClienteCorreo" class="text-primary">--</span></div>
-                        <div class="datos-modal-mecanico__fila"><span>Dirección:</span><span id="verClienteDireccion">--</span></div>
-                    </div>
-
-                    <hr>
-
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <h6 class="fw-bold small text-success mb-0">
-                            <i class="bi bi-car-front"></i> VEHÍCULOS
-                            <span class="badge bg-secondary ms-1" id="contadorVehiculosCliente">0</span>
-                        </h6>
-                        <button type="button" class="btn btn-primario btn-sm" id="btnAgregarVehiculoCliente">
-                            <i class="bi bi-plus-circle"></i> Agregar vehículo
-                        </button>
-                    </div>
-
-                    <div id="contenedorVacioVehiculosCliente" class="text-center text-muted py-3 d-none">
-                        <i class="bi bi-car-front fs-3 d-block mb-1"></i>
-                        <small>Este cliente no tiene vehículos registrados</small>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table tabla-sistema style-tabla tabla-sistema--compact tabla-sistema--center border-0 mb-0" id="tablaVehiculosCliente">
-                            <thead>
-                                <tr>
-                                    <th class="small">PLACA</th>
-                                    <th class="small">MARCA / MODELO</th>
-                                    <th class="small text-center">AÑO</th>
-                                    <th class="small">COLOR</th>
-                                    <th class="small text-center">ESTADO</th>
-                                    <th class="small text-center">ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contenedorVehiculosCliente"></tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{!-- ===== MODAL NUEVO VEHÍCULO ===== --}}
-    <div class="modal fade modal-personalizado modal-formulario-mecanico" id="modalNuevoVehiculo" tabindex="-1" aria-labelledby="modalNuevoVehiculoLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold" id="modalNuevoVehiculoLabel">NUEVO VEHÍCULO</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="datos-modal-mecanico mb-3">
-                        <div class="datos-modal-mecanico__fila"><span>Cliente:</span><span id="nombreClienteVehiculo">--</span></div>
-                    </div>
-                    <form id="formNuevoVehiculo" novalidate>
-                        <input type="hidden" id="inputIdClienteVehiculo">
-                        <input type="hidden" id="inputModoVehiculo" value="crear">
-                        <input type="hidden" id="inputIdVehiculoEditar" value="">
-
-                        <h6 class="modal-seccion-titulo">DATOS DEL VEHÍCULO</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="input-style">
-                                    <input type="text" class="form-control text-uppercase" id="inputPlacaVehiculo" placeholder=" " required>
-                                    <label for="inputPlacaVehiculo"><i class="bi bi-card-text"></i> Placa</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="input-style">
-                                    <input type="text" class="form-control" id="inputMarcaVehiculo" placeholder=" " required>
-                                    <label for="inputMarcaVehiculo"><i class="bi bi-tag"></i> Marca</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="input-style">
-                                    <input type="text" class="form-control" id="inputModeloVehiculo" placeholder=" " required>
-                                    <label for="inputModeloVehiculo"><i class="bi bi-tag-fill"></i> Modelo</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="input-style">
-                                    <input type="number" class="form-control" id="inputAnioVehiculo" placeholder=" " min="1900" max="2100" required>
-                                    <label for="inputAnioVehiculo"><i class="bi bi-calendar3"></i> Año</label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="input-style">
-                                    <input type="text" class="form-control" id="inputColorVehiculo" placeholder=" ">
-                                    <label for="inputColorVehiculo"><i class="bi bi-palette"></i> Color</label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="input-style">
-                                    <input type="text" class="form-control" id="inputVinVehiculo" placeholder=" ">
-                                    <label for="inputVinVehiculo"><i class="bi bi-upc-scan"></i> VIN</label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="input-style">
-                                    <input type="text" class="form-control" id="inputNumeroMotorVehiculo" placeholder=" ">
-                                    <label for="inputNumeroMotorVehiculo"><i class="bi bi-gear"></i> N° Motor</label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="input-style">
-                                    <input type="text" class="form-control" id="inputNumeroChasisVehiculo" placeholder=" ">
-                                    <label for="inputNumeroChasisVehiculo"><i class="bi bi-hdd-stack"></i> N° Chasis</label>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="input-style">
-                                    <textarea class="form-control" id="inputObservacionesVehiculo" rows="2" placeholder=" "></textarea>
-                                    <label for="inputObservacionesVehiculo"><i class="bi bi-pencil-square"></i> Observaciones</label>
-                                </div>
-                            </div>
+                    <div id="contenidoDetalleCliente">
+                        <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-person"></i> DATOS DEL CLIENTE</h6>
+                        <div class="datos-modal-mecanico mb-3" id="datosClienteModal">
+                            <div class="datos-modal-mecanico__fila"><span>Documento:</span><span id="verClienteDocumento">--</span></div>
+                            <div class="datos-modal-mecanico__fila"><span>Tipo:</span><span id="verClienteTipoDocumento">--</span></div>
+                            <div class="datos-modal-mecanico__fila"><span>Estado:</span><span id="verClienteEstado" class="badge bg-secondary">--</span></div>
+                            <div class="datos-modal-mecanico__fila"><span>Nombre:</span><span id="verClienteNombre">--</span></div>
+                            <div class="datos-modal-mecanico__fila"><span>Teléfono:</span><span id="verClienteTelefono">--</span></div>
+                            <div class="datos-modal-mecanico__fila"><span>Correo:</span><span id="verClienteCorreo" class="text-primary">--</span></div>
+                            <div class="datos-modal-mecanico__fila"><span>Dirección:</span><span id="verClienteDireccion">--</span></div>
                         </div>
-                    </form>
+
+                        <hr>
+
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="fw-bold small text-success mb-0">
+                                <i class="bi bi-car-front"></i> VEHÍCULOS
+                                <span class="badge bg-secondary ms-1" id="contadorVehiculosCliente">0</span>
+                            </h6>
+                            <button type="button" class="btn btn-primario btn-sm" id="btnAgregarVehiculoCliente">
+                                <i class="bi bi-plus-circle"></i> Agregar vehículo
+                            </button>
+                        </div>
+
+                        <div id="contenedorVacioVehiculosCliente" class="text-center text-muted py-3 d-none">
+                            <i class="bi bi-car-front fs-3 d-block mb-1"></i>
+                            <small>Este cliente no tiene vehículos registrados</small>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table tabla-sistema style-tabla tabla-sistema--compact tabla-sistema--center border-0 mb-0" id="tablaVehiculosCliente">
+                                <thead>
+                                    <tr>
+                                        <th class="small">PLACA</th>
+                                        <th class="small">MARCA / MODELO</th>
+                                        <th class="small text-center">AÑO</th>
+                                        <th class="small">COLOR</th>
+                                        <th class="small text-center">ESTADO</th>
+                                        <th class="small text-center">ACCIONES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contenedorVehiculosCliente"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <section id="formularioVehiculoCliente" class="d-none">
+                        <h6 class="modal-seccion-titulo"><i class="bi bi-car-front"></i> <span id="tituloFormularioVehiculoCliente">NUEVO VEHÍCULO</span></h6>
+                        <form id="formNuevoVehiculo" novalidate>
+                            <input type="hidden" id="inputIdClienteVehiculo">
+                            <input type="hidden" id="inputModoVehiculo" value="crear">
+                            <input type="hidden" id="inputIdVehiculoEditar" value="">
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="input-style">
+                                        <input type="text" class="form-control text-uppercase" id="inputPlacaVehiculo" placeholder=" " required>
+                                        <label for="inputPlacaVehiculo"><i class="bi bi-card-text"></i> Placa</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-style">
+                                        <input type="text" class="form-control" id="inputMarcaVehiculo" placeholder=" " required>
+                                        <label for="inputMarcaVehiculo"><i class="bi bi-tag"></i> Marca</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-style">
+                                        <input type="text" class="form-control" id="inputModeloVehiculo" placeholder=" " required>
+                                        <label for="inputModeloVehiculo"><i class="bi bi-tag-fill"></i> Modelo</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-style">
+                                        <input type="number" class="form-control" id="inputAnioVehiculo" placeholder=" " min="1900" max="2100" required>
+                                        <label for="inputAnioVehiculo"><i class="bi bi-calendar3"></i> Año</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="input-style">
+                                        <input type="text" class="form-control" id="inputColorVehiculo" placeholder=" " required>
+                                        <label for="inputColorVehiculo"><i class="bi bi-palette"></i> Color</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="input-style">
+                                        <input type="text" class="form-control" id="inputVinVehiculo" placeholder=" " required>
+                                        <label for="inputVinVehiculo"><i class="bi bi-upc-scan"></i> VIN</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="input-style">
+                                        <input type="text" class="form-control" id="inputNumeroMotorVehiculo" placeholder=" " required>
+                                        <label for="inputNumeroMotorVehiculo"><i class="bi bi-gear"></i> N° Motor</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="input-style">
+                                        <input type="text" class="form-control" id="inputNumeroChasisVehiculo" placeholder=" " required>
+                                        <label for="inputNumeroChasisVehiculo"><i class="bi bi-hdd-stack"></i> N° Chasis</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="input-style">
+                                        <textarea class="form-control" id="inputObservacionesVehiculo" rows="2" placeholder=" "></textarea>
+                                        <label for="inputObservacionesVehiculo"><i class="bi bi-pencil-square"></i> Observaciones</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </section>
                 </div>
                 <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" form="formNuevoVehiculo" class="btn btn-primario" id="btnGuardarVehiculo">
-                        <i class="bi bi-check-circle"></i> Guardar Vehículo
+                    <button type="button" class="btn btn-cancelar" id="btnCerrarDetalleCliente" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-cancelar d-none" id="btnCancelarFormularioVehiculo">Cancelar</button>
+                    <button type="button" form="formNuevoVehiculo" class="btn btn-primario d-none" id="btnGuardarVehiculo">
+                        <i class="bi bi-check-circle"></i> Guardar vehículo
                     </button>
                 </div>
             </div>
@@ -1917,6 +1931,30 @@
         </button>
     </template>
 
+    <template id="templateFilaOrdenListado">
+        <tr>
+            <td class="codigo-orden fw-semibold"></td>
+            <td class="fecha-orden"></td>
+            <td class="cliente-orden"></td>
+            <td class="vehiculo-orden"></td>
+            <td class="descripcion-orden small"></td>
+            <td><span class="estado-orden badge"></span></td>
+            <td>
+                <div class="acciones-orden-listado d-flex justify-content-center gap-1">
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-abrir-orden-listado" title="Continuar orden" aria-label="Continuar orden">
+                        <i class="bi bi-play-fill"></i><span class="texto-accion-orden visually-hidden">Continuar</span>
+                    </button>
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-ver-historial d-none" title="Ver detalle de la orden" aria-label="Ver detalle de la orden">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-vista-comprobante-historial d-none" title="Ejemplo de boleta o factura" aria-label="Abrir ejemplo de boleta o factura">
+                        <i class="bi bi-receipt-cutoff"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </template>
+
     <template id="templateFilaProductoConsumo">
         <tr>
             <td class="nombre-producto small"></td>
@@ -1926,24 +1964,6 @@
             <td class="acciones-producto text-center">
                 <button type="button" class="btn btn-accion-icono btn-accion-icono--peligro btn-quitar-consumo" title="Quitar" aria-label="Quitar producto del consumo">
                     <i class="bi bi-trash"></i>
-                </button>
-            </td>
-        </tr>
-    </template>
-
-    <template id="templateFilaHistorial">
-        <tr>
-            <td class="codigo-historial ps-3"></td>
-            <td class="fecha-historial"></td>
-            <td class="cliente-historial"></td>
-            <td class="vehiculo-historial"></td>
-            <td class="descripcion-historial small"></td>
-            <td class="acciones-historial text-center">
-                <button type="button" class="btn btn-sm btn-primario btn-ver-historial" title="Ver detalle" aria-label="Ver detalle de la orden">
-                    <i class="bi bi-eye"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-primario btn-vista-comprobante-historial btn-ticket-historial" title="Ejemplo de boleta o factura" aria-label="Abrir ejemplo de boleta o factura">
-                    <i class="bi bi-receipt-cutoff"></i>
                 </button>
             </td>
         </tr>
@@ -2017,18 +2037,20 @@
             <td class="hora-cita"></td>
             <td class="estado-cita text-center"></td>
             <td class="acciones-cita text-center">
-                <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-ver-cita" title="Ver cita" aria-label="Ver cita">
-                    <i class="bi bi-eye"></i>
-                </button>
-                <button type="button" class="btn btn-accion-icono btn-accion-icono--exito btn-tomar-cita" title="Tomar cita y crear orden" aria-label="Tomar cita y crear orden">
-                    <i class="bi bi-hand-index-thumb"></i>
-                </button>
-                <button type="button" class="btn btn-accion-icono btn-accion-icono--aviso btn-cancelar-cita" title="Cancelar cita" aria-label="Cancelar cita">
-                    <i class="bi bi-x-circle"></i>
-                </button>
-                <button type="button" class="btn btn-accion-icono btn-accion-icono--peligro btn-eliminar-cita" title="Eliminar cita" aria-label="Eliminar cita">
-                    <i class="bi bi-trash"></i>
-                </button>
+                <div class="d-inline-flex flex-wrap justify-content-center gap-1">
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-ver-cita" title="Ver cita" aria-label="Ver cita">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--exito btn-tomar-cita" title="Tomar cita y crear orden" aria-label="Tomar cita y crear orden">
+                        <i class="bi bi-hand-index-thumb"></i>
+                    </button>
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--aviso btn-cancelar-cita" title="Cancelar cita" aria-label="Cancelar cita">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--peligro btn-eliminar-cita" title="Eliminar cita" aria-label="Eliminar cita">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
             </td>
         </tr>
     </template>
@@ -2051,9 +2073,11 @@
             <td class="telefono-cliente"></td>
             <td class="correo-cliente"></td>
             <td class="acciones-cliente text-center">
-                <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-ver-cliente" title="Ver cliente y vehículos" aria-label="Ver cliente y vehículos">
-                    <i class="bi bi-eye"></i>
-                </button>
+                <div class="d-inline-flex justify-content-center gap-1">
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-ver-cliente" title="Ver cliente y vehículos" aria-label="Ver cliente y vehículos">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
             </td>
         </tr>
     </template>
@@ -2066,12 +2090,14 @@
             <td class="color-vehiculo small"></td>
             <td class="estado-vehiculo text-center"></td>
             <td class="acciones-vehiculo text-center">
-                <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-editar-vehiculo" title="Editar vehículo" aria-label="Editar vehículo">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <button type="button" class="btn btn-accion-icono btn-accion-icono--peligro btn-eliminar-vehiculo" title="Eliminar vehículo" aria-label="Eliminar vehículo">
-                    <i class="bi bi-trash"></i>
-                </button>
+                <div class="d-inline-flex justify-content-center gap-1">
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-editar-vehiculo" title="Editar vehículo" aria-label="Editar vehículo">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--peligro btn-eliminar-vehiculo" title="Eliminar vehículo" aria-label="Eliminar vehículo">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
             </td>
         </tr>
     </template>
@@ -2105,6 +2131,33 @@
                 </button>
             </div>
         </div>
+    </template>
+
+    <template id="templateFilaCotizacionListado">
+        <tr>
+            <td class="codigo-cotizacion fw-semibold"></td>
+            <td class="fecha-cotizacion"></td>
+            <td class="cliente-cotizacion"></td>
+            <td class="vehiculo-cotizacion"></td>
+            <td class="monto-cotizacion text-end"></td>
+            <td><span class="estado-cotizacion badge"></span></td>
+            <td class="text-center">
+                <div class="d-inline-flex flex-wrap justify-content-center gap-1">
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--primario item-cotizacion" title="Ver cotización" aria-label="Ver cotización">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--exito btn-aprobar-cotizacion" title="Aprobar cotización" aria-label="Aprobar cotización">
+                        <i class="bi bi-check-lg"></i>
+                    </button>
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--peligro btn-rechazar-cotizacion" title="Rechazar cotización" aria-label="Rechazar cotización">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    <button type="button" class="btn btn-accion-icono btn-accion-icono--aviso btn-pendiente-cotizacion" title="Marcar como pendiente" aria-label="Marcar como pendiente">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
     </template>
 
     <template id="templateBloqueOcupado">

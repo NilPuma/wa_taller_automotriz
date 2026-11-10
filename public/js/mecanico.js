@@ -19,7 +19,6 @@ const fragmento = document.createDocumentFragment();
 const templateDashboard              = document.querySelector('#templateDashboardMecanico').content;
 const templateContenedorOrdenes      = document.querySelector('#templateContenedorOrdenes').content;
 const templateContenedorAgenda       = document.querySelector('#templateContenedorAgenda').content;
-const templateContenedorHistorial    = document.querySelector('#templateContenedorHistorial').content;
 const templateContenedorCotizaciones = document.querySelector('#templateContenedorCotizaciones').content;
 const templateContenedorCitas        = document.querySelector('#templateContenedorCitas').content;
 const templateContenedorClientes     = document.querySelector('#templateContenedorClientes').content;
@@ -78,19 +77,16 @@ let busquedaProductoCotizacion = '';
 let busquedaServicioOT         = '';
 let busquedaProductoOT         = '';
 
-// Control para reabrir modalVerCliente al cerrar modalNuevoVehiculo
-let reabrirVerClienteAlCerrar = false;
 
 // Paginación / filtros de órdenes
 let porPaginaOrdenes     = leerPreferencia('porPaginaOrdenes', DEFAULT_POR_PAGINA);
 let paginaOrdenesActual  = 1;
 let filtroOrdenActual    = 'todas';
-let busquedaOrdenActual  = '';
+let busquedaOrdenModalActual = '';
+let busquedaOrdenListadoActual = '';
+let paginaOrdenesListado = 1;
+let porPaginaOrdenesListado = 10;
 
-// Historial
-let porPaginaHistorial      = leerPreferencia('porPaginaHistorial', DEFAULT_POR_PAGINA);
-let paginaHistorialActual   = 1;
-let busquedaHistorialActual = '';
 
 // Clientes
 let porPaginaClientes     = leerPreferencia('porPaginaClientes', DEFAULT_POR_PAGINA);
@@ -106,6 +102,9 @@ let busquedaCitasActual = '';
 let porPaginaCotizaciones    = leerPreferencia('porPaginaCotizaciones', DEFAULT_POR_PAGINA);
 let paginaCotizacionesActual = 1;
 let filtroCotizacionActual   = 'todas';
+let paginaCotizacionesListado = 1;
+let porPaginaCotizacionesListado = 10;
+let busquedaCotizacionListado = '';
 
 // Flags
 let _enviandoVehiculo   = false;
@@ -198,7 +197,6 @@ function enlazarMenu() {
         '#btnMenuInicio':       renderDashboard,
         '#btnMenuOrdenes':      renderOrdenes,
         '#btnMenuAgenda':       renderAgenda,
-        '#btnMenuHistorial':    renderHistorial,
         '#btnMenuCotizaciones': renderCotizaciones,
         '#btnMenuCitas':        renderCitas,
         '#btnMenuClientes':     renderClientes
@@ -253,13 +251,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    const modalNuevoVehiculo = document.querySelector('#modalNuevoVehiculo');
-    if (modalNuevoVehiculo) {
-        modalNuevoVehiculo.addEventListener('hidden.bs.modal', function () {
-            if (reabrirVerClienteAlCerrar) {
-                reabrirVerClienteAlCerrar = false;
-                abrirModal('#modalVerCliente');
-            }
+    const modalVerCliente = document.querySelector('#modalVerCliente');
+    if (modalVerCliente) {
+        modalVerCliente.addEventListener('hidden.bs.modal', function () {
+            limpiarFormularioVehiculo();
+            mostrarFormularioVehiculoCliente(false);
         });
     }
 
@@ -953,6 +949,10 @@ function listarVehiculosCliente() {
 
         contenedorVehiculos.appendChild(clone);
     });
+
+    const formulario = document.querySelector('#formularioVehiculoCliente');
+    const formularioAbierto = Boolean(formulario && !formulario.classList.contains('d-none'));
+    actualizarInteraccionVehiculosCliente(formularioAbierto);
 }
 
 // ============================================================
@@ -960,38 +960,20 @@ function listarVehiculosCliente() {
 // ============================================================
 // Prepara el formulario para registrar un vehículo de una persona.
 function abrirModalCrearVehiculo(persona) {
-    if (document.querySelector('#modalVerCliente') && document.querySelector('#modalVerCliente').classList.contains('show')) {
-        reabrirVerClienteAlCerrar = true;
-        cerrarModal('#modalVerCliente');
-    }
-
     limpiarFormularioVehiculo();
 
     document.querySelector('#inputModoVehiculo').value = 'crear';
     document.querySelector('#inputIdVehiculoEditar').value = '';
     document.querySelector('#inputIdClienteVehiculo').value = persona.id_persona;
-
-    document.querySelector('#nombreClienteVehiculo').textContent =
-        `${persona.nombres || ''} ${persona.apellidos || ''}`.trim();
-    document.querySelector('#modalNuevoVehiculoLabel').textContent = 'NUEVO VEHÍCULO';
-
-    abrirModal('#modalNuevoVehiculo');
+    mostrarFormularioVehiculoCliente(true, 'NUEVO VEHÍCULO');
 }
 
 // Carga el vehículo seleccionado en el formulario de edición.
 function abrirModalEditarVehiculo(persona, vehiculo) {
-    if (document.querySelector('#modalVerCliente') && document.querySelector('#modalVerCliente').classList.contains('show')) {
-        reabrirVerClienteAlCerrar = true;
-        cerrarModal('#modalVerCliente');
-    }
-
+    limpiarFormularioVehiculo();
     document.querySelector('#inputModoVehiculo').value = 'editar';
     document.querySelector('#inputIdVehiculoEditar').value = vehiculo.id_vehiculo;
     document.querySelector('#inputIdClienteVehiculo').value = persona.id_persona;
-
-    document.querySelector('#nombreClienteVehiculo').textContent =
-        `${persona.nombres || ''} ${persona.apellidos || ''}`.trim();
-    document.querySelector('#modalNuevoVehiculoLabel').textContent = 'EDITAR VEHÍCULO';
 
     document.querySelector('#inputPlacaVehiculo').value = vehiculo.placa || '';
     document.querySelector('#inputVinVehiculo').value = vehiculo.vin || '';
@@ -1003,7 +985,41 @@ function abrirModalEditarVehiculo(persona, vehiculo) {
     document.querySelector('#inputNumeroChasisVehiculo').value = vehiculo.numero_chasis || '';
     document.querySelector('#inputObservacionesVehiculo').value = vehiculo.observaciones || '';
 
-    abrirModal('#modalNuevoVehiculo');
+    mostrarFormularioVehiculoCliente(true, 'EDITAR VEHÍCULO');
+}
+
+// Muestra el formulario integrado sin ocultar los datos ni la tabla de vehículos.
+function mostrarFormularioVehiculoCliente(mostrar, titulo = 'NUEVO VEHÍCULO') {
+    const modal = document.querySelector('#modalVerCliente');
+    const formulario = document.querySelector('#formularioVehiculoCliente');
+    const botonAgregar = document.querySelector('#btnAgregarVehiculoCliente');
+    const botonCerrar = document.querySelector('#btnCerrarDetalleCliente');
+    const botonCancelar = document.querySelector('#btnCancelarFormularioVehiculo');
+    const botonGuardar = document.querySelector('#btnGuardarVehiculo');
+    const tituloFormulario = document.querySelector('#tituloFormularioVehiculoCliente');
+
+    if (!modal || !formulario || !botonAgregar || !botonCerrar || !botonCancelar || !botonGuardar || !tituloFormulario) return;
+
+    formulario.classList.toggle('d-none', !mostrar);
+    botonAgregar.disabled = mostrar;
+    actualizarInteraccionVehiculosCliente(mostrar);
+    botonCerrar.classList.toggle('d-none', mostrar);
+    botonCancelar.classList.toggle('d-none', !mostrar);
+    botonGuardar.classList.toggle('d-none', !mostrar);
+    modal.classList.toggle('modo-formulario-vehiculo', mostrar);
+    tituloFormulario.textContent = titulo;
+}
+
+// Evita cambios sobre vehículos existentes mientras el formulario está activo.
+function actualizarInteraccionVehiculosCliente(bloquear) {
+    document.querySelectorAll('#contenedorVehiculosCliente .btn-editar-vehiculo, #contenedorVehiculosCliente .btn-eliminar-vehiculo')
+        .forEach(boton => {
+            boton.disabled = bloquear;
+            boton.setAttribute('aria-disabled', String(bloquear));
+            boton.title = bloquear
+                ? 'Guarde o cancele el formulario para habilitar esta acción'
+                : (boton.classList.contains('btn-editar-vehiculo') ? 'Editar vehículo' : 'Eliminar vehículo');
+        });
 }
 
 // ============================================================
@@ -1020,7 +1036,8 @@ async function guardarVehiculoNuevo(datos) {
 
     await refrescarVehiculosYTabla();
 
-    cerrarModal('#modalNuevoVehiculo');
+    limpiarFormularioVehiculo();
+    mostrarFormularioVehiculoCliente(false);
     mostrarToast('exito', 'Correcto', res.data.mensaje);
     return true;
 }
@@ -1036,7 +1053,8 @@ async function actualizarVehiculo(idVehiculo, datos) {
 
     await refrescarVehiculosYTabla();
 
-    cerrarModal('#modalNuevoVehiculo');
+    limpiarFormularioVehiculo();
+    mostrarFormularioVehiculoCliente(false);
     mostrarToast('exito', 'Correcto', res.data.mensaje);
     return true;
 }
@@ -1055,6 +1073,9 @@ function limpiarFormularioVehiculo() {
     document.querySelector('#inputNumeroMotorVehiculo').value = '';
     document.querySelector('#inputNumeroChasisVehiculo').value = '';
     document.querySelector('#inputObservacionesVehiculo').value = '';
+    document.querySelector('#inputIdClienteVehiculo').value = '';
+    document.querySelector('#inputModoVehiculo').value = 'crear';
+    document.querySelector('#inputIdVehiculoEditar').value = '';
 }
 
 // Lee y normaliza los datos del formulario de vehículo.
@@ -1284,6 +1305,8 @@ document.addEventListener('click', async function (event) {
         return;
     }
 
+    limpiarFormularioVehiculo();
+    mostrarFormularioVehiculoCliente(false);
     clienteActual = persona;
 
     document.querySelector('#inputIdClienteVer').value = persona.id_persona;
@@ -1320,10 +1343,19 @@ document.addEventListener('click', function (event) {
     abrirModalCrearVehiculo(persona);
 });
 
+// Oculta el formulario y vuelve al detalle del cliente sin guardar el vehículo.
+document.addEventListener('click', function (event) {
+    const boton = event.target.closest('#btnCancelarFormularioVehiculo');
+    if (!boton) return;
+
+    limpiarFormularioVehiculo();
+    mostrarFormularioVehiculoCliente(false);
+});
+
 // Maneja el evento click del control .btn-editar-vehiculo.
 document.addEventListener('click', function (event) {
     const boton = event.target.closest('.btn-editar-vehiculo');
-    if (!boton) return;
+    if (!boton || boton.disabled) return;
 
     const idVehiculo = boton.dataset.id;
     const vehiculo = vehiculosClienteActual.find(v => v.id_vehiculo == idVehiculo);
@@ -1375,7 +1407,7 @@ document.addEventListener('click', async function (event) {
 // Maneja el evento click del control .btn-eliminar-vehiculo.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-eliminar-vehiculo');
-    if (!boton) return;
+    if (!boton || boton.disabled) return;
 
     const idVehiculo = boton.dataset.id;
     if (!idVehiculo) return;
@@ -2162,6 +2194,13 @@ function renderCotizaciones() {
 
     paginaCotizacionesActual = 1;
     filtroCotizacionActual = 'todas';
+    paginaCotizacionesListado = 1;
+    porPaginaCotizacionesListado = 10;
+    busquedaCotizacionListado = '';
+    const inputBusquedaCotizacion = document.querySelector('#inputBuscarCotizacionListado');
+    if (inputBusquedaCotizacion) inputBusquedaCotizacion.value = '';
+    const selectorTamanoCotizacion = document.querySelector('#porPaginaCotizacionesListado');
+    if (selectorTamanoCotizacion) selectorTamanoCotizacion.value = '10';
 
     const btnTodasCot = document.querySelector('.filtro-cotizacion[data-filtro="todas"]');
     if (btnTodasCot) {
@@ -2258,17 +2297,14 @@ function listarCotizacionesSidebar(filtradas) {
         const soloLectura = Boolean(cot.tiene_ot) || cot.estado === 'APROBADA';
 
         [btnAprobar, btnRechazar, btnPendiente].forEach(btn => {
-            if (soloLectura) {
-                btn.disabled = true;
-                btn.classList.add('disabled');
-                btn.title = cot.tiene_ot
+            btn.disabled = soloLectura;
+            btn.classList.toggle('disabled', soloLectura);
+            btn.classList.toggle('d-none', soloLectura);
+            btn.title = soloLectura
+                ? (cot.tiene_ot
                     ? 'Cotización con orden de trabajo asociada (solo lectura)'
-                    : 'Cotización aprobada (solo lectura)';
-            } else {
-                btn.disabled = false;
-                btn.classList.remove('disabled');
-                btn.title = '';
-            }
+                    : 'Cotización aprobada (solo lectura)')
+                : '';
         });
 
         if (cotizacionActual && Number(cotizacionActual.id_cotizacion) === Number(cot.id_cotizacion)) {
@@ -2279,6 +2315,82 @@ function listarCotizacionesSidebar(filtradas) {
     });
 
     actualizarPaginacionCotizaciones(paginaCotizacionesActual, totalPaginas, base.length, pagina.length);
+    listarCotizacionesListado();
+}
+
+// Pinta la tabla principal de cotizaciones con búsqueda, filtros y paginación.
+function listarCotizacionesListado() {
+    const contenedor = document.querySelector('#tablaCotizacionesListado');
+    if (!contenedor) return;
+
+    let filtradas = [...listadoGeneralCotizaciones];
+    if (filtroCotizacionActual && filtroCotizacionActual !== 'todas') {
+        const estados = { aprobada: 'APROBADA', pendiente: 'PENDIENTE', rechazada: 'RECHAZADA' };
+        filtradas = filtradas.filter(cot => cot.estado === estados[filtroCotizacionActual]);
+    }
+
+    const busqueda = busquedaCotizacionListado.toLowerCase();
+    if (busqueda) {
+        filtradas = filtradas.filter(cot => {
+            const codigo = 'COT-' + String(cot.id_cotizacion).padStart(4, '0');
+            const cliente = `${cot.cliente_nombres || ''} ${cot.cliente_apellidos || ''}`;
+            const vehiculo = `${cot.placa || ''} ${cot.marca || ''} ${cot.modelo || ''}`;
+            return `${codigo} ${cliente} ${vehiculo}`.toLowerCase().includes(busqueda);
+        });
+    }
+
+    const total = filtradas.length;
+    const paginas = Math.max(1, Math.ceil(total / porPaginaCotizacionesListado));
+    paginaCotizacionesListado = Math.min(paginaCotizacionesListado, paginas);
+    const inicio = (paginaCotizacionesListado - 1) * porPaginaCotizacionesListado;
+    const pagina = filtradas.slice(inicio, inicio + porPaginaCotizacionesListado);
+    const plantilla = document.querySelector('#templateFilaCotizacionListado').content;
+    contenedor.innerHTML = '';
+
+    pagina.forEach(cot => {
+        const clone = plantilla.cloneNode(true);
+        const codigo = 'COT-' + String(cot.id_cotizacion).padStart(4, '0');
+        const nombreCliente = `${cot.cliente_nombres || ''} ${cot.cliente_apellidos || ''}`.trim() || '—';
+        const vehiculo = `${cot.placa || '—'} · ${cot.marca || ''} ${cot.modelo || ''}`.trim();
+        clone.querySelector('.codigo-cotizacion').textContent = codigo;
+        clone.querySelector('.fecha-cotizacion').textContent = cot.fecha_cotizacion ? formatearFecha(cot.fecha_cotizacion) : '—';
+        clone.querySelector('.cliente-cotizacion').textContent = nombreCliente;
+        clone.querySelector('.vehiculo-cotizacion').textContent = vehiculo;
+        clone.querySelector('.monto-cotizacion').textContent = 'S/ ' + Number(cot.monto_cotizacion || 0).toFixed(2);
+
+        const badge = clone.querySelector('.estado-cotizacion');
+        badge.textContent = cot.estado || '—';
+        badge.className = 'estado-cotizacion badge ' + claseBadgeEstado(cot.estado);
+
+        const vista = clone.querySelector('.item-cotizacion');
+        vista.dataset.id = cot.id_cotizacion;
+        [
+            clone.querySelector('.btn-aprobar-cotizacion'),
+            clone.querySelector('.btn-rechazar-cotizacion'),
+            clone.querySelector('.btn-pendiente-cotizacion')
+        ].forEach(boton => { boton.dataset.id = cot.id_cotizacion; });
+
+        const soloLectura = Boolean(cot.tiene_ot) || cot.estado === 'APROBADA';
+        clone.querySelectorAll('.btn-aprobar-cotizacion, .btn-rechazar-cotizacion, .btn-pendiente-cotizacion').forEach(boton => {
+            boton.disabled = soloLectura;
+            boton.classList.toggle('d-none', soloLectura);
+            boton.title = soloLectura
+                ? (cot.tiene_ot ? 'Cotización asociada a una orden de trabajo' : 'Cotización aprobada')
+                : boton.title;
+        });
+
+        contenedor.appendChild(clone);
+    });
+
+    setTexto('#contadorCotizacionesListado', total);
+    const vacio = document.querySelector('#vacioCotizacionesListado');
+    if (vacio) vacio.classList.toggle('d-none', total > 0);
+    setTexto('#infoPaginacionCotizacionesListado', `${total ? inicio + 1 : 0}–${Math.min(inicio + pagina.length, total)} de ${total}`);
+    setTexto('#paginaCotizacionesListado', `${paginaCotizacionesListado} / ${paginas}`);
+    const anterior = document.querySelector('#btnCotizacionesListadoAnterior');
+    const siguiente = document.querySelector('#btnCotizacionesListadoSiguiente');
+    if (anterior) anterior.disabled = paginaCotizacionesListado <= 1;
+    if (siguiente) siguiente.disabled = paginaCotizacionesListado >= paginas;
 }
 
 // Actualiza controles y rango de la paginación de cotizaciones.
@@ -2877,6 +2989,8 @@ document.addEventListener('click', async function (event) {
         listarItemsCotizacion();
         recalcularTotalesCotizacion();
         listarCotizacionesSidebar();
+        alternarModoSoloLecturaCotizacion(true);
+        abrirModal('#modalGestionCotizaciones');
 
     } catch (error) {
         console.error(error);
@@ -2888,13 +3002,46 @@ document.addEventListener('click', async function (event) {
 
 // Maneja el evento click del control .filtro-cotizacion.
 document.addEventListener('click', function (event) {
-    const boton = event.target.closest('.filtro-cotizacion');
+    const boton = event.target.closest('.filtro-cotizacion, .filtro-cotizacion-listado');
     if (!boton) return;
 
-    document.querySelectorAll('.filtro-cotizacion').forEach(b => b.classList.remove('active'));
-    boton.classList.add('active');
+    document.querySelectorAll('.filtro-cotizacion, .filtro-cotizacion-listado').forEach(b => {
+        b.classList.toggle('active', b.dataset.filtro === boton.dataset.filtro);
+    });
 
     aplicarFiltroCotizacion(boton.dataset.filtro);
+});
+
+document.addEventListener('input', function (event) {
+    const input = event.target.closest('#inputBuscarCotizacionListado');
+    if (!input) return;
+    busquedaCotizacionListado = input.value.trim();
+    paginaCotizacionesListado = 1;
+    listarCotizacionesListado();
+});
+
+document.addEventListener('change', function (event) {
+    const selector = event.target.closest('#porPaginaCotizacionesListado');
+    if (!selector) return;
+    porPaginaCotizacionesListado = Number(selector.value) || 10;
+    paginaCotizacionesListado = 1;
+    listarCotizacionesListado();
+});
+
+document.addEventListener('click', function (event) {
+    const anterior = event.target.closest('#btnCotizacionesListadoAnterior');
+    const siguiente = event.target.closest('#btnCotizacionesListadoSiguiente');
+    if (!anterior && !siguiente) return;
+    paginaCotizacionesListado += siguiente ? 1 : -1;
+    listarCotizacionesListado();
+});
+
+document.addEventListener('click', function (event) {
+    const boton = event.target.closest('#btnNuevaCotizacionListado');
+    if (!boton) return;
+    limpiarFormularioCotizacion();
+    alternarModoSoloLecturaCotizacion(false);
+    abrirModal('#modalGestionCotizaciones');
 });
 
 // Maneja el evento keypress del control #inputIrPaginaCotizaciones.
@@ -2932,7 +3079,25 @@ document.addEventListener('keypress', function (event) {
 function aplicarFiltroCotizacion(filtro) {
     filtroCotizacionActual = filtro || 'todas';
     paginaCotizacionesActual = 1;
+    paginaCotizacionesListado = 1;
     listarCotizacionesSidebar();
+}
+
+// Bloquea la edición al consultar una cotización existente.
+function alternarModoSoloLecturaCotizacion(soloLectura) {
+    const modal = document.querySelector('#modalGestionCotizaciones');
+    if (!modal) return;
+    modal.classList.toggle('modo-solo-lectura', soloLectura);
+    modal.querySelectorAll('.modal-body input, .modal-body textarea, .modal-body select, .modal-body button').forEach(control => {
+        if (control.id === 'btnAgendarCitaCotizacion') return;
+        control.disabled = soloLectura;
+    });
+    const generar = modal.querySelector('#btnGenerarCotizacion');
+    const limpiar = modal.querySelector('#btnLimpiarCotizacion');
+    if (generar) generar.classList.toggle('d-none', soloLectura);
+    if (limpiar) limpiar.classList.toggle('d-none', soloLectura);
+    const agendar = modal.querySelector('#btnAgendarCitaCotizacion');
+    if (agendar) agendar.disabled = !cotizacionActual;
 }
 
 // Recalcula subtotales, impuestos y total de la cotización.
@@ -3027,6 +3192,7 @@ function limpiarFormularioCotizacion() {
     listarItemsCotizacion();
     recalcularTotalesCotizacion();
     listarCotizacionesSidebar();
+    alternarModoSoloLecturaCotizacion(false);
 }
 
 // ============================================================
@@ -3056,7 +3222,14 @@ function renderOrdenes() {
     idInformeActual = null;
     paginaOrdenesActual = 1;
     filtroOrdenActual = 'todas';
-    busquedaOrdenActual = '';
+    busquedaOrdenModalActual = '';
+    busquedaOrdenListadoActual = '';
+    paginaOrdenesListado = 1;
+    porPaginaOrdenesListado = 10;
+    const inputBusquedaOrden = document.querySelector('#inputBuscarOrdenListado');
+    if (inputBusquedaOrden) inputBusquedaOrden.value = '';
+    const selectorTamanoOrden = document.querySelector('#porPaginaOrdenesListado');
+    if (selectorTamanoOrden) selectorTamanoOrden.value = '10';
 
     busquedaServicioOT = '';
     busquedaProductoOT = '';
@@ -3187,8 +3360,8 @@ function listarOrdenes() {
         }
     }
 
-    if (busquedaOrdenActual) {
-        const q = busquedaOrdenActual.toLowerCase();
+    if (busquedaOrdenModalActual) {
+        const q = busquedaOrdenModalActual.toLowerCase();
         filtradas = filtradas.filter(o => {
             const codigo = 'OT-' + String(o.id_orden_trabajo).padStart(4, '0').toLowerCase();
             const cliente = `${o.cliente_nombres || ''} ${o.cliente_apellidos || ''}`.toLowerCase();
@@ -3227,6 +3400,83 @@ function listarOrdenes() {
     });
 
     actualizarPaginacionOrdenes(paginaOrdenesActual, totalPaginas, filtradas.length, pagina.length);
+    listarOrdenesListado();
+}
+
+// Pinta la tabla principal de órdenes con los filtros y la paginación visibles.
+function listarOrdenesListado() {
+    const contenedor = document.querySelector('#tablaOrdenesListado');
+    if (!contenedor) return;
+
+    let filtradas = [...listadoGeneralOrdenes];
+    if (filtroOrdenActual && filtroOrdenActual !== 'todas') {
+        const estados = { pendiente: 'PENDIENTE', proceso: 'EN PROCESO', finalizada: 'FINALIZADA' };
+        filtradas = filtradas.filter(orden => orden.estado === estados[filtroOrdenActual]);
+    }
+
+    const busqueda = busquedaOrdenListadoActual.toLowerCase();
+    if (busqueda) {
+        filtradas = filtradas.filter(orden => {
+            const codigo = 'OT-' + String(orden.id_orden_trabajo).padStart(4, '0');
+            const cliente = `${orden.cliente_nombres || ''} ${orden.cliente_apellidos || ''}`;
+            const vehiculo = `${orden.placa || ''} ${orden.marca || ''} ${orden.modelo || ''}`;
+            const observacion = orden.observacion || '';
+            return `${codigo} ${cliente} ${vehiculo} ${observacion}`.toLowerCase().includes(busqueda);
+        });
+    }
+
+    const total = filtradas.length;
+    const paginas = Math.max(1, Math.ceil(total / porPaginaOrdenesListado));
+    paginaOrdenesListado = Math.min(paginaOrdenesListado, paginas);
+    const inicio = (paginaOrdenesListado - 1) * porPaginaOrdenesListado;
+    const pagina = filtradas.slice(inicio, inicio + porPaginaOrdenesListado);
+    const plantilla = document.querySelector('#templateFilaOrdenListado').content;
+    contenedor.innerHTML = '';
+
+    pagina.forEach(orden => {
+        const clone = plantilla.cloneNode(true);
+        clone.querySelector('.codigo-orden').textContent = 'OT-' + String(orden.id_orden_trabajo).padStart(4, '0');
+        clone.querySelector('.fecha-orden').textContent = orden.fecha_atencion ? formatearFecha(orden.fecha_atencion) : '—';
+        clone.querySelector('.cliente-orden').textContent = `${orden.cliente_nombres || ''} ${orden.cliente_apellidos || ''}`.trim() || '—';
+        clone.querySelector('.vehiculo-orden').textContent = `${orden.placa || '—'} · ${orden.marca || ''} ${orden.modelo || ''}`.trim();
+
+        const estado = String(orden.estado || '').toUpperCase();
+        const badge = clone.querySelector('.estado-orden');
+        badge.textContent = orden.estado || '—';
+        badge.className = 'estado-orden badge ' + claseBadgeEstado(orden.estado);
+        clone.querySelector('.descripcion-orden').textContent = orden.observacion || '—';
+
+        const botonContinuar = clone.querySelector('.btn-abrir-orden-listado');
+        const textoAccion = clone.querySelector('.texto-accion-orden');
+        const botonDetalle = clone.querySelector('.btn-ver-historial');
+        const botonComprobante = clone.querySelector('.btn-vista-comprobante-historial');
+        botonContinuar.dataset.id = orden.id_orden_trabajo;
+
+        if (estado === 'FINALIZADA') {
+            botonContinuar.classList.add('d-none');
+            botonDetalle.classList.remove('d-none');
+            botonComprobante.classList.remove('d-none');
+            botonDetalle.dataset.id = orden.id_orden_trabajo;
+            botonComprobante.dataset.id = orden.id_orden_trabajo;
+        } else {
+            textoAccion.textContent = estado === 'PENDIENTE' ? 'Iniciar' : 'Continuar';
+            const etiquetaAccion = estado === 'PENDIENTE' ? 'Iniciar orden' : 'Continuar orden';
+            botonContinuar.title = etiquetaAccion;
+            botonContinuar.setAttribute('aria-label', etiquetaAccion);
+        }
+
+        contenedor.appendChild(clone);
+    });
+
+    setTexto('#contadorOrdenesListado', total);
+    const vacio = document.querySelector('#vacioOrdenesListado');
+    if (vacio) vacio.classList.toggle('d-none', total > 0);
+    setTexto('#infoPaginacionOrdenesListado', `${total ? inicio + 1 : 0}–${Math.min(inicio + pagina.length, total)} de ${total}`);
+    setTexto('#paginaOrdenesListado', `${paginaOrdenesListado} / ${paginas}`);
+    const anterior = document.querySelector('#btnOrdenesListadoAnterior');
+    const siguiente = document.querySelector('#btnOrdenesListadoSiguiente');
+    if (anterior) anterior.disabled = paginaOrdenesListado <= 1;
+    if (siguiente) siguiente.disabled = paginaOrdenesListado >= paginas;
 }
 
 // Actualiza controles y rango de la paginación de órdenes.
@@ -3745,15 +3995,71 @@ function pintarEvidenciasOT() {
 
 // Maneja el evento click del control .filtro-orden.
 document.addEventListener('click', function (event) {
-    const boton = event.target.closest('.filtro-orden');
+    const boton = event.target.closest('.filtro-orden, .filtro-orden-listado');
     if (!boton) return;
 
-    document.querySelectorAll('.filtro-orden').forEach(b => b.classList.remove('active'));
-    boton.classList.add('active');
+    document.querySelectorAll('.filtro-orden, .filtro-orden-listado').forEach(b => {
+        b.classList.toggle('active', b.dataset.filtro === boton.dataset.filtro);
+    });
 
     filtroOrdenActual = boton.dataset.filtro || 'todas';
     paginaOrdenesActual = 1;
+    paginaOrdenesListado = 1;
     listarOrdenes();
+});
+
+document.addEventListener('input', function (event) {
+    const input = event.target.closest('#inputBuscarOrdenListado');
+    if (!input) return;
+    busquedaOrdenListadoActual = input.value.trim();
+    paginaOrdenesListado = 1;
+    listarOrdenesListado();
+});
+
+document.addEventListener('change', function (event) {
+    const selector = event.target.closest('#porPaginaOrdenesListado');
+    if (!selector) return;
+    porPaginaOrdenesListado = Number(selector.value) || 10;
+    paginaOrdenesListado = 1;
+    listarOrdenesListado();
+});
+
+document.addEventListener('click', function (event) {
+    const anterior = event.target.closest('#btnOrdenesListadoAnterior');
+    const siguiente = event.target.closest('#btnOrdenesListadoSiguiente');
+    if (!anterior && !siguiente) return;
+    paginaOrdenesListado += siguiente ? 1 : -1;
+    listarOrdenesListado();
+});
+
+document.addEventListener('click', async function (event) {
+    const boton = event.target.closest('#btnNuevaOrdenListado');
+    if (!boton) return;
+    await flushAutoguardadoConsumo();
+    ordenActual = null;
+    itemsOT = [];
+    evidenciasGuardadas = [];
+    evidenciasPendientes = [];
+    archivosEvidenciaPendientes = [];
+    idInformeActual = null;
+    limpiarDetalleOrden();
+    busquedaOrdenModalActual = '';
+    const busqueda = document.querySelector('#inputBuscarOrden');
+    if (busqueda) busqueda.value = '';
+    abrirModal('#modalGestionOrdenes');
+});
+
+document.addEventListener('click', async function (event) {
+    const boton = event.target.closest('.btn-abrir-orden-listado');
+    if (!boton) return;
+    const idOrden = boton.dataset.id;
+    if (!idOrden) return;
+
+    await flushAutoguardadoConsumo();
+    await cargarOrdenActual(idOrden);
+    if (ordenActual && Number(ordenActual.id_orden_trabajo) === Number(idOrden)) {
+        abrirModal('#modalGestionOrdenes');
+    }
 });
 
 // Maneja el evento input del control #inputBuscarOrden.
@@ -3761,7 +4067,7 @@ document.addEventListener('input', function (event) {
     const input = event.target.closest('#inputBuscarOrden');
     if (!input) return;
 
-    busquedaOrdenActual = input.value.trim();
+    busquedaOrdenModalActual = input.value.trim();
     paginaOrdenesActual = 1;
     listarOrdenes();
 });
@@ -4698,117 +5004,6 @@ document.addEventListener('click', async function (event) {
     }
 });
 
-// ============================================================
-// SECCION HISTORIAL
-// ============================================================
-// Inserta el historial y prepara búsqueda y paginación.
-function renderHistorial() {
-    contenedorReactivo.innerHTML = "";
-    const clone = templateContenedorHistorial.cloneNode(true);
-    fragmento.appendChild(clone);
-    contenedorReactivo.appendChild(fragmento);
-
-    paginaHistorialActual = 1;
-    busquedaHistorialActual = '';
-
-    const inputBuscar = document.querySelector('#inputBuscarHistorial');
-    if (inputBuscar) inputBuscar.value = '';
-
-    sincronizarSelectPorPagina('historial', porPaginaHistorial);
-
-    listarHistorial();
-}
-
-// Filtra, pagina y pinta las órdenes finalizadas.
-function listarHistorial(filtradas) {
-    let contenedor = document.querySelector('#contenedorTablaHistorial');
-    if (!contenedor) return;
-    const templateFila = document.querySelector('#templateFilaHistorial').content;
-    contenedor.innerHTML = "";
-
-    let base = filtradas;
-
-    if (!base) {
-        base = listadoGeneralOrdenes.filter(o => o.estado === 'FINALIZADA');
-
-        if (busquedaHistorialActual) {
-            const q = busquedaHistorialActual.toLowerCase();
-            base = base.filter(o => {
-                const codigo = 'OT-' + String(o.id_orden_trabajo).padStart(4, '0').toLowerCase();
-                const cliente = `${o.cliente_nombres || ''} ${o.cliente_apellidos || ''}`.toLowerCase();
-                const placa = (o.placa || '').toLowerCase();
-                return codigo.includes(q) || cliente.includes(q) || placa.includes(q);
-            });
-        }
-    }
-
-    const totalPaginas = Math.max(1, Math.ceil(base.length / porPaginaHistorial));
-    if (paginaHistorialActual > totalPaginas) paginaHistorialActual = totalPaginas;
-    const inicio = (paginaHistorialActual - 1) * porPaginaHistorial;
-    const pagina = base.slice(inicio, inicio + porPaginaHistorial);
-
-    setTexto('#contadorHistorial', String(base.length));
-
-    pagina.forEach(orden => {
-        const clone = templateFila.cloneNode(true);
-
-        clone.querySelector('.codigo-historial').textContent =
-            'OT-' + String(orden.id_orden_trabajo).padStart(4, '0');
-        clone.querySelector('.fecha-historial').textContent =
-            orden.fecha_atencion ? formatearFecha(orden.fecha_atencion) : '—';
-        clone.querySelector('.cliente-historial').textContent =
-            `${orden.cliente_nombres || ''} ${orden.cliente_apellidos || ''}`.trim();
-        clone.querySelector('.vehiculo-historial').textContent =
-            `${orden.placa || ''} · ${orden.marca || ''} ${orden.modelo || ''}`.trim();
-        clone.querySelector('.descripcion-historial').textContent = orden.observacion || '—';
-        clone.querySelector('.btn-ver-historial').dataset.id = orden.id_orden_trabajo;
-        clone.querySelector('.btn-vista-comprobante-historial').dataset.id = orden.id_orden_trabajo;
-
-        contenedor.appendChild(clone);
-    });
-
-    actualizarPaginacionHistorial(paginaHistorialActual, totalPaginas, base.length, pagina.length);
-}
-
-// Actualiza controles y rango de la paginación del historial.
-function actualizarPaginacionHistorial(pagina, totalPaginas, totalRegistros, registrosPagina) {
-    const btnNum = document.querySelector('#btnHistorialPaginaNumero');
-    if (btnNum) btnNum.textContent = String(pagina);
-
-    actualizarBotonesPaginacion('Historial', pagina, totalPaginas);
-
-    const inicio = totalRegistros === 0 ? 0 : ((pagina - 1) * porPaginaHistorial) + 1;
-    const fin    = totalRegistros === 0 ? 0 : inicio + registrosPagina - 1;
-    actualizarInfoRango('infoRangoHistorial', inicio, fin, totalRegistros);
-    actualizarIrPagina('inputIrPaginaHistorial', pagina, totalPaginas);
-}
-
-// Maneja el evento input del control #inputBuscarHistorial.
-document.addEventListener('input', function (event) {
-    const input = event.target.closest('#inputBuscarHistorial');
-    if (!input) return;
-
-    busquedaHistorialActual = input.value.trim();
-    paginaHistorialActual = 1;
-    listarHistorial();
-});
-
-// Maneja el evento keypress del control #inputIrPaginaHistorial.
-document.addEventListener('keypress', function (event) {
-    const input = event.target.closest('#inputIrPaginaHistorial');
-    if (!input) return;
-    if (event.key !== 'Enter') return;
-
-    event.preventDefault();
-    const pagina = Number(input.value);
-    if (!pagina || isNaN(pagina) || pagina < 1) return;
-
-    const finalizadas = listadoGeneralOrdenes.filter(o => o.estado === 'FINALIZADA');
-    const totalPaginas = Math.max(1, Math.ceil(finalizadas.length / porPaginaHistorial));
-    paginaHistorialActual = Math.min(pagina, totalPaginas);
-    listarHistorial();
-});
-
 // Filtra la tabla del historial y recalcula el monto del PDF seleccionado.
 function renderDetallesTicketHistorial() {
     const contenedor = document.querySelector('#contenedorVerHistorialConsumo');
@@ -5125,7 +5320,6 @@ function renderAgenda() {
 document.addEventListener('click', function (event) {
     const item = event.target.closest(
         '#contenedorPaginacionOrdenes [data-pagina], ' +
-        '#contenedorPaginacionHistorial [data-pagina], ' +
         '#contenedorPaginacionClientes [data-pagina], ' +
         '#contenedorPaginacionCitas [data-pagina], ' +
         '#contenedorPaginacionCotizaciones [data-pagina]'
@@ -5148,11 +5342,6 @@ document.addEventListener('click', function (event) {
         return;
     }
 
-    if (item.closest('#contenedorPaginacionHistorial')) {
-        paginaHistorialActual = pagina;
-        listarHistorial();
-        return;
-    }
 
     if (item.closest('#contenedorPaginacionClientes')) {
         paginaClientesActual = pagina;
@@ -5194,12 +5383,6 @@ document.addEventListener('change', function (event) {
             listarOrdenes();
             break;
 
-        case 'historial':
-            porPaginaHistorial = valor;
-            guardarPreferencia('porPaginaHistorial', valor);
-            paginaHistorialActual = 1;
-            listarHistorial();
-            break;
 
         case 'clientes':
             porPaginaClientes = valor;
