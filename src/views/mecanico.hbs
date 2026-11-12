@@ -75,7 +75,7 @@
     {{!-- ============================================================ --}}
     <section id="contenedorPrincipal">
         <div id="header">
-            <div class="contenedor-header row d-flex align-items-center">
+            <div class="contenedor-header row align-items-center">
                 <div class="col">
                     <span>Perfil Mecánico</span>
                 </div>
@@ -248,12 +248,12 @@
                         <div class="btn-group btn-group-sm" role="group" aria-label="Filtrar órdenes">
                             <button type="button" class="btn filtro-orden-listado active" data-filtro="todas">Todas</button>
                             <button type="button" class="btn filtro-orden-listado" data-filtro="pendiente">Pendientes</button>
-                            <button type="button" class="btn filtro-orden-listado" data-filtro="proceso">En proceso</button>
+                            <button type="button" class="btn filtro-orden-listado" data-filtro="proceso">Proceso</button>
                             <button type="button" class="btn filtro-orden-listado" data-filtro="finalizada">Finalizadas</button>
                         </div>
-                        <div class="input-group input-group-sm seccion-cabecera__buscar">
-                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                            <input type="search" class="form-control" id="inputBuscarOrdenListado" placeholder="Buscar orden, cliente, placa o detalle" aria-label="Buscar órdenes">
+                        <div class="seccion-cabecera__buscar campo-busqueda-mecanico">
+                            <i class="bi bi-search campo-busqueda-mecanico__icono" aria-hidden="true"></i>
+                            <input type="search" class="form-control form-control-sm" id="inputBuscarOrdenListado" placeholder="Buscar por placa..." aria-label="Buscar órdenes por placa">
                         </div>
                         <button type="button" class="btn btn-primario" id="btnNuevaOrdenListado">
                             <i class="bi bi-plus-lg me-1"></i>Nueva OT
@@ -267,9 +267,9 @@
                     </div>
                     <div class="panel-tabla__body">
                         <div class="table-responsive">
-                            <table class="table tabla-sistema mb-0">
+                            <table class="table tabla-sistema tabla-sistema--center mb-0">
                                 <thead>
-                                    <tr><th>Orden</th><th>Fecha</th><th>Cliente</th><th>Vehículo</th><th>Observaciones / detalles</th><th>Estado</th><th class="text-center">Acciones</th></tr>
+                                    <tr><th>Orden</th><th>Fecha</th><th>Cliente</th><th>Vehículo</th><th>Observaciones / detalles</th><th class="text-center">Estado</th><th class="text-center">Acciones</th></tr>
                                 </thead>
                                 <tbody id="tablaOrdenesListado"></tbody>
                             </table>
@@ -278,7 +278,7 @@
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
                             <small class="text-muted" id="infoPaginacionOrdenesListado">0–0 de 0</small>
                             <div class="d-flex align-items-center gap-2">
-                                <select class="form-select form-select-sm" id="porPaginaOrdenesListado" aria-label="Órdenes por página" style="width:auto">
+                                <select class="form-select form-select-sm w-auto" id="porPaginaOrdenesListado" aria-label="Órdenes por página">
                                     <option>5</option><option selected>10</option><option>25</option><option>50</option>
                                 </select>
                                 <button type="button" class="btn btn-outline-secondary btn-sm" id="btnOrdenesListadoAnterior" aria-label="Página anterior"><i class="bi bi-chevron-left"></i></button>
@@ -308,22 +308,21 @@
                                             <div class="btn-group btn-group-sm" role="group" aria-label="Filtros de órdenes">
                                                 <button type="button" class="btn btn-sm filtro-orden active" data-filtro="todas">Todas</button>
                                                 <button type="button" class="btn btn-sm filtro-orden" data-filtro="pendiente">Pendientes</button>
-                                                <button type="button" class="btn btn-sm filtro-orden" data-filtro="proceso">En Proceso</button>
+                                                <button type="button" class="btn btn-sm filtro-orden" data-filtro="proceso">Proceso</button>
                                                 <button type="button" class="btn btn-sm filtro-orden" data-filtro="finalizada">Finalizadas</button>
                                             </div>
-
-                                            <div class="input-group input-group-sm seccion-cabecera__buscar">
-                                                <input type="text" class="form-control" id="inputBuscarOrden"
-                                                       placeholder="Buscar orden o cliente; placa para crear OT...">
-                                                <button class="btn btn-primario" type="button" id="btnBuscarVehiculoOT" title="Buscar vehículo">
-                                                    <i class="bi bi-search"></i> Buscar vehículo
-                                                </button>
-                                            </div>
-
                                         </div>
                                     </div>
 
-                                    <div class="row g-3 vista-row-altura">
+                                                                        <div class="busqueda-placa-fila busqueda-placa-fila--ot">
+                                        <div class="seccion-cabecera busqueda-placa-card">
+                                            <div id="contenedorBuscarVehiculoOT" class="input-group input-group-sm busqueda-placa-resumen">
+                                                <input type="text" class="form-control" id="inputBuscarOrden" placeholder="Buscar por placa..." aria-label="Buscar vehículo por placa">
+                                                <button class="btn btn-primario" type="button" id="btnBuscarVehiculoOT" aria-label="Buscar vehículo por placa">Buscar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+<div class="row g-3 vista-row-altura">
                                         <div class="col-lg-3">
                                             <div class="panel-tabla panel-tabla--compact h-100">
                                                 <div class="panel-tabla__header">
@@ -391,8 +390,7 @@
                                             <div class="panel-tabla__body">
                                                 <div class="panel-tabla__scroll ordenes-panel-scroll p-2">
 
-
-                                                    <div id="contenedorVehiculoBuscadoOT" class="panel-vehiculo-ot d-none">
+<div id="contenedorVehiculoBuscadoOT" class="panel-vehiculo-ot d-none">
                                                         <div class="panel-vehiculo-ot__resumen">
                                                             <span class="panel-vehiculo-ot__icono"><i class="bi bi-car-front"></i></span>
                                                             <div class="panel-vehiculo-ot__datos">
@@ -455,15 +453,12 @@
                                                         </div>
                                                     </div>
 
-                                                    <div id="contenedorVacioOrden" class="text-center text-muted py-5">
-                                                        <i class="bi bi-clipboard fs-3 d-block mb-2"></i>
+                                                    <div id="contenedorVacioOrden" class="text-center text-muted d-flex align-items-center justify-content-center gap-2 px-2 py-2">
+                                                        <i class="bi bi-clipboard fs-5"></i>
                                                         <small>Seleccione una orden para ver su detalle y registrar los repuestos utilizados</small>
                                                     </div>
 
-                                                    {{!-- EVIDENCIAS --}}
-
-
-
+                                                    {{!-- Consumo de productos y servicios de la orden --}}
                                                     <section class="ordenes-bloque-consumo">
                                                         <div class="panel-tabla__header">
                                                             <h5 class="panel-tabla__titulo">
@@ -471,13 +466,12 @@
                                                             </h5>
                                                         </div>
 
-
-                                                        <div id="contenedorVacioConsumo" class="text-center text-muted py-5">
-                                                            <i class="bi bi-box fs-3 d-block mb-2"></i>
+<div id="contenedorVacioConsumo" class="text-center text-muted d-flex align-items-center justify-content-center gap-2 px-2 py-2">
+                                                            <i class="bi bi-box fs-5"></i>
                                                             <small>Seleccione una orden para registrar productos y servicios utilizados</small>
                                                         </div>
 
-                                                        <div id="contenedorConsumoActivo" class="d-none flex-grow-1 d-flex flex-column min-h-0">
+                                                        <div id="contenedorConsumoActivo" class="d-none flex-grow-1 d-flex flex-column">
 
                                                             {{!-- BLOQUE DE BÚSQUEDA --}}
                                                             <div id="contenedorListasDisponiblesOT" class="d-none flex-shrink-0">
@@ -485,10 +479,10 @@
 
                                                                     <div class="col-6">
                                                                         <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-tools"></i> SERVICIOS</h6>
-                                                                        <div class="input-group input-group-sm mb-2">
-                                                                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                                                        <div class="input-group input-group-sm mb-2 campo-busqueda-mecanico">
+                                                                            <i class="bi bi-search campo-busqueda-mecanico__icono" aria-hidden="true"></i>
                                                                             <input type="text" class="form-control form-control-sm" id="inputBuscarServicioOT"
-                                                                            placeholder="Buscar...">
+                                                                            placeholder="Buscar servicio..." aria-label="Buscar servicios">
                                                                         </div>
                                                                         <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
                                                                         id="contenedorResultadosServiciosOT">
@@ -502,10 +496,10 @@
 
                                                                 <div class="col-6">
                                                                     <h6 class="fw-bold small text-success mb-2"><i class="bi bi-box-seam"></i> PRODUCTOS</h6>
-                                                                    <div class="input-group input-group-sm mb-2">
-                                                                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                                                                    <div class="input-group input-group-sm mb-2 campo-busqueda-mecanico">
+                                                                        <i class="bi bi-search campo-busqueda-mecanico__icono" aria-hidden="true"></i>
                                                                         <input type="text" class="form-control form-control-sm" id="inputBuscarProductoOT"
-                                                                        placeholder="Buscar...">
+                                                                        placeholder="Buscar producto..." aria-label="Buscar productos">
                                                                     </div>
                                                                     <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
                                                                     id="contenedorResultadosProductosOT">
@@ -532,7 +526,7 @@
                                                                 <tr>
                                                                     <th class="small">Tipo</th>
                                                                     <th class="small">Descripción</th>
-                                                                    <th class="small text-center w-50">Cant.</th>
+                                                                    <th class="small text-center">Cant.</th>
                                                                     <th class="small text-end">P. Unit.</th>
                                                                     <th class="small text-end">Subtotal</th>
                                                                     <th class="small text-center"></th>
@@ -542,9 +536,7 @@
                                                         </table>
                                                     </div>
 
-
-
-                                                </div>
+</div>
 
                                             </section>
                                             <div id="contenedorEvidencias" class="ordenes-bloque-evidencias d-none">
@@ -596,7 +588,7 @@
                                     </div>
                                     </div>
                                     <div class="col-lg-4">
-                                        <div class="panel-tabla panel-tabla--compact resumen-sticky flex-grow-1 min-h-0">
+                                            <div class="panel-tabla panel-tabla--compact resumen-sticky flex-grow-1">
                                             <div class="panel-tabla__header">
                                                 <h5 class="panel-tabla__titulo">
                                                     <i class="bi bi-clipboard-check"></i> Resumen
@@ -616,9 +608,9 @@
                                                     </div>
 
                                                     <div class="bg-success-subtle p-3 rounded mb-3 flex-shrink-0">
-                                                        <div class="d-flex justify-content-between align-items-center">
+                                                        <div class="d-flex justify-content-between align-items-center resumen-total-cotizacion">
                                                             <span class="fw-bold">TOTAL</span>
-                                                            <span class="fw-normal fs-5 text-success" id="resumenTotalConsumo">S/ 0.00</span>
+                                                            <span class="fw-normal fs-5 text-success monto-total-resumen" id="resumenTotalConsumo">S/ 0.00</span>
                                                         </div>
                                                     </div>
 
@@ -665,11 +657,6 @@
                         <h5><i class="bi bi-calendar-week"></i> Agenda Semanal</h5>
                         <small class="seccion-cabecera__subtitulo" id="agendaNombreMecanico">Mecánico</small>
                     </div>
-                    <div class="seccion-cabecera__acciones">
-                        <span class="pill-contador agenda-leyenda__item--disponible">Disponible</span>
-                        <span class="pill-contador agenda-leyenda__item--ocupado">Ocupado</span>
-                        <span class="pill-contador agenda-leyenda__item--cita">Cita agendada</span>
-                    </div>
                 </div>
 
                 <div class="panel-tabla vista-row-altura">
@@ -684,16 +671,22 @@
                             <table class="table tabla-sistema style-tabla agenda-tabla border-0 mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="col-hora">HORA</th>
-                                        <th><span>LUNES</span><a href="#" class="btn-editar-dia ms-1" data-dia="LUNES" title="Editar día">&#9998;</a></th>
-                                        <th><span>MARTES</span><a href="#" class="btn-editar-dia ms-1" data-dia="MARTES" title="Editar día">&#9998;</a></th>
-                                        <th><span>MIERCOLES</span><a href="#" class="btn-editar-dia ms-1" data-dia="MIERCOLES" title="Editar día">&#9998;</a></th>
-                                        <th><span>JUEVES</span><a href="#" class="btn-editar-dia ms-1" data-dia="JUEVES" title="Editar día">&#9998;</a></th>
-                                        <th><span>VIERNES</span><a href="#" class="btn-editar-dia ms-1" data-dia="VIERNES" title="Editar día">&#9998;</a></th>
-                                        <th><span>SABADO</span><a href="#" class="btn-editar-dia ms-1" data-dia="SABADO" title="Editar día">&#9998;</a></th>
+                                        <th scope="col">HORA</th>
+                                        <th scope="col">LUNES</th>
+                                        <th scope="col">MARTES</th>
+                                        <th scope="col">MIÉRCOLES</th>
+                                        <th scope="col">JUEVES</th>
+                                        <th scope="col">VIERNES</th>
+                                        <th scope="col">SÁBADO</th>
                                     </tr>
                                 </thead>
-                                <tbody id="contenedorTablaAgenda"></tbody>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-center text-muted py-4" colspan="7">
+                                            El horario semanal aún no está disponible.
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -718,9 +711,9 @@
                             <button type="button" class="btn filtro-cotizacion-listado" data-filtro="pendiente">Pendientes</button>
                             <button type="button" class="btn filtro-cotizacion-listado" data-filtro="rechazada">Rechazadas</button>
                         </div>
-                        <div class="input-group input-group-sm seccion-cabecera__buscar">
-                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                            <input type="search" class="form-control" id="inputBuscarCotizacionListado" placeholder="Buscar código, cliente o placa" aria-label="Buscar cotizaciones">
+                        <div class="seccion-cabecera__buscar campo-busqueda-mecanico">
+                            <i class="bi bi-search campo-busqueda-mecanico__icono" aria-hidden="true"></i>
+                            <input type="search" class="form-control form-control-sm" id="inputBuscarCotizacionListado" placeholder="Buscar por código, cliente o placa..." aria-label="Buscar cotizaciones por código, cliente o placa">
                         </div>
                         <button type="button" class="btn btn-primario" id="btnNuevaCotizacionListado">
                             <i class="bi bi-plus-lg me-1"></i>Nueva cotización
@@ -736,7 +729,7 @@
                         <div class="table-responsive">
                             <table class="table tabla-sistema mb-0">
                                 <thead>
-                                    <tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Vehículo</th><th>Total</th><th>Estado</th><th class="text-center">Acciones</th></tr>
+                                    <tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Vehículo</th><th class="text-end">Total</th><th class="text-center">Estado</th><th class="text-center">Acciones</th></tr>
                                 </thead>
                                 <tbody id="tablaCotizacionesListado"></tbody>
                             </table>
@@ -745,7 +738,7 @@
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
                             <small class="text-muted" id="infoPaginacionCotizacionesListado">0–0 de 0</small>
                             <div class="d-flex align-items-center gap-2">
-                                <select class="form-select form-select-sm" id="porPaginaCotizacionesListado" aria-label="Cotizaciones por página" style="width:auto">
+                                <select class="form-select form-select-sm w-auto" id="porPaginaCotizacionesListado" aria-label="Cotizaciones por página">
                                     <option>5</option><option selected>10</option><option>25</option><option>50</option>
                                 </select>
                                 <button type="button" class="btn btn-outline-secondary btn-sm" id="btnCotizacionesListadoAnterior" aria-label="Página anterior"><i class="bi bi-chevron-left"></i></button>
@@ -773,21 +766,23 @@
                                         </div>
                                         <div class="seccion-cabecera__acciones">
                                             <div class="btn-group btn-group-sm" role="group" aria-label="Filtros de cotizaciones">
-                                                <button type="button" class="btn btn-sm filtro-cotizacion active" data-filtro="todas">Todas</button>
-                                                <button type="button" class="btn btn-sm filtro-cotizacion" data-filtro="aprobada">Aprobadas</button>
-                                                <button type="button" class="btn btn-sm filtro-cotizacion" data-filtro="pendiente">Pendientes</button>
-                                                <button type="button" class="btn btn-sm filtro-cotizacion" data-filtro="rechazada">Rechazadas</button>
-                                            </div>
-                                            <div class="input-group input-group-sm cotizacion-buscar-vehiculo">
-                                                <input type="text" class="form-control" id="inputPlacaCotizacion" placeholder="Placa del vehículo" aria-label="Placa del vehículo">
-                                                <button class="btn btn-primario" type="button" id="btnBuscarPlaca" title="Buscar vehículo">
-                                                    <i class="bi bi-search"></i> Buscar vehículo
-                                                </button>
+                                                <button type="button" class="btn filtro-cotizacion active" data-filtro="todas">Todas</button>
+                                                <button type="button" class="btn filtro-cotizacion" data-filtro="aprobada">Aprobadas</button>
+                                                <button type="button" class="btn filtro-cotizacion" data-filtro="pendiente">Pendientes</button>
+                                                <button type="button" class="btn filtro-cotizacion" data-filtro="rechazada">Rechazadas</button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="row g-3 vista-row-altura">
+                                                                        <div class="busqueda-placa-fila busqueda-placa-fila--cotizacion">
+                                        <div class="seccion-cabecera busqueda-placa-card">
+                                            <div class="input-group input-group-sm cotizacion-buscar-vehiculo busqueda-placa-resumen">
+                                                <input type="text" class="form-control" id="inputPlacaCotizacion" placeholder="Buscar por placa..." aria-label="Buscar vehículo por placa">
+                                                <button class="btn btn-primario" type="button" id="btnBuscarPlaca" aria-label="Buscar vehículo por placa">Buscar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+<div class="row g-3 vista-row-altura">
 
                                         {{!-- COLUMNA IZQUIERDA --}}
                                         <div class="col-lg-3">
@@ -868,7 +863,7 @@
                                                             <div id="contenedorInfoClienteCotizacion" class="d-none">
 
                                                                 {{!-- CLIENTE: nombre + teléfono --}}
-                                                                <div id="contenedorInfoVehiculoCotizacion-wrapper">
+                                                                <div>
                                                                     <h6 class="cotizacion-info__titulo cotizacion-info__titulo--cliente"><i class="bi bi-person-fill" aria-hidden="true"></i><span>Cliente</span></h6>
                                                                     <div class="row g-2 mb-3">
                                                                         <div class="col-6">
@@ -924,7 +919,7 @@
                                                 </div>
 
                                                 {{!-- CARD: Servicios y Productos --}}
-                                                <div class="panel-tabla panel-tabla--compact flex-grow-1 min-h-0">
+                                                <div class="panel-tabla panel-tabla--compact flex-grow-1">
                                                     <div class="panel-tabla__header">
                                                         <h6 class="panel-tabla__titulo">
                                                             <i class="bi bi-cart"></i> Servicios y Productos
@@ -938,10 +933,10 @@
                                                         <div class="row g-2 mb-2 flex-shrink-0">
                                                             <div class="col-6">
                                                                 <h6 class="fw-bold small text-primary mb-2"><i class="bi bi-tools"></i> SERVICIOS</h6>
-                                                                <div class="input-group input-group-sm mb-2">
-                                                                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                                                    <input type="text" class="form-control form-control-sm" id="inputBuscarServicioCotizacion"
-                                                                           placeholder="Buscar...">
+                                                                <div class="input-group input-group-sm mb-2 campo-busqueda-mecanico">
+                                                                    <i class="bi bi-search campo-busqueda-mecanico__icono" aria-hidden="true"></i>
+                                                                    <input type="text" class="form-control" id="inputBuscarServicioCotizacion"
+                                                                           placeholder="Buscar servicio..." aria-label="Buscar servicios">
                                                                 </div>
                                                                 <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
                                                                      id="contenedorResultadosServiciosCotizacion">
@@ -953,10 +948,10 @@
                                                             </div>
                                                             <div class="col-6">
                                                                 <h6 class="fw-bold small text-success mb-2"><i class="bi bi-box-seam"></i> PRODUCTOS</h6>
-                                                                <div class="input-group input-group-sm mb-2">
-                                                                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
-                                                                    <input type="text" class="form-control form-control-sm" id="inputBuscarProductoCotizacion"
-                                                                           placeholder="Buscar...">
+                                                                <div class="input-group input-group-sm mb-2 campo-busqueda-mecanico">
+                                                                    <i class="bi bi-search campo-busqueda-mecanico__icono" aria-hidden="true"></i>
+                                                                    <input type="text" class="form-control" id="inputBuscarProductoCotizacion"
+                                                                           placeholder="Buscar producto..." aria-label="Buscar productos">
                                                                 </div>
                                                                 <div class="card-scroll card-scroll--xs border rounded p-2 d-none"
                                                                      id="contenedorResultadosProductosCotizacion">
@@ -982,7 +977,7 @@
                                                                     <tr>
                                                                         <th class="small">Tipo</th>
                                                                         <th class="small">Descripción</th>
-                                                                        <th class="small text-center w-50">Cant.</th>
+                                                                        <th class="small text-center">Cant.</th>
                                                                         <th class="small text-end">P. Unit.</th>
                                                                         <th class="small text-end">Subtotal</th>
                                                                         <th class="small text-center"></th>
@@ -1005,7 +1000,7 @@
 
                                         {{!-- COLUMNA DERECHA: Resumen --}}
                                         <div class="col-lg-3">
-                                            <div class="panel-tabla panel-tabla--compact resumen-sticky flex-grow-1 min-h-0">
+                                            <div class="panel-tabla panel-tabla--compact resumen-sticky flex-grow-1">
                                                 <div class="panel-tabla__header">
                                                     <h5 class="panel-tabla__titulo">
                                                         <i class="bi bi-clipboard-check"></i> Resumen
@@ -1028,7 +1023,7 @@
                                                         <div class="bg-success-subtle p-3 rounded mb-3 flex-shrink-0">
                                                             <div class="d-flex justify-content-between align-items-center resumen-total-cotizacion">
                                                                 <span class="fw-bold">TOTAL</span>
-                                                                <span class="fw-normal fs-5 text-success" id="contenedorTotalFinalCotizacion">S/ 0.00</span>
+                                                                <span class="fw-normal fs-5 text-success monto-total-resumen" id="contenedorTotalFinalCotizacion">S/ 0.00</span>
                                                             </div>
                                                         </div>
 
@@ -1052,7 +1047,7 @@
                                                             <button type="button" class="btn btn-primario w-100" id="btnGenerarCotizacion">
                                                                 <i class="bi bi-file-earmark-pdf"></i> GENERAR COTIZACIÓN
                                                             </button>
-                                                            <button type="button" class="btn btn-secundario-cotizacion w-100" id="btnAgendarCitaCotizacion" disabled>
+                                                            <button type="button" class="btn btn-secundario-cotizacion w-100 d-none" id="btnAgendarCitaCotizacion" disabled>
                                                                 <i class="bi bi-calendar-plus"></i> Agendar cita desde cotización seleccionada
                                                             </button>
                                                             <button type="button" class="btn btn-cancelar w-100" id="btnLimpiarCotizacion">
@@ -1087,10 +1082,10 @@
                         </small>
                     </div>
                     <div class="seccion-cabecera__acciones">
-                        <div class="input-group input-group-sm seccion-cabecera__buscar">
-                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <div class="seccion-cabecera__buscar campo-busqueda-mecanico">
+                            <i class="bi bi-search campo-busqueda-mecanico__icono" aria-hidden="true"></i>
                             <input type="text" class="form-control form-control-sm" id="inputBuscarCita"
-                                   placeholder="Buscar por cliente, teléfono o vehículo...">
+                                   placeholder="Buscar por cliente, teléfono o placa..." aria-label="Buscar citas por cliente, teléfono o placa">
                         </div>
 
                         <button type="button" class="btn btn-primario btn-sm" id="btnNuevaCita">
@@ -1181,10 +1176,10 @@
                             <i class="bi bi-person-lines-fill"></i>
                             <span id="contadorClientes">0</span> resultados
                         </span>
-                        <div class="input-group input-group-sm seccion-cabecera__buscar">
-                            <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <div class="seccion-cabecera__buscar campo-busqueda-mecanico">
+                            <i class="bi bi-search campo-busqueda-mecanico__icono" aria-hidden="true"></i>
                             <input type="text" class="form-control form-control-sm" id="inputBuscarCliente"
-                                   placeholder="Buscar por nombre o documento...">
+                                   placeholder="Buscar cliente por nombre o documento..." aria-label="Buscar clientes por nombre o documento">
                         </div>
 
                         <button type="button" class="btn btn-primario btn-sm" id="btnNuevoCliente">
@@ -1261,63 +1256,9 @@
     {{!-- MODALES                                                      --}}
     {{!-- ============================================================ --}}
 
-    {{!-- ===== MODAL HORARIO ===== --}}
-    <div class="modal fade modal-personalizado modal-formulario-mecanico" id="modalHorario" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalHorarioLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                    <h5 class="modal-title fw-bold" id="modalHorarioLabel">HORARIO</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-tabs px-3 pt-2">
-                    <span class="tab-mecanico fw-semibold" id="nombreMecanicoModal">MECANICO</span>
-                    <span class="tab-separador">|</span>
-                    <div class="tab-dias d-inline-flex gap-1" id="tabsDiasHorario">
-                        <a href="#" class="tab-dia active" data-dia="LUNES">LUNES</a>
-                        <a href="#" class="tab-dia" data-dia="MARTES">MARTES</a>
-                        <a href="#" class="tab-dia" data-dia="MIERCOLES">MIERCOLES</a>
-                        <a href="#" class="tab-dia" data-dia="JUEVES">JUEVES</a>
-                        <a href="#" class="tab-dia" data-dia="VIERNES">VIERNES</a>
-                        <a href="#" class="tab-dia" data-dia="SABADO">SABADO</a>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="diaSeleccionadoHorario" value="LUNES">
-
-                    <h6 class="modal-seccion-titulo">AGREGAR BLOQUE HORARIO</h6>
-                    <div class="fila-agregar-horario d-flex flex-wrap align-items-end gap-2 mb-3">
-                        <div class="input-style flex-fill">
-                            <select class="form-select" id="selectHoraInicio">
-                                <option value="" selected disabled>--:--</option>
-                            </select>
-                            <label for="selectHoraInicio"><i class="bi bi-clock"></i> Inicio</label>
-                        </div>
-                        <span class="text-muted pb-2">A</span>
-                        <div class="input-style flex-fill">
-                            <select class="form-select" id="selectHoraFin">
-                                <option value="" selected disabled>--:--</option>
-                            </select>
-                            <label for="selectHoraFin"><i class="bi bi-clock-fill"></i> Fin</label>
-                        </div>
-                        <button type="button" class="btn btn-primario mb-1" id="btnAgregarHorario">AGREGAR</button>
-                    </div>
-
-                    <hr>
-                    <div id="contenedorBloquesOcupados">
-                        <p class="text-muted mb-0">No hay horarios ocupados este día.</p>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-cancelar" data-bs-dismiss="modal">CANCELAR</button>
-                    <button type="button" class="btn btn-primario" id="btnGuardarHorario">GUARDAR</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     {{!-- ===== MODAL VER HISTORIAL ===== --}}
     <div class="modal fade modal-personalizado modal-detalle-mecanico" id="modalVerHistorial" tabindex="-1" aria-labelledby="modalVerHistorialLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold" id="modalVerHistorialLabel">DETALLE DE ORDEN</h5>
@@ -1386,7 +1327,7 @@
 
     {{!-- ===== VISTA PREVIA VISUAL DE BOLETA / FACTURA ===== --}}
     <div class="modal fade modal-personalizado" id="modalVistaPreviaComprobante" tabindex="-1" aria-labelledby="modalVistaPreviaComprobanteLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold" id="modalVistaPreviaComprobanteLabel"><i class="bi bi-receipt me-2"></i>Ejemplo de comprobante</h5>
@@ -1505,7 +1446,7 @@
 
     {{!-- ===== MODAL VER CITA ===== --}}
     <div class="modal fade modal-personalizado modal-detalle-mecanico" id="modalVerCita" tabindex="-1" aria-labelledby="modalVerCitaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold" id="modalVerCitaLabel">DETALLE DE CITA</h5>
@@ -1713,7 +1654,7 @@
 
     {{!-- ===== MODAL VER CLIENTE ===== --}}
     <div class="modal fade modal-personalizado" id="modalVerCliente" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalVerClienteLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content">
                 <div class="modal-header border-0 pb-0">
                     <h5 class="modal-title fw-bold" id="modalVerClienteLabel">DETALLE DEL CLIENTE</h5>
@@ -1733,6 +1674,72 @@
                             <div class="datos-modal-mecanico__fila"><span>Correo:</span><span id="verClienteCorreo" class="text-primary">--</span></div>
                             <div class="datos-modal-mecanico__fila"><span>Dirección:</span><span id="verClienteDireccion">--</span></div>
                         </div>
+
+                        <section id="formularioVehiculoCliente" class="d-none">
+                            <h6 class="modal-seccion-titulo"><i class="bi bi-car-front"></i> <span id="tituloFormularioVehiculoCliente">NUEVO VEHÍCULO</span></h6>
+                            <form id="formNuevoVehiculo" novalidate>
+                                <input type="hidden" id="inputIdClienteVehiculo">
+                                <input type="hidden" id="inputModoVehiculo" value="crear">
+                                <input type="hidden" id="inputIdVehiculoEditar" value="">
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="input-style">
+                                            <input type="text" class="form-control text-uppercase" id="inputPlacaVehiculo" placeholder=" " required>
+                                            <label for="inputPlacaVehiculo"><i class="bi bi-card-text"></i> Placa</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-style">
+                                            <input type="text" class="form-control" id="inputMarcaVehiculo" placeholder=" " required>
+                                            <label for="inputMarcaVehiculo"><i class="bi bi-tag"></i> Marca</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-style">
+                                            <input type="text" class="form-control" id="inputModeloVehiculo" placeholder=" " required>
+                                            <label for="inputModeloVehiculo"><i class="bi bi-tag-fill"></i> Modelo</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="input-style">
+                                            <input type="number" class="form-control" id="inputAnioVehiculo" placeholder=" " min="1900" max="2100" required>
+                                            <label for="inputAnioVehiculo"><i class="bi bi-calendar3"></i> Año</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="input-style">
+                                            <input type="text" class="form-control" id="inputColorVehiculo" placeholder=" " required>
+                                            <label for="inputColorVehiculo"><i class="bi bi-palette"></i> Color</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="input-style">
+                                            <input type="text" class="form-control" id="inputVinVehiculo" placeholder=" " required>
+                                            <label for="inputVinVehiculo"><i class="bi bi-upc-scan"></i> VIN</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="input-style">
+                                            <input type="text" class="form-control" id="inputNumeroMotorVehiculo" placeholder=" " required>
+                                            <label for="inputNumeroMotorVehiculo"><i class="bi bi-gear"></i> N° Motor</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="input-style">
+                                            <input type="text" class="form-control" id="inputNumeroChasisVehiculo" placeholder=" " required>
+                                            <label for="inputNumeroChasisVehiculo"><i class="bi bi-hdd-stack"></i> N° Chasis</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="input-style">
+                                            <textarea class="form-control" id="inputObservacionesVehiculo" rows="2" placeholder=" "></textarea>
+                                            <label for="inputObservacionesVehiculo"><i class="bi bi-pencil-square"></i> Observaciones</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </section>
 
                         <hr>
 
@@ -1768,71 +1775,6 @@
                         </div>
                     </div>
 
-                    <section id="formularioVehiculoCliente" class="d-none">
-                        <h6 class="modal-seccion-titulo"><i class="bi bi-car-front"></i> <span id="tituloFormularioVehiculoCliente">NUEVO VEHÍCULO</span></h6>
-                        <form id="formNuevoVehiculo" novalidate>
-                            <input type="hidden" id="inputIdClienteVehiculo">
-                            <input type="hidden" id="inputModoVehiculo" value="crear">
-                            <input type="hidden" id="inputIdVehiculoEditar" value="">
-
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="input-style">
-                                        <input type="text" class="form-control text-uppercase" id="inputPlacaVehiculo" placeholder=" " required>
-                                        <label for="inputPlacaVehiculo"><i class="bi bi-card-text"></i> Placa</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="input-style">
-                                        <input type="text" class="form-control" id="inputMarcaVehiculo" placeholder=" " required>
-                                        <label for="inputMarcaVehiculo"><i class="bi bi-tag"></i> Marca</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="input-style">
-                                        <input type="text" class="form-control" id="inputModeloVehiculo" placeholder=" " required>
-                                        <label for="inputModeloVehiculo"><i class="bi bi-tag-fill"></i> Modelo</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="input-style">
-                                        <input type="number" class="form-control" id="inputAnioVehiculo" placeholder=" " min="1900" max="2100" required>
-                                        <label for="inputAnioVehiculo"><i class="bi bi-calendar3"></i> Año</label>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="input-style">
-                                        <input type="text" class="form-control" id="inputColorVehiculo" placeholder=" " required>
-                                        <label for="inputColorVehiculo"><i class="bi bi-palette"></i> Color</label>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="input-style">
-                                        <input type="text" class="form-control" id="inputVinVehiculo" placeholder=" " required>
-                                        <label for="inputVinVehiculo"><i class="bi bi-upc-scan"></i> VIN</label>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="input-style">
-                                        <input type="text" class="form-control" id="inputNumeroMotorVehiculo" placeholder=" " required>
-                                        <label for="inputNumeroMotorVehiculo"><i class="bi bi-gear"></i> N° Motor</label>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="input-style">
-                                        <input type="text" class="form-control" id="inputNumeroChasisVehiculo" placeholder=" " required>
-                                        <label for="inputNumeroChasisVehiculo"><i class="bi bi-hdd-stack"></i> N° Chasis</label>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="input-style">
-                                        <textarea class="form-control" id="inputObservacionesVehiculo" rows="2" placeholder=" "></textarea>
-                                        <label for="inputObservacionesVehiculo"><i class="bi bi-pencil-square"></i> Observaciones</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </section>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-cancelar" id="btnCerrarDetalleCliente" data-bs-dismiss="modal">Cerrar</button>
@@ -1918,7 +1860,7 @@
             <td class="vehiculo-orden"></td>
             <td class="servicio-orden"></td>
             <td class="fecha-orden"></td>
-            <td class="estado-orden text-center"></td>
+            <td class="text-center"><span class="estado-orden badge"></span></td>
         </tr>
     </template>
 
@@ -1938,8 +1880,8 @@
             <td class="cliente-orden"></td>
             <td class="vehiculo-orden"></td>
             <td class="descripcion-orden small"></td>
-            <td><span class="estado-orden badge"></span></td>
-            <td>
+            <td class="text-center"><span class="estado-orden badge"></span></td>
+            <td class="text-center">
                 <div class="acciones-orden-listado d-flex justify-content-center gap-1">
                     <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-abrir-orden-listado" title="Continuar orden" aria-label="Continuar orden">
                         <i class="bi bi-play-fill"></i><span class="texto-accion-orden visually-hidden">Continuar</span>
@@ -1983,7 +1925,7 @@
             <td class="tipo-item small"></td>
             <td class="descripcion-item small"></td>
             <td class="cantidad-item text-center small">
-                <div class="input-group input-group-sm justify-content-center" style="max-width: 110px; margin: 0 auto;">
+                <div class="input-group input-group-sm justify-content-center mx-auto grupo-cantidad-cotizacion">
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-restar-item" title="-">
                         <i class="bi bi-dash"></i>
                     </button>
@@ -2005,25 +1947,19 @@
 
     <template id="templateItemServicioDisponible">
         <button type="button" class="item-disponible-servicio btn-agregar-servicio-lista d-flex align-items-center justify-content-between border-bottom py-2 px-1" title="Agregar servicio">
-            <span class="me-2 flex-grow-1">
-                <span class="small fw-semibold nombre-servicio d-block"></span>
-                <span class="small text-muted precio-servicio d-block"></span>
-            </span>
-            <span class="item-disponible__indicador" aria-hidden="true">
-                <i class="bi bi-plus-lg"></i>
-            </span>
+            <span class="me-2 flex-grow-1 nombre-servicio small fw-semibold"></span>
+            <span class="precio-servicio item-disponible__precio small text-muted"></span>
+            <!-- Se conserva comentado el indicador + para que no aparezca. -->
+            <!-- <span class="item-disponible__indicador" aria-hidden="true"><i class="bi bi-plus-lg"></i></span> -->
         </button>
     </template>
 
     <template id="templateItemProductoDisponible">
         <button type="button" class="item-disponible-producto btn-agregar-producto-lista d-flex align-items-center justify-content-between border-bottom py-2 px-1" title="Agregar producto">
-            <span class="me-2 flex-grow-1">
-                <span class="small fw-semibold nombre-producto d-block"></span>
-                <span class="small text-muted precio-producto d-block"></span>
-            </span>
-            <span class="item-disponible__indicador" aria-hidden="true">
-                <i class="bi bi-plus-lg"></i>
-            </span>
+            <span class="me-2 flex-grow-1 nombre-producto small fw-semibold"></span>
+            <span class="precio-producto item-disponible__precio small text-muted"></span>
+            <!-- Se conserva comentado el indicador + para que no aparezca. -->
+            <!-- <span class="item-disponible__indicador" aria-hidden="true"><i class="bi bi-plus-lg"></i></span> -->
         </button>
     </template>
 
@@ -2035,7 +1971,7 @@
             <td class="vehiculo-cita"></td>
             <td class="fecha-cita"></td>
             <td class="hora-cita"></td>
-            <td class="estado-cita text-center"></td>
+            <td class="text-center"><span class="estado-cita badge"></span></td>
             <td class="acciones-cita text-center">
                 <div class="d-inline-flex flex-wrap justify-content-center gap-1">
                     <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-ver-cita" title="Ver cita" aria-label="Ver cita">
@@ -2053,16 +1989,6 @@
                 </div>
             </td>
         </tr>
-    </template>
-
-    <template id="templateFilaAgenda">
-        <tr>
-            <td class="hora-agenda fw-semibold small"></td>
-        </tr>
-    </template>
-
-    <template id="templateCeldaAgenda">
-        <td class="contenido-agenda text-center small"></td>
     </template>
 
     <template id="templateFilaCliente">
@@ -2088,7 +2014,7 @@
             <td class="marca-modelo-vehiculo small"></td>
             <td class="anio-vehiculo text-center small"></td>
             <td class="color-vehiculo small"></td>
-            <td class="estado-vehiculo text-center"></td>
+            <td class="text-center"><span class="estado-vehiculo badge"></span></td>
             <td class="acciones-vehiculo text-center">
                 <div class="d-inline-flex justify-content-center gap-1">
                     <button type="button" class="btn btn-accion-icono btn-accion-icono--primario btn-editar-vehiculo" title="Editar vehículo" aria-label="Editar vehículo">
@@ -2140,7 +2066,7 @@
             <td class="cliente-cotizacion"></td>
             <td class="vehiculo-cotizacion"></td>
             <td class="monto-cotizacion text-end"></td>
-            <td><span class="estado-cotizacion badge"></span></td>
+            <td class="text-center"><span class="estado-cotizacion badge"></span></td>
             <td class="text-center">
                 <div class="d-inline-flex flex-wrap justify-content-center gap-1">
                     <button type="button" class="btn btn-accion-icono btn-accion-icono--primario item-cotizacion" title="Ver cotización" aria-label="Ver cotización">
@@ -2158,14 +2084,6 @@
                 </div>
             </td>
         </tr>
-    </template>
-
-    <template id="templateBloqueOcupado">
-        <div class="bloque-ocupado d-flex align-items-center gap-2 mb-2">
-            <span class="badge-ocupado-modal">OCUPADO</span>
-            <span class="bloque-horario"></span>
-            <a href="#" class="btn-eliminar-bloque ms-auto" title="Quitar horario">&#128465;</a>
-        </div>
     </template>
 
     <template id="templateEvidenciaGuardada">

@@ -4,6 +4,7 @@
         '#dashboardCliente': { tipo: 'dashboard' },
         '#citasCliente': { plantilla: 'templateCitasCliente' },
         '#vehiculosCliente': { plantilla: 'templateVehiculosCliente' },
+        '#ordenesCliente': { plantilla: 'templateOrdenesCliente' },
         '#cotizacionesCliente': { plantilla: 'templateCotizacionesCliente' },
         '#historialCliente': { plantilla: 'templateHistorialCliente' },
         '#perfilCliente': { plantilla: 'templatePerfilCliente' }

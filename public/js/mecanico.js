@@ -82,7 +82,6 @@ let busquedaProductoOT         = '';
 let porPaginaOrdenes     = leerPreferencia('porPaginaOrdenes', DEFAULT_POR_PAGINA);
 let paginaOrdenesActual  = 1;
 let filtroOrdenActual    = 'todas';
-let busquedaOrdenModalActual = '';
 let busquedaOrdenListadoActual = '';
 let paginaOrdenesListado = 1;
 let porPaginaOrdenesListado = 10;
@@ -248,6 +247,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnMenuCerrarSesion.addEventListener('click', function (e) {
             e.preventDefault();
             abrirModal('#modalCerrarSesion');
+        });
+    }
+
+    const btnConfirmarCerrarSesion = document.querySelector('#btnConfirmarCerrarSesion');
+    if (btnConfirmarCerrarSesion) {
+        btnConfirmarCerrarSesion.addEventListener('click', async function () {
+            if (btnConfirmarCerrarSesion.disabled) return;
+
+            btnConfirmarCerrarSesion.disabled = true;
+
+            try {
+                const respuesta = await axios.post('/api/logout');
+
+                if (!respuesta.data || !respuesta.data.ok) {
+                    mostrarToast('error', 'Error al cerrar sesión',
+                        respuesta.data?.mensaje || 'No se pudo cerrar la sesión. Inténtelo nuevamente.');
+                    return;
+                }
+
+                window.location.replace('/');
+            } catch (error) {
+                console.error('Error cerrando sesión:', error);
+                const mensaje = error.response?.data?.mensaje || 'No se pudo conectar con el servidor. Inténtelo nuevamente.';
+                mostrarToast('error', 'Error al cerrar sesión', mensaje);
+            } finally {
+                btnConfirmarCerrarSesion.disabled = false;
+            }
         });
     }
 
@@ -506,18 +532,25 @@ function fechaISO(fecha) {
 // Selecciona las clases visuales de Bootstrap según el estado.
 function claseBadgeEstado(estado) {
     switch (estado) {
-        case 'PENDIENTE':   return 'bg-warning text-dark';
-        case 'EN PROCESO':  return 'bg-primary';
-        case 'FINALIZADA':  return 'bg-success';
-        case 'CANCELADA':   return 'bg-danger';
-        case 'CONFIRMADA':  return 'bg-info text-dark';
-        case 'ATENDIDA':    return 'bg-success';
-        case 'APROBADA':    return 'bg-success';
-        case 'RECHAZADA':   return 'bg-danger';
-        case 'ACTIVO':      return 'bg-success';
-        case 'INACTIVO':    return 'bg-secondary';
-        default:            return 'bg-secondary';
+        case 'PENDIENTE':   return 'badge-estado badge-estado--pendiente';
+        case 'EN PROCESO':  return 'badge-estado badge-estado--proceso';
+        case 'FINALIZADA':  return 'badge-estado badge-estado--finalizada';
+        case 'CANCELADA':   return 'badge-estado badge-estado--cancelada';
+        case 'CONFIRMADA':  return 'badge-estado badge-estado--confirmada';
+        case 'ATENDIDA':    return 'badge-estado badge-estado--atendida';
+        case 'APROBADA':    return 'badge-estado badge-estado--aprobada';
+        case 'RECHAZADA':   return 'badge-estado badge-estado--rechazada';
+        case 'ACTIVO':      return 'badge-estado badge-estado--activo';
+        case 'INACTIVO':    return 'badge-estado badge-estado--inactivo';
+        default:            return 'badge-estado badge-estado--sin-definir';
     }
+}
+
+// Acorta la etiqueta visual sin modificar el estado guardado en el sistema.
+function textoEstadoBadge(estado) {
+    const valor = String(estado || '').trim();
+    if (!valor) return '—';
+    return valor.toUpperCase() === 'EN PROCESO' ? 'PROCESO' : valor;
 }
 
 // Calcula el promedio de días de las órdenes finalizadas recibidas.
@@ -828,7 +861,7 @@ function listarOrdenesPendientesDashboard(pendientes) {
             orden.fecha_atencion ? formatearFecha(orden.fecha_atencion) : '—';
 
         const badge = templateFila.querySelector('.estado-orden');
-        badge.textContent = orden.estado || '—';
+        badge.textContent = textoEstadoBadge(orden.estado);
         badge.className = 'estado-orden badge ' + claseBadgeEstado(orden.estado);
 
         const clone = templateFila.cloneNode(true);
@@ -941,7 +974,7 @@ function listarVehiculosCliente() {
         clone.querySelector('.color-vehiculo').textContent = vehiculo.color;
 
         const badge = clone.querySelector('.estado-vehiculo');
-        badge.textContent = vehiculo.estado;
+        badge.textContent = textoEstadoBadge(vehiculo.estado);
         badge.className = 'estado-vehiculo badge ' + claseBadgeEstado(vehiculo.estado);
 
         clone.querySelector('.btn-editar-vehiculo').dataset.id = vehiculo.id_vehiculo;
@@ -1319,7 +1352,7 @@ document.addEventListener('click', async function (event) {
     document.querySelector('#verClienteDireccion').textContent = persona.direccion;
 
     const badge = document.querySelector('#verClienteEstado');
-    badge.textContent = persona.estado;
+    badge.textContent = textoEstadoBadge(persona.estado);
     badge.className = 'badge ' + claseBadgeEstado(persona.estado);
 
     await cargarVehiculosPorPersona(persona.id_persona);
@@ -1672,7 +1705,7 @@ function listarCitas(filtradas) {
         clone.querySelector('.hora-cita').textContent = cita.hora_cita;
 
         const badge = clone.querySelector('.estado-cita');
-        badge.textContent = cita.estado;
+        badge.textContent = textoEstadoBadge(cita.estado);
         badge.className = 'estado-cita badge ' + claseBadgeEstado(cita.estado);
 
         const btnVer      = clone.querySelector('.btn-ver-cita');
@@ -1972,7 +2005,7 @@ document.addEventListener('click', async function (event) {
         document.querySelector('#verCitaHora').textContent = cita.hora_cita;
 
         const badge = document.querySelector('#verCitaEstado');
-        badge.textContent = cita.estado;
+        badge.textContent = textoEstadoBadge(cita.estado);
         badge.className = 'badge ' + claseBadgeEstado(cita.estado);
 
         document.querySelector('#verCitaClienteDocumento').textContent = cita.documento || '—';
@@ -2277,7 +2310,7 @@ function listarCotizacionesSidebar(filtradas) {
             cot.fecha_cotizacion ? formatearFecha(cot.fecha_cotizacion) : '—';
 
         const badge = clone.querySelector('.estado-cotizacion');
-        badge.textContent = cot.estado || '—';
+        badge.textContent = textoEstadoBadge(cot.estado);
         badge.className = 'estado-cotizacion badge ' + claseBadgeEstado(cot.estado);
 
         const badgeOcupada = clone.querySelector('.ocupada-cotizacion');
@@ -2359,7 +2392,7 @@ function listarCotizacionesListado() {
         clone.querySelector('.monto-cotizacion').textContent = 'S/ ' + Number(cot.monto_cotizacion || 0).toFixed(2);
 
         const badge = clone.querySelector('.estado-cotizacion');
-        badge.textContent = cot.estado || '—';
+        badge.textContent = textoEstadoBadge(cot.estado);
         badge.className = 'estado-cotizacion badge ' + claseBadgeEstado(cot.estado);
 
         const vista = clone.querySelector('.item-cotizacion');
@@ -2932,9 +2965,6 @@ document.addEventListener('click', async function (event) {
 
         const cot = res.data.cotizacion;
         cotizacionActual = cot;
-        const btnAgendarCita = document.querySelector('#btnAgendarCitaCotizacion');
-        if (btnAgendarCita) btnAgendarCita.disabled = false;
-
         setTexto('#contenedorPlacaActiva', cot.placa || '--');
 
         const persona = {
@@ -3097,7 +3127,11 @@ function alternarModoSoloLecturaCotizacion(soloLectura) {
     if (generar) generar.classList.toggle('d-none', soloLectura);
     if (limpiar) limpiar.classList.toggle('d-none', soloLectura);
     const agendar = modal.querySelector('#btnAgendarCitaCotizacion');
-    if (agendar) agendar.disabled = !cotizacionActual;
+    const puedeAgendar = soloLectura && Boolean(cotizacionActual);
+    if (agendar) {
+        agendar.disabled = !puedeAgendar;
+        agendar.classList.toggle('d-none', !puedeAgendar);
+    }
 }
 
 // Recalcula subtotales, impuestos y total de la cotización.
@@ -3168,7 +3202,10 @@ function limpiarFormularioCotizacion() {
     clienteActual = null;
     vehiculoActualCotizacion = null;
     const btnAgendarCita = document.querySelector('#btnAgendarCitaCotizacion');
-    if (btnAgendarCita) btnAgendarCita.disabled = true;
+    if (btnAgendarCita) {
+        btnAgendarCita.disabled = true;
+        btnAgendarCita.classList.add('d-none');
+    }
 
     const inputPlaca = document.querySelector('#inputPlacaCotizacion');
     if (inputPlaca) inputPlaca.value = '';
@@ -3198,6 +3235,19 @@ function limpiarFormularioCotizacion() {
 // ============================================================
 // SECCION ORDENES DE TRABAJO
 // ============================================================
+// Muestra la búsqueda por placa solo al iniciar una orden nueva.
+function alternarBuscadorVehiculoOT(mostrar) {
+    const contenedor = document.querySelector('#contenedorBuscarVehiculoOT');
+    if (!contenedor) return;
+
+    contenedor.classList.toggle('d-none', !mostrar);
+
+    if (!mostrar) {
+        const input = document.querySelector('#inputBuscarOrden');
+        if (input) input.value = '';
+    }
+}
+
 // Inserta la vista de órdenes y prepara sus filtros y controles.
 function renderOrdenes() {
     // Flush del autoguardado pendiente antes de salir de la vista
@@ -3222,7 +3272,6 @@ function renderOrdenes() {
     idInformeActual = null;
     paginaOrdenesActual = 1;
     filtroOrdenActual = 'todas';
-    busquedaOrdenModalActual = '';
     busquedaOrdenListadoActual = '';
     paginaOrdenesListado = 1;
     porPaginaOrdenesListado = 10;
@@ -3245,6 +3294,7 @@ function renderOrdenes() {
 
     const inputBuscar = document.querySelector('#inputBuscarOrden');
     if (inputBuscar) inputBuscar.value = '';
+    alternarBuscadorVehiculoOT(true);
 
     sincronizarSelectPorPagina('ordenes', porPaginaOrdenes);
 
@@ -3268,7 +3318,7 @@ function limpiarDetalleOrden() {
     const badge = document.querySelector('#consumoOrdenEstado');
     if (badge) {
         badge.textContent = '--';
-        badge.className = 'badge bg-secondary';
+        badge.className = 'badge badge-estado badge-estado--sin-definir';
     }
 
     vehiculoBuscadoOT = null;
@@ -3360,16 +3410,6 @@ function listarOrdenes() {
         }
     }
 
-    if (busquedaOrdenModalActual) {
-        const q = busquedaOrdenModalActual.toLowerCase();
-        filtradas = filtradas.filter(o => {
-            const codigo = 'OT-' + String(o.id_orden_trabajo).padStart(4, '0').toLowerCase();
-            const cliente = `${o.cliente_nombres || ''} ${o.cliente_apellidos || ''}`.toLowerCase();
-            const placa = (o.placa || '').toLowerCase();
-            return codigo.includes(q) || cliente.includes(q) || placa.includes(q);
-        });
-    }
-
     const totalPaginas = Math.max(1, Math.ceil(filtradas.length / porPaginaOrdenes));
     if (paginaOrdenesActual > totalPaginas) paginaOrdenesActual = totalPaginas;
     const inicio = (paginaOrdenesActual - 1) * porPaginaOrdenes;
@@ -3386,7 +3426,7 @@ function listarOrdenes() {
             `${orden.placa || ''} · ${orden.marca || ''} ${orden.modelo || ''}`.trim();
 
         const badge = clone.querySelector('.estado-orden');
-        badge.textContent = orden.estado || '—';
+        badge.textContent = textoEstadoBadge(orden.estado);
         badge.className = 'estado-orden badge ' + claseBadgeEstado(orden.estado);
 
         const btn = clone.querySelector('.item-orden');
@@ -3417,11 +3457,8 @@ function listarOrdenesListado() {
     const busqueda = busquedaOrdenListadoActual.toLowerCase();
     if (busqueda) {
         filtradas = filtradas.filter(orden => {
-            const codigo = 'OT-' + String(orden.id_orden_trabajo).padStart(4, '0');
-            const cliente = `${orden.cliente_nombres || ''} ${orden.cliente_apellidos || ''}`;
-            const vehiculo = `${orden.placa || ''} ${orden.marca || ''} ${orden.modelo || ''}`;
-            const observacion = orden.observacion || '';
-            return `${codigo} ${cliente} ${vehiculo} ${observacion}`.toLowerCase().includes(busqueda);
+            const placa = String(orden.placa || '').toLowerCase();
+            return placa.includes(busqueda);
         });
     }
 
@@ -3442,7 +3479,7 @@ function listarOrdenesListado() {
 
         const estado = String(orden.estado || '').toUpperCase();
         const badge = clone.querySelector('.estado-orden');
-        badge.textContent = orden.estado || '—';
+        badge.textContent = textoEstadoBadge(orden.estado);
         badge.className = 'estado-orden badge ' + claseBadgeEstado(orden.estado);
         clone.querySelector('.descripcion-orden').textContent = orden.observacion || '—';
 
@@ -3503,6 +3540,7 @@ async function cargarOrdenActual(idOrden) {
 
         const orden = res.data.orden;
         ordenActual = orden;
+        alternarBuscadorVehiculoOT(false);
         vehiculoBuscadoOT = null;
         const tarjetaVehiculo = document.querySelector('#contenedorVehiculoBuscadoOT');
         if (tarjetaVehiculo) tarjetaVehiculo.classList.add('d-none');
@@ -3636,7 +3674,7 @@ function pintarDetalleOrden(orden) {
 
     const badge = document.querySelector('#consumoOrdenEstado');
     if (badge) {
-        badge.textContent = orden.estado || '—';
+        badge.textContent = textoEstadoBadge(orden.estado);
         badge.className = 'badge ' + claseBadgeEstado(orden.estado);
     }
 }
@@ -4043,7 +4081,7 @@ document.addEventListener('click', async function (event) {
     archivosEvidenciaPendientes = [];
     idInformeActual = null;
     limpiarDetalleOrden();
-    busquedaOrdenModalActual = '';
+    alternarBuscadorVehiculoOT(true);
     const busqueda = document.querySelector('#inputBuscarOrden');
     if (busqueda) busqueda.value = '';
     abrirModal('#modalGestionOrdenes');
@@ -4060,16 +4098,6 @@ document.addEventListener('click', async function (event) {
     if (ordenActual && Number(ordenActual.id_orden_trabajo) === Number(idOrden)) {
         abrirModal('#modalGestionOrdenes');
     }
-});
-
-// Maneja el evento input del control #inputBuscarOrden.
-document.addEventListener('input', function (event) {
-    const input = event.target.closest('#inputBuscarOrden');
-    if (!input) return;
-
-    busquedaOrdenModalActual = input.value.trim();
-    paginaOrdenesActual = 1;
-    listarOrdenes();
 });
 
 // Muestra únicamente las citas y cotizaciones disponibles para crear la OT.

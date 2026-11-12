@@ -4,7 +4,7 @@ const router = express.Router();
 // ==========================================================
 // MIDDLEWARES
 // ==========================================================
-const { verificarToken, verificarVista } = require('../middleware/authMiddleware');
+const { verificarToken, verificarVista, verificarRol, verificarRolVista } = require('../middleware/authMiddleware');
 const { upload: uploadEvidencias } = require('../middleware/evidenciaMiddleware');
 const { prepararTicketPDF } = require('../middleware/ticketPDFMiddleware');
 const { prepararOperacionesImpuestos } = require('../middleware/impuestoMiddleware');
@@ -34,16 +34,16 @@ const controllerTicketOT = require('../controllers/controllerTicketOT');
 router.get('/', (req, res) => {
     res.render('index');
 });
-router.get('/root', verificarVista, (req, res) => {
+router.get('/root', verificarVista, verificarRolVista(1), (req, res) => {
     res.render('root');
 });
-router.get('/admin', verificarVista, (req, res) => {
+router.get('/admin', verificarVista, verificarRolVista(1), (req, res) => {
     res.render('administrador');
 });
-router.get('/mecanico', verificarVista, (req, res) => {
+router.get('/mecanico', verificarVista, verificarRolVista(3), (req, res) => {
     res.render('mecanico');
 });
-router.get('/cliente', verificarVista, (req, res) => {
+router.get('/cliente', verificarVista, verificarRolVista(4), (req, res) => {
     res.render('cliente');
 });
 
@@ -63,6 +63,11 @@ router.use('/api', verificarToken);
 // API: PERFIL (requiere token)
 // ==========================================================
 router.get('/api/obtenerPerfil', controllerAuth.obtenerPerfil);
+
+// Las operaciones del taller quedan disponibles para administración y mecánica.
+// El cliente conserva únicamente la consulta de su perfil hasta contar con rutas
+// que entreguen y validen información propia de su cuenta.
+router.use('/api', verificarRol(1, 3));
 
 // ==========================================================
 // API: PERSONAS

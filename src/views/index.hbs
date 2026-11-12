@@ -14,23 +14,23 @@
 
               {{!-- Seccion de login --}}
               <div class="col-sm-12 col-md-6 col-lg-6">
-                <div id="contenedorLogin" class="row">
-                  <div class="col-12 col-lg-6 col-md-8">
-                    <form action="" class=" formulario-login form-group p-4 shadow" novalidate>
+                <div  class="row">
+                  <div id="contenedorLogin" class="col-12 col-lg-4 col-md-8">
+                    <form class="formulario-login form-group p-4 shadow">
                       <div>
                         <div class="text-center mb-4">
                           <img id="logo" src="/img/logo.png" alt="" class="img-fluid logo" width="150px">
                         </div>
 
-                        <div class="form-floating mb-2">
-                          <input id="correoSesion" type="email" class="form-control" placeholder="" autocomplete="username" required>
-                          <label for="correoSesion"><i class="bi bi-person me-1"></i>Correo</label>
+                        <div class="input-style espacio-margin-input">
+                          <input id="correoSesion" type="text" id="miInput" placeholder=" " autocomplete="off">
+                          <label for="miInput"><i class="bi bi-person  me-1"></i> Correo</label>
                         </div>
-                        <div class="form-floating mb-4">
-                          <input id="passwordSesion" type="password" class="form-control" placeholder="" autocomplete="current-password" required>
-                          <label for="passwordSesion"><i class="bi bi-shield-check me-1"></i>Contraseña</label>
+                        <div class="input-style">
+                          <input id="passwordSesion" type="password" id="miInput" placeholder=" " autocomplete="off">
+                          <label for="miInput"><i class="bi bi-person  bi bi-shield-check me-1"></i> Contraseña</label>
                         </div>
-                        <div class="text-center mb-4">
+                        <div class="text-center espacio-margin-btn">
                           <button type="button" id="btn_login" class="btn btn-primario" onclick="validarUsuario()">
                               <span>INGRESAR</span>
                           </button>
@@ -48,7 +48,7 @@
                       </div>
 
                     </form>
-
+                  
                     <!-- Modal de registro de Usuario -->
                     <div class="modal fade" id="modalRegistro" data-bs-backdrop="static" data-bs-keyboard="false"
                       tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -67,11 +67,11 @@
                               <label for="">&nbsp Alias</label>
                               <input id="nick" class="form-control mb-3 style-input" type="text">
                               <label for="">&nbsp Telefono</label>
-                              <input id="telefono" class="form-control mb-3 style-input" type="tel" inputmode="tel" autocomplete="tel">
+                              <input id="telefono" class="form-control mb-3 style-input" type="number">
                               <label for="">&nbsp Correo (Sera tu usuario de iniciar sesion)</label>
-                              <input id="correoRegistro" class="form-control mb-3 style-input" type="email" autocomplete="email">
+                              <input id="correoRegistro" class="form-control mb-3 style-input" type="text">
                               <label for="">&nbsp Contraseña</label>
-                              <input id="passwordRegistro" class="form-control mb-3 style-input" type="password" autocomplete="new-password" minlength="8">
+                              <input id="passwordRegistro" class="form-control mb-3 style-input" type="password">
                               {{!-- <span
                                 class="lbx-datos-select nav-link dropdown-toggle border border-1 rounded-2 mb-3 text-dark"
                                 data-bs-toggle="dropdown" role="button" aria-expanded="false">Seleccione tipo
@@ -133,18 +133,18 @@
     </div>
   </section>
   <!-- Toast de notificaciones -->
-    <div id="toastContainer" class="toast-container-custom" aria-live="polite" aria-atomic="true">
-        <div id="toastCertificado" class="toast-personalizado" role="alert">
-        <i id="toastIcono" class="bi toast-icono"></i>
-        <div class="toast-contenido">
-            <p id="toastTitulo" class="toast-titulo mb-0"></p>
-            <p id="toastMensaje" class="toast-mensaje mb-0"></p>
-        </div>
-        <button type="button" id="toastCerrar" class="toast-cerrar" aria-label="Cerrar notificación">
-            <i class="bi bi-x-lg"></i>
-        </button>
-        </div>
+  <div id="toastContainer" class="toast-container-custom" aria-live="polite" aria-atomic="true">
+    <div id="toastCertificado" class="toast-personalizado" role="alert">
+      <i id="toastIcono" class="bi toast-icono"></i>
+    <div class="toast-contenido">
+      <p id="toastTitulo" class="toast-titulo mb-0"></p>
+      <p id="toastMensaje" class="toast-mensaje mb-0"></p>
     </div>
+    <button type="button" id="toastCerrar" class="toast-cerrar" aria-label="Cerrar notificación">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    </div>
+  </div>
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

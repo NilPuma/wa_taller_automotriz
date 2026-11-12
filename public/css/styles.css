@@ -759,11 +759,10 @@ body {
   min-height: 0;
   overflow: hidden;
 }
-/* Vistas: ya NO scrollean, solo contienen */
+/* En escritorio, las vistas ocupan el alto disponible y el contenido usa scroll interno. */
 #dashboard,
 #ordenes,
 #agenda,
-#historial,
 #cotizaciones,
 #citas,
 #clientes {
@@ -805,7 +804,7 @@ body {
 }
 
 /* ============================================================
-   5.2. SCROLLS INTERNOS
+   SCROLLS INTERNOS
    ============================================================ */
 .card-scroll {
   overflow-y: auto;
@@ -848,7 +847,7 @@ body {
 }
 
 /* ============================================================
-   6. BARRA DE SECCIÓN
+   BARRAS DE SECCIÓN
    ============================================================ */
 .seccion-cabecera {
   display: flex;
@@ -928,11 +927,6 @@ body {
   max-width: 320px;
 }
 
-.seccion-cabecera__acciones .cotizacion-buscar-vehiculo {
-  flex: 1 1 220px;
-  min-width: 180px;
-  max-width: 320px;
-}
 .pill-contador {
   display: inline-flex;
   align-items: center;
@@ -974,7 +968,7 @@ body {
 }
 
 /* ============================================================
-   6.1. SELECTOR "REGISTROS POR PÁGINA"
+   SELECTOR DE REGISTROS POR PÁGINA
    ============================================================ */
 .selector-por-pagina-wrap {
   display: inline-flex;
@@ -1014,7 +1008,7 @@ body {
 }
 
 /* ============================================================
-   6.2. PAGINADOR
+   PAGINADORES
    ============================================================ */
 .paginador-wrap {
   display: flex;
@@ -1031,34 +1025,7 @@ body {
   white-space: nowrap;
 }
 
-.paginador-ir {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  color: var(--texto-secundario);
-}
-
-.paginador-ir input {
-  width: 56px;
-  padding: 3px 6px;
-  font-size: 0.72rem;
-  text-align: center;
-  border: 1px solid #284473;
-  border-radius: 5px;
-  background: var(--color1);
-  color: var(--texto-principal);
-  transition: var(--transicion-media);
-}
-
-.paginador-ir input:focus {
-  border-color: #bb7514;
-  box-shadow: 0 0 0 2px rgba(187, 117, 20, 0.15);
-  outline: none;
-}
-
 .ordenes-paginacion .page-link,
-.historial-paginacion .page-link,
 .clientes-paginacion .page-link,
 .citas-paginacion .page-link {
   color: var(--texto-principal);
@@ -1070,7 +1037,6 @@ body {
 }
 
 .ordenes-paginacion .page-item:not(.disabled) .page-link:hover,
-.historial-paginacion .page-item:not(.disabled) .page-link:hover,
 .clientes-paginacion .page-item:not(.disabled) .page-link:hover,
 .citas-paginacion .page-item:not(.disabled) .page-link:hover {
   background: #E8EBF0;
@@ -1079,7 +1045,6 @@ body {
 }
 
 .ordenes-paginacion .page-item.active .page-link,
-.historial-paginacion .page-item.active .page-link,
 .clientes-paginacion .page-item.active .page-link,
 .citas-paginacion .page-item.active .page-link {
   background: #284473;
@@ -1088,7 +1053,6 @@ body {
 }
 
 .ordenes-paginacion .page-item.disabled .page-link,
-.historial-paginacion .page-item.disabled .page-link,
 .clientes-paginacion .page-item.disabled .page-link,
 .citas-paginacion .page-item.disabled .page-link {
   opacity: 0.4;
@@ -1096,7 +1060,7 @@ body {
 }
 
 /* ============================================================
-   7. ELEMENTOS COMUNES DE VISTAS
+   ELEMENTOS COMUNES DE LAS VISTAS
    ============================================================ */
 .panel-seccion {
   border-radius: 10px;
@@ -1199,7 +1163,7 @@ body {
 }
 
 /* ============================================================
-   7.1. SISTEMA ÚNICO DE TABLAS — .tabla-sistema (HÍBRIDO AGL)
+   SISTEMA DE TABLAS
    ============================================================ */
 .tabla-sistema {
   width: 100%;
@@ -1275,7 +1239,7 @@ body {
 }
 
 /* ============================================================
-   7.2. PANEL TABLA — Card estilo AGL con scroll interno
+   PANELES DE TABLA
    ============================================================ */
 .panel-tabla {
   background: var(--color1);
@@ -1398,7 +1362,7 @@ body {
 }
 
 /* ============================================================
-   7.3. TARJETAS ESTADÍSTICAS — estilo AGL (colores neutros)
+   TARJETAS DE ESTADÍSTICAS
    ============================================================ */
 .stat-card {
   background: var(--color1);
@@ -1472,7 +1436,7 @@ body {
 }
 
 /* ============================================================
-   8. DASHBOARD — stats fijas + tabla con scroll interno
+   DASHBOARD
    ============================================================ */
 #dashboard {
   display: flex;
@@ -1552,16 +1516,11 @@ body {
   color: var(--texto-secundario) !important;
 }
 
-#ordenes .item-orden .estado-orden {
-  font-size: 0.65rem;
-  padding: 4px 8px;
-}
-
 #ordenes #contenedorInfoOrden .small {
   font-size: 0.72rem;
 }
 
-#ordenes #contenedorInfoOrden .badge {
+#ordenes #contenedorInfoOrden .badge:not(.badge-estado) {
   font-size: 0.65rem;
   padding: 4px 8px;
 }
@@ -1643,7 +1602,7 @@ body {
 }
 
 /* ============================================================
-   9.1. BOTONES COMPACTOS — LISTAS DE SERVICIOS/PRODUCTOS
+   BOTONES DE SERVICIOS Y PRODUCTOS
    ============================================================ */
 .item-disponible-servicio,
 .item-disponible-producto {
@@ -1725,49 +1684,10 @@ body {
   background: transparent;
 }
 
-#agenda .agenda-tabla .col-hora {
-  width: 80px;
-}
-
-#agenda .agenda-tabla .btn-editar-dia {
-  font-size: 0.75rem;
-  color: #bb7514;
-  text-decoration: none;
-  transition: var(--transicion-media);
-}
-
-#agenda .agenda-tabla .btn-editar-dia:hover {
-  color: #284473;
-  transform: scale(1.1);
-}
-
-#agenda .agenda-tabla .hora-agenda {
-  background: #F0F2F5;
-  font-weight: 600;
-}
-
-#agenda .agenda-tabla .contenido-agenda {
-  min-height: 38px;
-}
-
 /* ============================================================
    11. HISTORIAL
    ============================================================ */
 /* Los estilos de tabla se heredan de .tabla-sistema */
-
-/* Acciones del historial: detalle y descarga del ticket de servicio. */
-#historial .acciones-historial {
-  white-space: nowrap;
-}
-
-#historial .btn-ticket-historial {
-  padding: 2px 6px;
-  transition: var(--transicion-media);
-}
-
-#historial .btn-ticket-historial:hover {
-  transform: scale(1.15);
-}
 
 /* Modal de previsualización y descarga del ticket. */
 #modalTicketPDF .modal-ticket-pdf__contenido {
@@ -1836,11 +1756,6 @@ body {
   color: var(--texto-principal);
 }
 
-#cotizaciones .item-cotizacion .estado-cotizacion {
-  font-size: 0.65rem;
-  padding: 4px 8px;
-}
-
 #cotizaciones .item-cotizacion .ocupada-cotizacion {
   font-size: 0.6rem;
   padding: 3px 6px;
@@ -1903,7 +1818,7 @@ body {
 }
 
 /* ============================================================
-   12.1. DATOS DE COTIZACIÓN
+   DATOS DE CLIENTE Y VEHÍCULO EN COTIZACIONES
    ============================================================ */
 /* Etiquetas de datos: mismo tono y peso que los detalles de OT */
 #cotizaciones #contenedorInfoClienteCotizacion .campo-mecanico__etiqueta {
@@ -1997,7 +1912,7 @@ body {
 }
 
 /* ============================================================
-   14. CLIENTES
+   CLIENTES Y VEHÍCULOS
    ============================================================ */
 #clientes #tablaClientes .acciones-cliente .btn {
   padding: 2px 6px;
@@ -2009,7 +1924,7 @@ body {
 }
 
 /* ============================================================
-   15. TOASTS — ajustes visuales de mecánico
+   NOTIFICACIONES TOAST
    ============================================================ */
 .toast-personalizado {
   box-shadow: var(--sombra-lg);
@@ -2211,7 +2126,7 @@ body {
 }
 
 /* ============================================================
-   16. INICIO Y LOGIN
+   INICIO Y ACCESO
    ============================================================ */
 #inicio {
   background:
@@ -2268,7 +2183,7 @@ body {
 }
 
 /* ============================================================
-   18. UTILIDADES
+   UTILIDADES DEL MÓDULO
    ============================================================ */
 .max-w-320 { max-width: 320px; }
 .max-h-250 { max-height: 250px; }
@@ -2357,15 +2272,14 @@ body {
 }
 
 /* ============================================================
-   20. RESPONSIVIDAD MÓVIL — scroll natural en pantallas pequeñas
+   RESPONSIVIDAD DE VISTAS Y TABLAS
    ============================================================ */
 @media (max-width: 991.98px) {
 
-  /* 20.1 Vistas: recuperan scroll vertical */
+  /* Las vistas recuperan el scroll vertical en pantallas pequeñas. */
   #dashboard,
   #ordenes,
   #agenda,
-  #historial,
   #cotizaciones,
   #citas,
   #clientes {
@@ -2375,7 +2289,7 @@ body {
     gap: 0.75rem;
   }
 
-  /* 20.2 Panel tabla: se ajusta a contenido (deja de intentar llenar el alto) */
+  /* Los paneles se ajustan al contenido y dejan de forzar la altura completa. */
   .panel-tabla,
   #dashboard .panel-tabla,
   .vista-row-altura > [class*="col-"] > .panel-tabla,
@@ -2386,7 +2300,7 @@ body {
     min-height: 0;
   }
 
-  /* 20.3 Quitar scroll interno de panel-tabla y card-scroll */
+  /* Se habilita el desplazamiento natural de paneles y listas. */
   .panel-tabla__body {
     overflow: visible;
   }
@@ -2406,7 +2320,7 @@ body {
     overflow: visible;
   }
 
-  /* 20.4 Row con columnas: se apila sin forzar altura */
+  /* Las columnas se apilan sin conservar alturas de escritorio. */
   .vista-row-altura {
     flex: 0 0 auto;
     height: auto;
@@ -2424,7 +2338,7 @@ body {
     height: auto;
   }
 
-  /* 20.5 Cotizaciones: cards dejan de tener scroll interno */
+  /* Los paneles de cotización dejan de usar scroll interno. */
   #cotizaciones .col-lg-6 > .d-flex {
     overflow: visible;
     height: auto;
@@ -2446,14 +2360,14 @@ body {
     min-height: 0;
   }
 
-  /* 20.6 Tablas anchas: scroll horizontal en móvil */
+  /* Las tablas anchas mantienen desplazamiento horizontal. */
   .tabla-sistema {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
   }
 
-  /* 20.7 Ajustes de padding de cards en móvil */
+  /* Se conserva un espaciado cómodo dentro de las tarjetas. */
   .panel-tabla,
   .panel-tabla--compact {
     padding: 14px;
@@ -2462,11 +2376,11 @@ body {
 }
 
 /* ============================================================
-   21. RESPONSIVIDAD MÓVIL — SERVICIOS Y CONSUMO
+   RESPONSIVIDAD DE SERVICIOS, PRODUCTOS Y CONSUMO
    ============================================================ */
 @media (max-width: 767.98px) {
 
-  /* 21.1 Buscadores de servicios y productos (Cotizaciones y Órdenes) */
+  /* Campos de búsqueda de servicios y productos. */
   #cotizaciones .input-group-sm,
   #ordenes .input-group-sm {
     min-height: 36px;
@@ -2486,14 +2400,14 @@ body {
     min-height: 36px;
   }
 
-  /* 21.2 Listas de servicios/productos disponibles */
+  /* Listas de servicios y productos disponibles. */
   #cotizaciones .card-scroll--xs,
   #ordenes .card-scroll--xs {
     max-height: 180px;
     padding: 6px !important;
   }
 
-  /* 21.3 Items de servicios/productos disponibles */
+  /* Elementos de las listas disponibles. */
   .item-disponible-servicio,
   .item-disponible-producto {
     padding: 8px 6px !important;
@@ -2512,7 +2426,7 @@ body {
     font-size: 0.7rem !important;
   }
 
-  /* 21.4 Botones de agregar (más grandes en móvil) */
+  /* Tamaño táctil de los botones para agregar conceptos. */
   .btn-agregar-servicio-lista,
   .btn-agregar-producto-lista,
   .btn-agregar-servicio-ot,
@@ -2523,36 +2437,33 @@ body {
     font-size: 0.75rem;
   }
 
-  /* 21.5 Formularios de servicios y productos: lado a lado en tablet */
+  /* Campos de servicio y producto en dos columnas. */
   #cotizaciones .panel-tabla--compact .row.g-2 > .col-6,
   #ordenes .panel-tabla--compact .row.g-2 > .col-6 {
     flex: 0 0 50%;
     max-width: 50%;
   }
 
-  /* 21.6 Botón "Buscar vehículo" en Cotizaciones: full width en móvil */
-
-
-  /* 21.8 Footer del consumo: botón FINALIZAR visible y tocable */
+  /* Tamaño y área táctil del botón para finalizar una orden. */
   #btnFinalizarOrden {
     padding: 10px 16px;
     font-size: 0.75rem;
   }
 
-  /* 21.9 Resúmenes: sticky no aplica al apilar */
+  /* Los resúmenes dejan de ser sticky cuando las columnas se apilan. */
   #cotizaciones .resumen-sticky,
   #ordenes .resumen-sticky {
     position: static;
   }
 
-  /* 21.11 Input-group de búsqueda: más compacto */
+  /* Ajuste compacto de los grupos de búsqueda. */
   #cotizaciones .input-group-sm > .input-group-text,
   #ordenes .input-group-sm > .input-group-text {
     min-width: 32px;
     justify-content: center;
   }
 
-  /* 21.12 Botones de acción de la lista (aprobar/rechazar/pendiente) */
+  /* Botones de acción de las cotizaciones. */
   #cotizaciones .item-cotizacion .acciones-cotizacion .btn {
     font-size: 0.7rem;
     padding: 6px 8px;
@@ -2562,7 +2473,7 @@ body {
 
 @media (max-width: 480px) {
 
-  /* 21.14 En pantallas muy chicas: apilar servicios/productos */
+  /* En pantallas estrechas, los campos pasan a una columna. */
   #cotizaciones .panel-tabla--compact .row.g-2 > .col-6,
   #ordenes .panel-tabla--compact .row.g-2 > .col-6 {
     flex: 0 0 100%;
@@ -2570,14 +2481,14 @@ body {
     margin-bottom: 10px;
   }
 
-  /* 21.15 Botones en panel-tabla__header: más chicos */
+  /* Botones compactos en las cabeceras de panel. */
   #cotizaciones .panel-tabla__header .btn,
   #ordenes .panel-tabla__header .btn {
     font-size: 0.7rem;
     padding: 5px 10px;
   }
 
-  /* 21.16 Pill del total: más pequeño */
+  /* Contador compacto. */
   .pill-contador {
     font-size: 0.7rem;
     padding: 4px 8px;
@@ -2587,7 +2498,7 @@ body {
     font-size: 0.75rem;
   }
 
-  /* 21.17 Inputs más compactos */
+  /* Campos de formulario compactos. */
   .input-style input,
   .input-style select {
     height: 38px;
@@ -2799,7 +2710,6 @@ input[type="number"] {
     padding: 10px 18px 18px;
   }
 
-
 }
 
 @media (max-width: 575.98px) {
@@ -2819,7 +2729,6 @@ input[type="number"] {
     grid-column: 1 / -1 !important;
   }
 }
-
 
 /* Panel compacto de vehículo y origen de OT — sección mecánico. */
 #ordenes .panel-vehiculo-ot {
@@ -2939,8 +2848,6 @@ input[type="number"] {
   background: #F3F6FB;
 }
 
-
-
 #ordenes .opcion-origen-ot input {
   position: static;
   flex: 0 0 auto;
@@ -2971,10 +2878,6 @@ input[type="number"] {
   font-size: .62rem;
   line-height: 1.3;
 }
-
-
-
-
 
 #ordenes .panel-origen-ot__vacio {
   display: flex;
@@ -3008,10 +2911,6 @@ input[type="number"] {
   font-size: .62rem;
 }
 
-
-
-
-
 #ordenes #contenedorAccionCrearOrdenDirecta .btn {
   white-space: nowrap;
 }
@@ -3044,23 +2943,7 @@ input[type="number"] {
   }
 }
 
-
-
-@media (max-width: 991.98px) {
-  #ordenes .ordenes-columna-trabajo > .panel-tabla {
-    flex: 0 0 auto;
-    height: auto;
-    min-height: 0;
-  }
-
-  #ordenes .ordenes-panel-evidencias {
-    height: auto;
-    min-height: 0;
-  }
-}
-
 /* Resumen del consumo de la orden. */
-
 
 #ordenes .ordenes-bloque-consumo,
 #ordenes .ordenes-bloque-evidencias {
@@ -3074,7 +2957,6 @@ input[type="number"] {
     position: static;
   }
 }
-
 
 #ordenes #contenedorFooterConsumo {
   flex-shrink: 0;
@@ -3097,7 +2979,7 @@ input[type="number"] {
   color: #02A302 !important;
 }
 
-/* 22. Ajustes responsivos de Órdenes y consumo. */
+/* Elementos seleccionables de servicio y producto en Órdenes y Cotizaciones. */
 #cotizaciones .item-disponible-servicio.btn-agregar-servicio-lista,
 #cotizaciones .item-disponible-producto.btn-agregar-producto-lista,
 #ordenes .item-disponible-servicio.btn-agregar-servicio-ot,
@@ -3143,6 +3025,25 @@ input[type="number"] {
   border-radius: 50%;
   background: #284473;
   color: #FFFFFF;
+}
+
+#cotizaciones .item-disponible__precio,
+#ordenes .item-disponible__precio {
+  flex: 0 0 auto;
+  margin-left: 12px;
+  color: #284473 !important;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+#cotizaciones .item-disponible-servicio .nombre-servicio,
+#cotizaciones .item-disponible-producto .nombre-producto,
+#ordenes .item-disponible-servicio .nombre-servicio,
+#ordenes .item-disponible-producto .nombre-producto {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 991.98px) {
@@ -3263,7 +3164,7 @@ input[type="number"] {
   }
 }
 
-/* 23. Evidencias de Órdenes: cuadrícula clara y usable en móvil. */
+/* Evidencias de órdenes de trabajo. */
 #ordenes #contenedorEvidencias {
   min-width: 0;
 }
@@ -3465,47 +3366,9 @@ input[type="number"] {
   }
 }
 
-
-/* Acción de ejemplo de comprobante: resalte propio dentro del módulo mecánico. */
-#historial .acciones-historial .btn-vista-comprobante-historial {
-  border-color: #0f766e;
-  background-color: #0f766e;
-  color: #fff;
-}
-
-#historial .acciones-historial .btn-vista-comprobante-historial:hover,
-#historial .acciones-historial .btn-vista-comprobante-historial:focus-visible {
-  border-color: #115e59;
-  background-color: #115e59;
-  color: #fff;
-}
-
-#historial .acciones-historial .btn-vista-comprobante-historial:focus-visible {
-  outline: 3px solid rgba(15, 118, 110, 0.28);
-  outline-offset: 2px;
-}
-
 #modalVistaPreviaComprobante .btn-tipo-comprobante-visual:disabled {
   cursor: not-allowed;
   opacity: 0.48;
-}
-
-
-#historial .acciones-historial .btn-ver-historial,
-#historial .acciones-historial .btn-vista-comprobante-historial {
-  display: inline-flex;
-  width: 34px;
-  height: 34px;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border-radius: 8px;
-}
-
-#historial .acciones-historial .btn-ver-historial i,
-#historial .acciones-historial .btn-vista-comprobante-historial i {
-  font-size: 0.95rem;
-  line-height: 1;
 }
 
 /* Selector de boleta o factura en la vista previa del módulo mecánico. */
@@ -3599,7 +3462,7 @@ input[type="number"] {
   word-break: break-word;
 }
 
-.datos-modal-mecanico__fila > .badge {
+.datos-modal-mecanico__fila > .badge:not(.badge-estado) {
   justify-self: start;
   color: #fff;
 }
@@ -3608,7 +3471,6 @@ input[type="number"] {
 #modalVerCita .modal-body,
 #modalVerCliente .modal-body,
 #modalVerCliente.modo-formulario-vehiculo .modal-body,
-#modalHorario .modal-body,
 #modalVistaPreviaComprobante .modal-body,
 #modalNuevaCita .modal-body,
 #modalNuevoCliente .modal-body,
@@ -3662,14 +3524,6 @@ input[type="number"] {
   overflow-x: hidden;
 }
 
-.modal-registros-mecanico__contenido,
-.modal-registros-mecanico__contenido .vista-scroll {
-  height: auto;
-  min-height: 0;
-  max-height: none;
-  overflow: visible;
-}
-
 .modal-registros-mecanico .vista-row-altura {
   flex: 0 0 auto;
   height: auto;
@@ -3701,99 +3555,6 @@ input[type="number"] {
   justify-content: flex-start;
 }
 
-.modal-registros-mecanico .modal-ordenes-mecanico__contenido .vista-row-altura > .col-lg-3:first-child,
-.modal-registros-mecanico .modal-cotizaciones-mecanico__contenido .vista-row-altura > .col-lg-3:first-child {
-  display: none;
-}
-
-.modal-registros-mecanico .modal-ordenes-mecanico__contenido .vista-row-altura > .col-lg-5 {
-  width: 66.666667%;
-}
-
-.modal-registros-mecanico .modal-ordenes-mecanico__contenido .vista-row-altura > .col-lg-4 {
-  width: 33.333333%;
-}
-
-#cotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura {
-  display: flex;
-  align-items: flex-start;
-  margin-right: calc(-0.5 * var(--bs-gutter-x));
-  margin-left: calc(-0.5 * var(--bs-gutter-x));
-}
-
-#cotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-6 {
-  flex: 0 0 66.666667%;
-  width: 66.666667%;
-  max-width: 66.666667%;
-}
-
-#cotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-3:last-child {
-  flex: 0 0 33.333333%;
-  width: 33.333333%;
-  max-width: 33.333333%;
-}
-
-#cotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky {
-  position: static;
-  min-width: 0;
-  width: 100%;
-}
-
-#cotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .input-style,
-#cotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .input-style textarea {
-  width: 100%;
-  min-width: 0;
-}
-
-#cotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .row > .col-12.col-md-6 {
-  flex: 0 0 100%;
-  width: 100%;
-  max-width: 100%;
-}
-
-#cotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky #btnGenerarCotizacion,
-#cotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky #btnAgendarCitaCotizacion,
-#cotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky #btnLimpiarCotizacion {
-  min-height: 40px;
-  height: auto;
-  white-space: normal;
-  line-height: 1.3;
-}
-
-#ordenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > .col-lg-5 {
-  flex: 0 0 66.666667%;
-  width: 66.666667%;
-  max-width: 66.666667%;
-}
-
-#ordenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > .col-lg-4 {
-  flex: 0 0 33.333333%;
-  width: 33.333333%;
-  max-width: 33.333333%;
-}
-
-#ordenes .modal-ordenes-mecanico__contenido .seccion-cabecera__acciones .input-group {
-  width: 100%;
-  min-width: 0;
-}
-
-#ordenes .modal-ordenes-mecanico__contenido .seccion-cabecera__acciones .input-group .form-control {
-  min-width: 0;
-}
-
-#ordenes .modal-ordenes-mecanico__contenido .seccion-cabecera__acciones .input-group .btn {
-  flex: 0 0 auto;
-}
-
-@media (max-width: 767.98px) {
-  #cotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > [class*="col-"],
-  #ordenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > [class*="col-"] {
-    flex: 0 0 100%;
-    width: 100%;
-    max-width: 100%;
-  }
-}
-
 @media (max-width: 767.98px) {
   .vista-registros-mecanico .seccion-cabecera__acciones {
     align-items: stretch;
@@ -3805,27 +3566,38 @@ input[type="number"] {
     width: 100%;
   }
 
-  .modal-registros-mecanico .modal-ordenes-mecanico__contenido .vista-row-altura > [class*="col-"],
-  .modal-registros-mecanico .modal-cotizaciones-mecanico__contenido .vista-row-altura > [class*="col-"] {
-    width: 100%;
-  }
 }
 
-/* Distribución estable para los modales de gestión en escritorio y móvil. */
+/* Modales de gestión: una sola distribución para OT y cotizaciones. */
 #modalGestionCotizaciones .modal-dialog,
 #modalGestionOrdenes .modal-dialog {
   width: calc(100% - 2rem);
   max-width: 1140px;
 }
 
+#modalGestionCotizaciones .modal-body,
+#modalGestionOrdenes .modal-body {
+  padding: 1.25rem 1.5rem;
+  background: var(--color2);
+}
+
+#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido > .seccion-cabecera,
+#modalGestionOrdenes .modal-ordenes-mecanico__contenido > .seccion-cabecera {
+  margin: 0 0 1rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura,
 #modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura {
   display: grid !important;
-  grid-template-columns: minmax(0, 2fr) minmax(230px, 1fr) !important;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr) !important;
   align-items: start;
-  gap: 1rem !important;
+  gap: 1rem;
   width: 100%;
-  margin: 0 !important;
+  margin: 0;
 }
 
 #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-3:first-child,
@@ -3834,23 +3606,21 @@ input[type="number"] {
 }
 
 #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-6,
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-3:last-child,
-#modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > .col-lg-5,
-#modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > .col-lg-4 {
-  width: auto !important;
-  max-width: none !important;
-  min-width: 0;
-  margin: 0 !important;
-}
-
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-6,
 #modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > .col-lg-5 {
-  grid-column: 1 !important;
+  grid-column: 1;
 }
 
 #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-3:last-child,
 #modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > .col-lg-4 {
   grid-column: 2;
+}
+
+#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > [class*="col-"],
+#modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > [class*="col-"] {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  margin: 0;
 }
 
 #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .panel-tabla,
@@ -3865,57 +3635,107 @@ input[type="number"] {
   overflow: visible;
 }
 
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky,
-#modalGestionOrdenes .modal-ordenes-mecanico__contenido .resumen-sticky {
-  position: static !important;
+#modalGestionCotizaciones .resumen-sticky,
+#modalGestionOrdenes .resumen-sticky {
+  position: static;
   width: 100%;
   min-width: 0;
 }
 
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .row > .col-12.col-md-6 {
-  flex: 0 0 100% !important;
-  width: 100% !important;
-  max-width: 100% !important;
+#modalGestionCotizaciones .resumen-sticky > .panel-tabla__body > .card-scroll,
+#modalGestionOrdenes .resumen-sticky > .panel-tabla__body > .card-scroll {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.85fr);
+  align-items: stretch;
+  gap: 0.85rem 1rem;
+  overflow: visible;
 }
 
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .input-style,
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky textarea {
+#modalGestionCotizaciones .resumen-totales,
+#modalGestionOrdenes .resumen-totales {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-content: center;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--borde-suave);
+  border-radius: 9px;
+  background: #FFFFFF;
+}
+
+#modalGestionCotizaciones .resumen-totales > div,
+#modalGestionOrdenes .resumen-totales > div {
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+#modalGestionCotizaciones .resumen-sticky .bg-success-subtle,
+#modalGestionOrdenes .resumen-sticky .bg-success-subtle {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 1rem 1.1rem;
+}
+
+#modalGestionCotizaciones .resumen-sticky .row.mb-3,
+#modalGestionCotizaciones .resumen-sticky > .panel-tabla__body > .card-scroll > .mb-3.flex-shrink-0,
+#modalGestionOrdenes .resumen-sticky > .panel-tabla__body > .card-scroll > .mb-3.flex-shrink-0,
+#modalGestionCotizaciones .resumen-sticky .mt-auto {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+#modalGestionCotizaciones .resumen-sticky .row.mb-3 > .col-12.col-md-6 {
+  flex: 0 0 100%;
+  width: 100%;
+  max-width: 100%;
+}
+
+#modalGestionCotizaciones .resumen-sticky .input-style,
+#modalGestionOrdenes .resumen-sticky .input-style,
+#modalGestionCotizaciones .resumen-sticky textarea,
+#modalGestionOrdenes .resumen-sticky textarea {
   display: block;
-  width: 100% !important;
+  width: 100%;
   min-width: 0;
 }
 
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky #btnGenerarCotizacion,
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky #btnAgendarCitaCotizacion,
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky #btnLimpiarCotizacion {
+#modalGestionCotizaciones .resumen-sticky textarea,
+#modalGestionOrdenes .resumen-sticky textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+#modalGestionCotizaciones #inputFechaCotizacion {
+  min-height: 46px;
+}
+
+#modalGestionCotizaciones .acciones-resumen-cotizacion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.65rem;
+}
+
+#modalGestionCotizaciones .acciones-resumen-cotizacion .btn {
   display: block;
   width: 100%;
-  min-height: 42px;
+  min-height: 44px;
   height: auto;
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  line-height: 1.35;
   white-space: normal;
   overflow-wrap: anywhere;
-  line-height: 1.35;
 }
 
-#modalGestionOrdenes .modal-ordenes-mecanico__contenido .seccion-cabecera__acciones .input-group {
-  display: flex;
-  width: 100%;
-  min-width: 0;
+#modalGestionCotizaciones.modo-solo-lectura .acciones-resumen-cotizacion {
+  grid-template-columns: minmax(0, 1fr);
 }
 
-#modalGestionOrdenes .modal-ordenes-mecanico__contenido .seccion-cabecera__acciones .input-group .form-control {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-@media (max-width: 767.98px) {
-  #modalGestionCotizaciones .modal-dialog,
-  #modalGestionOrdenes .modal-dialog {
-    width: calc(100% - 1rem);
-    max-width: none;
-    margin: 0.5rem auto;
-  }
-
+@media (max-width: 991.98px) {
   #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura,
   #modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura {
     grid-template-columns: minmax(0, 1fr) !important;
@@ -3923,60 +3743,85 @@ input[type="number"] {
 
   #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > [class*="col-"],
   #modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > [class*="col-"] {
-    grid-column: 1 !important;
-    width: 100% !important;
-    max-width: none !important;
-  }
-
-  #modalGestionOrdenes .modal-ordenes-mecanico__contenido .vista-row-altura > .col-lg-3:first-child,
-  #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .vista-row-altura > .col-lg-3:first-child {
-    display: none !important;
+    grid-column: 1;
   }
 }
-/* Reorganización interior de los modales de gestión. */
-#modalGestionCotizaciones .modal-body, #modalGestionOrdenes .modal-body { padding: 1.25rem 1.5rem; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido > .seccion-cabecera, #modalGestionOrdenes .modal-ordenes-mecanico__contenido > .seccion-cabecera { margin: 0 0 1rem; padding: 0; border: 0; background: transparent; box-shadow: none; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura { display: grid !important; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr) !important; gap: 1rem !important; margin: 0 !important; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-3:first-child { display: none !important; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-6 { grid-column: 1 !important; width: 100% !important; max-width: none !important; min-width: 0; margin: 0 !important; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-3:last-child { grid-column: 2 !important; width: 100% !important; max-width: none !important; min-width: 0; margin: 0 !important; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-6 > .d-flex { height: auto !important; gap: 1rem !important; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .panel-tabla, #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .panel-tabla__body, #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .panel-tabla__scroll { width: 100%; min-width: 0; max-height: none !important; overflow: visible !important; }
-#modalGestionCotizaciones #contenedorInfoVehiculoCotizacion-wrapper { padding: 1rem 1.1rem; border: 1px solid var(--borde-suave); border-radius: 10px; background: #fff; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky { position: static !important; width: 100%; min-width: 0; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky > .panel-tabla__body > .card-scroll { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(220px, .85fr); align-items: stretch; gap: .85rem 1rem; overflow: visible; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-totales { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; align-content: center; margin: 0 !important; padding: .85rem 1rem; border: 1px solid var(--borde-suave); border-radius: 9px; background: #fff; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-totales > div { justify-content: flex-start !important; align-items: baseline !important; gap: .4rem; margin: 0 !important; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .bg-success-subtle { display: flex; align-items: center; margin: 0 !important; padding: 1rem 1.1rem !important; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .row.mb-3, #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky > .panel-tabla__body > .card-scroll > .mb-3.flex-shrink-0, #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .mt-auto { grid-column: 1 / -1; margin: 0 !important; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .row.mb-3 > .col-12.col-md-6 { flex: 0 0 100% !important; width: 100% !important; max-width: 100% !important; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .input-style { width: 100%; min-width: 0; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido #inputFechaCotizacion { min-height: 46px; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky textarea { width: 100%; min-height: 100px; resize: vertical; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .mt-auto { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; }
-#modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .mt-auto .btn { width: 100%; min-height: 44px; height: auto; margin: 0 !important; padding: .65rem .75rem; white-space: normal; overflow-wrap: anywhere; line-height: 1.35; }
-#modalGestionCotizaciones.modo-solo-lectura .modal-cotizaciones-mecanico__contenido .resumen-sticky .mt-auto { grid-template-columns: minmax(0, 1fr); }
-#modalGestionOrdenes .modal-ordenes-mecanico__contenido .seccion-cabecera__acciones .input-group { display: flex; width: 100%; min-width: 0; }
-#modalGestionOrdenes .modal-ordenes-mecanico__contenido .seccion-cabecera__acciones .input-group .form-control { flex: 1 1 auto; min-width: 0; }
+
 @media (max-width: 991.98px) {
-  #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura {
-    grid-template-columns: minmax(0, 1fr) !important;
+  #modalGestionCotizaciones .modal-dialog,
+  #modalGestionOrdenes .modal-dialog {
+    width: calc(100% - 1rem);
+    max-width: none;
+    margin: 0.5rem auto;
   }
 
-  #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-6,
-  #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-3:last-child {
-    grid-column: 1 !important;
+  #modalGestionCotizaciones .modal-body,
+  #modalGestionOrdenes .modal-body {
+    padding: 1rem;
+  }
+
+  #modalGestionCotizaciones .resumen-sticky > .panel-tabla__body > .card-scroll,
+  #modalGestionOrdenes .resumen-sticky > .panel-tabla__body > .card-scroll {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #modalGestionCotizaciones .acciones-resumen-cotizacion {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
-
-@media (max-width: 767.98px) {
-  #modalGestionCotizaciones .modal-body, #modalGestionOrdenes .modal-body { padding: 1rem; }
-  #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky > .panel-tabla__body > .card-scroll { grid-template-columns: minmax(0, 1fr); }
-  #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .resumen-sticky .mt-auto { grid-template-columns: minmax(0, 1fr); }
-  #modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura { grid-template-columns: minmax(0, 1fr) !important; }
-  #modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > .col-lg-5, #modalGestionOrdenes .modal-ordenes-mecanico__contenido .row.vista-row-altura > .col-lg-4 { grid-column: 1; }
-  #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-6, #modalGestionCotizaciones .modal-cotizaciones-mecanico__contenido .row.vista-row-altura > .col-lg-3:last-child { width: 100% !important; max-width: none !important; }
+/* Buscadores mecánico: lupa integrada dentro del campo y texto según su uso. */
+#ordenes .seccion-cabecera__buscar.campo-busqueda-mecanico,
+#cotizaciones .seccion-cabecera__buscar.campo-busqueda-mecanico,
+#citas .seccion-cabecera__buscar.campo-busqueda-mecanico,
+#clientes .seccion-cabecera__buscar.campo-busqueda-mecanico,
+#modalGestionOrdenes .campo-busqueda-mecanico,
+#modalGestionCotizaciones .campo-busqueda-mecanico {
+  position: relative;
+  min-width: 0;
 }
+
+#ordenes .campo-busqueda-mecanico__icono,
+#cotizaciones .campo-busqueda-mecanico__icono,
+#citas .campo-busqueda-mecanico__icono,
+#clientes .campo-busqueda-mecanico__icono,
+#modalGestionOrdenes .campo-busqueda-mecanico__icono,
+#modalGestionCotizaciones .campo-busqueda-mecanico__icono {
+  position: absolute;
+  z-index: 6;
+  top: 50%;
+  left: 0.75rem;
+  transform: translateY(-50%);
+  color: #758195;
+  pointer-events: none;
+}
+
+#ordenes .campo-busqueda-mecanico > .form-control,
+#cotizaciones .campo-busqueda-mecanico > .form-control,
+#citas .campo-busqueda-mecanico > .form-control,
+#clientes .campo-busqueda-mecanico > .form-control,
+#modalGestionOrdenes .campo-busqueda-mecanico > .form-control,
+#modalGestionCotizaciones .campo-busqueda-mecanico > .form-control {
+  width: 100%;
+  min-width: 0;
+  padding-left: 2.15rem;
+  border-radius: 10px;
+}
+
+#modalGestionOrdenes .input-group.campo-busqueda-mecanico > .form-control,
+#modalGestionCotizaciones .input-group.campo-busqueda-mecanico > .form-control {
+  margin-left: 0;
+}
+
+#modalGestionOrdenes #inputBuscarOrden,
+#modalGestionCotizaciones #inputPlacaCotizacion {
+  border-radius: 10px;
+}
+
+#modalGestionOrdenes #btnBuscarVehiculoOT,
+#modalGestionCotizaciones #btnBuscarPlaca {
+  border-radius: 10px;
+}
+
 /* Cabeceras de listados mecánico: filtros, búsqueda y altas alineados. */
 #ordenes > .seccion-cabecera,
 #cotizaciones > .seccion-cabecera,
@@ -4182,11 +4027,6 @@ input[type="number"] {
     max-width: none;
   }
 
-  #clientes > .seccion-cabecera .pill-contador {
-    grid-column: 1 / -1;
-    justify-self: start;
-  }
-
   #citas > .seccion-cabecera #btnNuevaCita,
   #clientes > .seccion-cabecera #btnNuevoCliente {
     grid-column: 2;
@@ -4218,7 +4058,6 @@ input[type="number"] {
 /* Sistema común de presentación para los modales del portal mecánico. */
 #modalGestionOrdenes .modal-content,
 #modalGestionCotizaciones .modal-content,
-#modalHorario .modal-content,
 #modalVerHistorial .modal-content,
 #modalVistaPreviaComprobante .modal-content,
 #modalNuevaCita .modal-content,
@@ -4237,7 +4076,6 @@ input[type="number"] {
 
 #modalGestionOrdenes .modal-header,
 #modalGestionCotizaciones .modal-header,
-#modalHorario .modal-header,
 #modalVerHistorial .modal-header,
 #modalVistaPreviaComprobante .modal-header,
 #modalNuevaCita .modal-header,
@@ -4256,7 +4094,6 @@ input[type="number"] {
 
 #modalGestionOrdenes .modal-title,
 #modalGestionCotizaciones .modal-title,
-#modalHorario .modal-title,
 #modalVerHistorial .modal-title,
 #modalVistaPreviaComprobante .modal-title,
 #modalNuevaCita .modal-title,
@@ -4274,7 +4111,6 @@ input[type="number"] {
 
 #modalGestionOrdenes .modal-body,
 #modalGestionCotizaciones .modal-body,
-#modalHorario .modal-body,
 #modalVerHistorial .modal-body,
 #modalVistaPreviaComprobante .modal-body,
 #modalNuevaCita .modal-body,
@@ -4294,7 +4130,6 @@ input[type="number"] {
 
 #modalGestionOrdenes .modal-footer,
 #modalGestionCotizaciones .modal-footer,
-#modalHorario .modal-footer,
 #modalVerHistorial .modal-footer,
 #modalVistaPreviaComprobante .modal-footer,
 #modalNuevaCita .modal-footer,
@@ -4314,7 +4149,6 @@ input[type="number"] {
 
 #modalGestionOrdenes .modal-footer .btn,
 #modalGestionCotizaciones .modal-footer .btn,
-#modalHorario .modal-footer .btn,
 #modalVerHistorial .modal-footer .btn,
 #modalVistaPreviaComprobante .modal-footer .btn,
 #modalNuevaCita .modal-footer .btn,
@@ -4327,7 +4161,6 @@ input[type="number"] {
   margin: 0;
 }
 
-#modalHorario .modal-body .modal-seccion-titulo,
 #modalNuevaCita .modal-body .modal-seccion-titulo,
 #modalNuevoCliente .modal-body .modal-seccion-titulo,
 #modalVerCliente.modo-formulario-vehiculo .modal-body .modal-seccion-titulo,
@@ -4346,7 +4179,6 @@ input[type="number"] {
   line-height: 1.35;
 }
 
-#modalHorario .modal-body .row,
 #modalNuevaCita .modal-body .row,
 #modalNuevoCliente .modal-body .row,
 #modalVerCliente.modo-formulario-vehiculo .modal-body .row {
@@ -4354,22 +4186,9 @@ input[type="number"] {
   --bs-gutter-y: 0.9rem;
 }
 
-#modalHorario .fila-agregar-horario,
 #modalVerHistorial .modal-body > .d-flex,
 #modalVerCliente .modal-body > .d-flex {
   min-width: 0;
-}
-
-#modalHorario .modal-tabs {
-  padding: 0.85rem 1.35rem 0;
-}
-
-#modalHorario .tab-dias {
-  max-width: 100%;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  white-space: nowrap;
-  scrollbar-width: thin;
 }
 
 #modalVerHistorial .datos-modal-mecanico,
@@ -4445,7 +4264,6 @@ input[type="number"] {
 @media (max-width: 575.98px) {
   #modalGestionOrdenes .modal-header,
   #modalGestionCotizaciones .modal-header,
-  #modalHorario .modal-header,
   #modalVerHistorial .modal-header,
   #modalVistaPreviaComprobante .modal-header,
   #modalNuevaCita .modal-header,
@@ -4459,7 +4277,6 @@ input[type="number"] {
 
   #modalGestionOrdenes .modal-body,
   #modalGestionCotizaciones .modal-body,
-  #modalHorario .modal-body,
   #modalVerHistorial .modal-body,
   #modalVistaPreviaComprobante .modal-body,
   #modalNuevaCita .modal-body,
@@ -4473,7 +4290,6 @@ input[type="number"] {
 
   #modalGestionOrdenes .modal-footer,
   #modalGestionCotizaciones .modal-footer,
-  #modalHorario .modal-footer,
   #modalVerHistorial .modal-footer,
   #modalVistaPreviaComprobante .modal-footer,
   #modalNuevaCita .modal-footer,
@@ -4495,12 +4311,12 @@ input[type="number"] {
 }
 
 /* Ajustes de detalle para el resumen de cotización y búsqueda de vehículo en OT. */
-#modalGestionCotizaciones .resumen-sticky .bg-success-subtle {
+#modalGestionCotizaciones .resumen-sticky .bg-success-subtle, #modalGestionOrdenes .resumen-sticky .bg-success-subtle {
   display: block;
   padding: 1rem 1.1rem !important;
 }
 
-#modalGestionCotizaciones .resumen-total-cotizacion {
+#modalGestionCotizaciones .resumen-total-cotizacion, #modalGestionOrdenes .resumen-total-cotizacion {
   display: grid !important;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center !important;
@@ -4508,13 +4324,13 @@ input[type="number"] {
   width: 100%;
 }
 
-#modalGestionCotizaciones .resumen-total-cotizacion > span:first-child {
+#modalGestionCotizaciones .resumen-total-cotizacion > span:first-child, #modalGestionOrdenes .resumen-total-cotizacion > span:first-child {
   color: #203658;
   font-size: 0.9rem;
   letter-spacing: 0.035em;
 }
 
-#modalGestionCotizaciones #contenedorTotalFinalCotizacion {
+#modalGestionCotizaciones .monto-total-resumen, #modalGestionOrdenes .monto-total-resumen {
   min-width: 0;
   color: #16803C !important;
   font-size: 1.2rem !important;
@@ -4565,11 +4381,11 @@ input[type="number"] {
 }
 
 @media (max-width: 575.98px) {
-  #modalGestionCotizaciones .resumen-total-cotizacion {
+  #modalGestionCotizaciones .resumen-total-cotizacion, #modalGestionOrdenes .resumen-total-cotizacion {
     gap: 0.7rem;
   }
 
-  #modalGestionCotizaciones #contenedorTotalFinalCotizacion {
+  #modalGestionCotizaciones .monto-total-resumen, #modalGestionOrdenes .monto-total-resumen {
     font-size: 1.05rem !important;
   }
 
@@ -4627,11 +4443,159 @@ input[type="number"] {
   opacity: 0.4;
 }
 
-/* ============================================================
-   24. PORTAL DE CLIENTE
-   ============================================================ */
+/* Fila de búsqueda alineada exactamente con la columna Resumen. */
+#modalGestionOrdenes .busqueda-placa-fila,
+#modalGestionCotizaciones .busqueda-placa-fila {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+  gap: 1rem;
+  width: 100%;
+  margin: 0 0 0.85rem;
+}
 
-/* Contenedor de navegación y área de trabajo. */
+#modalGestionOrdenes .busqueda-placa-card,
+#modalGestionCotizaciones .busqueda-placa-card {
+  display: flex;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+  min-width: 0;
+  padding: 0.55rem;
+}
+
+#modalGestionOrdenes #contenedorBuscarVehiculoOT,
+#modalGestionCotizaciones .cotizacion-buscar-vehiculo {
+  display: flex;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+#modalGestionOrdenes #contenedorBuscarVehiculoOT .form-control,
+#modalGestionCotizaciones .cotizacion-buscar-vehiculo .form-control {
+  min-width: 0;
+  border-radius: 10px;
+}
+
+#modalGestionOrdenes #contenedorBuscarVehiculoOT .btn,
+#modalGestionCotizaciones .cotizacion-buscar-vehiculo .btn {
+  flex: 0 0 auto;
+  border-radius: 10px;
+}
+
+#modalGestionOrdenes .busqueda-placa-card #contenedorBuscarVehiculoOT,
+#modalGestionCotizaciones .busqueda-placa-card .cotizacion-buscar-vehiculo {
+  width: calc((100% + 0.1rem) / 2.7);
+  min-width: 280px;
+}
+
+#modalGestionCotizaciones.modo-solo-lectura .busqueda-placa-fila--cotizacion {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  #modalGestionOrdenes .busqueda-placa-fila,
+  #modalGestionCotizaciones .busqueda-placa-fila {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #modalGestionOrdenes .busqueda-placa-card #contenedorBuscarVehiculoOT,
+  #modalGestionCotizaciones .busqueda-placa-card .cotizacion-buscar-vehiculo {
+    width: 100%;
+    min-width: 0;
+  }
+}
+/* OT vacía: compacta detalle y consumo hasta una altura similar al resumen. */
+#modalGestionOrdenes .ordenes-panel-principal:has(#contenedorVacioOrden:not(.d-none)) {
+  align-self: start;
+  height: auto !important;
+  min-height: 0;
+}
+
+#modalGestionOrdenes .ordenes-panel-principal:has(#contenedorVacioOrden:not(.d-none)) .panel-tabla__body {
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+}
+
+#modalGestionOrdenes .ordenes-panel-principal:has(#contenedorVacioOrden:not(.d-none)) .ordenes-panel-scroll {
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+#modalGestionOrdenes #contenedorVacioOrden,
+#modalGestionOrdenes #contenedorVacioConsumo {
+  min-height: 44px;
+}
+
+#modalGestionOrdenes .ordenes-panel-principal:has(#contenedorVacioOrden:not(.d-none)) .ordenes-bloque-consumo {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+}
+/* Badges de estado mecánico: tonos suaves y medidas comunes en todas las vistas. */
+.badge.badge-estado {
+  display: inline-flex;
+  min-width: 5.25rem;
+  min-height: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.datos-modal-mecanico__fila > .badge.badge-estado {
+  justify-self: start;
+}
+
+.badge.badge-estado--pendiente {
+  color: #795300;
+  background-color: #FFF0C2;
+  border-color: #E9C24A;
+}
+
+.badge.badge-estado--proceso {
+  color: #1F4E91;
+  background-color: #DCEAFF;
+  border-color: #A8C5F2;
+}
+
+.badge.badge-estado--finalizada,
+.badge.badge-estado--atendida,
+.badge.badge-estado--aprobada,
+.badge.badge-estado--activo {
+  color: #28633C;
+  background-color: #DDF1E2;
+  border-color: #A9D6B5;
+}
+
+.badge.badge-estado--cancelada,
+.badge.badge-estado--rechazada {
+  color: #923844;
+  background-color: #FBE0E3;
+  border-color: #EAB4BB;
+}
+
+.badge.badge-estado--confirmada {
+  color: #1F6570;
+  background-color: #D9F1F4;
+  border-color: #9CD5DC;
+}
+
+.badge.badge-estado--inactivo,
+.badge.badge-estado--sin-definir {
+  color: #536171;
+  background-color: #E7EBF0;
+  border-color: #C5CDD6;
+}
+
 #bodyAdministrador.portal-cliente #contenedorPrincipal {
   min-width: 0;
 }
@@ -4656,6 +4620,7 @@ input[type="number"] {
 #bodyAdministrador.portal-cliente #dashboard,
 #bodyAdministrador.portal-cliente #citasCliente,
 #bodyAdministrador.portal-cliente #vehiculosCliente,
+#bodyAdministrador.portal-cliente #ordenesCliente,
 #bodyAdministrador.portal-cliente #cotizacionesCliente,
 #bodyAdministrador.portal-cliente #historialCliente,
 #bodyAdministrador.portal-cliente #perfilCliente {
@@ -4897,6 +4862,7 @@ input[type="number"] {
   #bodyAdministrador.portal-cliente #dashboard,
   #bodyAdministrador.portal-cliente #citasCliente,
   #bodyAdministrador.portal-cliente #vehiculosCliente,
+  #bodyAdministrador.portal-cliente #ordenesCliente,
   #bodyAdministrador.portal-cliente #cotizacionesCliente,
   #bodyAdministrador.portal-cliente #historialCliente,
   #bodyAdministrador.portal-cliente #perfilCliente {
@@ -4946,6 +4912,7 @@ input[type="number"] {
   #bodyAdministrador.portal-cliente #dashboard,
   #bodyAdministrador.portal-cliente #citasCliente,
   #bodyAdministrador.portal-cliente #vehiculosCliente,
+  #bodyAdministrador.portal-cliente #ordenesCliente,
   #bodyAdministrador.portal-cliente #cotizacionesCliente,
   #bodyAdministrador.portal-cliente #historialCliente,
   #bodyAdministrador.portal-cliente #perfilCliente {
@@ -5008,5 +4975,247 @@ input[type="number"] {
 
   #bodyAdministrador.portal-cliente #perfilCliente #formPerfilCliente .d-flex.justify-content-end .btn {
     width: 100%;
+  }
+}
+
+/* Seguimiento visual de órdenes de trabajo del portal cliente. */
+#bodyAdministrador.portal-cliente .ordenes-cliente__aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  border-color: #CFE2FF;
+  color: #355477;
+  font-size: 0.82rem;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente-layout {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.78fr) minmax(0, 1.7fr) minmax(220px, 0.72fr);
+  align-items: start;
+  gap: 1rem;
+  min-width: 0;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente-layout > .panel-tabla {
+  min-width: 0;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__items {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.85rem;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__grupo-titulo {
+  margin: 0.25rem 0 0;
+  color: var(--texto-principal);
+  font-size: 0.77rem;
+  font-weight: 700;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__grupo-titulo--historial {
+  margin-top: 0.7rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--borde-suave);
+}
+
+#bodyAdministrador.portal-cliente .orden-cliente-item {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.9rem;
+  border: 1px solid var(--borde-suave);
+  border-radius: 0.7rem;
+  background: #fff;
+  color: var(--texto-principal);
+}
+
+#bodyAdministrador.portal-cliente .orden-cliente-item--activa {
+  border-color: #8BADE0;
+  background: #F5F8FE;
+  box-shadow: 0 0 0 2px rgb(50 92 157 / 8%);
+}
+
+#bodyAdministrador.portal-cliente .orden-cliente-item__cabecera,
+#bodyAdministrador.portal-cliente .ordenes-cliente__detalle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+#bodyAdministrador.portal-cliente .orden-cliente-item__cabecera strong {
+  font-size: 0.88rem;
+}
+
+#bodyAdministrador.portal-cliente .orden-cliente-item__vehiculo,
+#bodyAdministrador.portal-cliente .orden-cliente-item__fecha {
+  color: var(--texto-secundario, #687586);
+  font-size: 0.76rem;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__contenido,
+#bodyAdministrador.portal-cliente .ordenes-cliente__resumen-body {
+  display: grid;
+  gap: 1rem;
+  padding: 1.05rem;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__bloque {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem 1rem;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__datos > div {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__datos span {
+  color: var(--texto-secundario, #687586);
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__datos strong {
+  color: var(--texto-principal);
+  font-size: 0.78rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__bloque-titulo h3 {
+  margin: 0;
+  color: var(--texto-principal);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__bloque-titulo h3 i {
+  margin-right: 0.35rem;
+  color: #315B9A;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__tabla-consumo {
+  min-width: 540px;
+}
+
+#bodyAdministrador.portal-cliente .orden-cliente-evidencia-vacia {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border: 1px dashed #C9D2DF;
+  border-radius: 0.65rem;
+  background: #F8FAFC;
+  color: var(--texto-secundario, #687586);
+  font-size: 0.76rem;
+}
+
+#bodyAdministrador.portal-cliente .orden-cliente-evidencia-vacia i {
+  color: #60758F;
+  font-size: 1.25rem;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__solo-lectura {
+  margin: 0;
+  color: var(--texto-secundario, #687586);
+  font-size: 0.72rem;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__total-linea {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  color: var(--texto-secundario, #687586);
+  font-size: 0.76rem;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__total-linea strong {
+  color: var(--texto-principal);
+  white-space: nowrap;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 0.15rem;
+  padding: 0.9rem;
+  border: 1px solid #A7D8AE;
+  border-radius: 0.55rem;
+  background: #E8F5E9;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__total strong {
+  color: var(--texto-principal);
+  font-size: 0.82rem;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__total span {
+  color: #16852B;
+  font-size: 1.15rem;
+  white-space: nowrap;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__observacion {
+  display: grid;
+  gap: 0.4rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--borde-suave);
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__observacion strong {
+  color: var(--texto-principal);
+  font-size: 0.75rem;
+}
+
+#bodyAdministrador.portal-cliente .ordenes-cliente__observacion p {
+  margin: 0;
+  color: var(--texto-secundario, #687586);
+  font-size: 0.76rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 1199.98px) {
+  #bodyAdministrador.portal-cliente .ordenes-cliente-layout {
+    grid-template-columns: minmax(210px, 0.75fr) minmax(0, 1.5fr);
+  }
+
+  #bodyAdministrador.portal-cliente .ordenes-cliente__resumen {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 991.98px) {
+  #bodyAdministrador.portal-cliente .ordenes-cliente-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #bodyAdministrador.portal-cliente .ordenes-cliente__resumen {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 575.98px) {
+  #bodyAdministrador.portal-cliente .ordenes-cliente__detalle-header {
+    align-items: flex-start;
+  }
+
+  #bodyAdministrador.portal-cliente .ordenes-cliente__contenido,
+  #bodyAdministrador.portal-cliente .ordenes-cliente__resumen-body {
+    padding: 0.85rem;
+  }
+
+  #bodyAdministrador.portal-cliente .ordenes-cliente__datos {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

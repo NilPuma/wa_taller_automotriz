@@ -34,6 +34,13 @@
             </div>
             <div class="item-separator"></div>
             <div class="item">
+                <a href="#ordenesCliente" id="btnMenuOrdenesCliente" aria-label="Ir a mis órdenes de trabajo">
+                    <div class="icono"><i class="bi bi-tools"></i></div>
+                    <div class="titulo"><span>Mis órdenes</span></div>
+                </a>
+            </div>
+            <div class="item-separator"></div>
+            <div class="item">
                 <a href="#vehiculosCliente" id="btnMenuVehiculosCliente" aria-label="Ir a mis vehículos">
                     <div class="icono"><i class="bi bi-car-front"></i></div>
                     <div class="titulo"><span>Mis vehículos</span></div>
@@ -165,25 +172,23 @@
                                 <div class="col-md-8">
                                     <section class="panel-tabla panel-tabla--compact h-100">
                                         <div class="panel-tabla__header">
-                                            <h2 class="panel-tabla__titulo"><i class="bi bi-clock-history"></i> Mi historial</h2>
-                                            <a href="#historialCliente" class="btn btn-sm btn-outline-primary">Ver historial completo</a>
+                                            <h2 class="panel-tabla__titulo"><i class="bi bi-tools"></i> Mis órdenes</h2>
+                                            <a href="#ordenesCliente" class="btn btn-sm btn-outline-primary">Ver mis órdenes</a>
                                         </div>
                                         <div class="panel-tabla__body">
                                             <div class="panel-tabla__scroll">
                                                 <table class="table tabla-sistema tabla-sistema--compact tabla-sistema--center mb-0" id="tablaResumenHistorialCliente">
                                                     <thead>
                                                         <tr>
-                                                            <th>N° DE ORDEN</th>
-                                                            <th>FECHA</th>
+                                                    <th>ORDEN</th>
+                                                    <th>ACTUALIZACIÓN</th>
                                                             <th>VEHÍCULO</th>
                                                             <th>DESCRIPCIÓN</th>
                                                             <th>ESTADO</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <td colspan="5" class="text-center text-muted">Aún no hay servicios registrados.</td>
-                                                        </tr>
+                                                        <tr><td colspan="5" class="text-center text-muted">Consulta aquí el avance de tus órdenes.</td></tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -297,6 +302,130 @@
                     </div>
                 </div>
             </section>
+        </section>
+    </template>
+
+    {{!-- ============================================================ --}}
+    {{!-- VISTA: SEGUIMIENTO DE ÓRDENES (MAQUETA VISUAL)              --}}
+    {{!-- ============================================================ --}}
+    <template id="templateOrdenesCliente">
+        <section id="ordenesCliente" class="vista-scroll text-start">
+            <div class="seccion-cabecera">
+                <div class="seccion-cabecera__titulo">
+                    <h5><i class="bi bi-tools"></i> Mis órdenes de trabajo</h5>
+                    <small class="seccion-cabecera__subtitulo">Consulta tus órdenes activas y revisa las que ya finalizaron.</small>
+                </div>
+                <span class="pill-contador"><i class="bi bi-clipboard-check"></i> 1 activa</span>
+            </div>
+
+            <div class="ordenes-cliente-layout">
+                <section class="panel-tabla ordenes-cliente__lista">
+                    <div class="panel-tabla__header">
+                        <h2 class="panel-tabla__titulo"><i class="bi bi-list-check"></i> Mis órdenes</h2>
+                    </div>
+                    <div class="ordenes-cliente__items">
+                        <h3 class="ordenes-cliente__grupo-titulo">Activas</h3>
+                        <article class="orden-cliente-item orden-cliente-item--activa" aria-current="true">
+                            <div class="orden-cliente-item__cabecera">
+                                <strong>OT-0001</strong>
+                                <span class="badge text-bg-warning">EN PROCESO</span>
+                            </div>
+                            <span class="orden-cliente-item__vehiculo"><i class="bi bi-car-front"></i> Toyota Corolla · ABC-123</span>
+                            <span class="orden-cliente-item__fecha">Ingreso: 11 nov 2026</span>
+                        </article>
+
+
+                        <h3 class="ordenes-cliente__grupo-titulo ordenes-cliente__grupo-titulo--historial">Historial</h3>
+                        <article class="orden-cliente-item">
+                            <div class="orden-cliente-item__cabecera">
+                                <strong>OT-0002</strong>
+                                <span class="badge text-bg-success">FINALIZADA</span>
+                            </div>
+                            <span class="orden-cliente-item__vehiculo"><i class="bi bi-car-front"></i> Toyota Corolla · ABC-123</span>
+                            <span class="orden-cliente-item__fecha">Finalizada: 05 nov 2026</span>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="panel-tabla ordenes-cliente__detalle" aria-labelledby="tituloDetalleOrdenCliente">
+                    <div class="panel-tabla__header ordenes-cliente__detalle-header">
+                        <h2 class="panel-tabla__titulo" id="tituloDetalleOrdenCliente"><i class="bi bi-info-circle"></i> Detalle de orden</h2>
+                        <span class="badge text-bg-warning">EN PROCESO</span>
+                    </div>
+                    <div class="panel-tabla__body ordenes-cliente__contenido">
+                        <section class="ordenes-cliente__bloque">
+                            <div class="ordenes-cliente__datos">
+                                <div><span>N° ORDEN</span><strong>OT-0001</strong></div>
+                                <div><span>ESTADO</span><strong>En proceso</strong></div>
+                                <div><span>FECHA</span><strong>11 nov 2026</strong></div>
+                                <div><span>VEHÍCULO</span><strong>Toyota Corolla · ABC-123</strong></div>
+                                <div><span>SERVICIO</span><strong>Revisión del sistema de frenos</strong></div>
+                            </div>
+                        </section>
+
+                        <section class="ordenes-cliente__bloque" aria-labelledby="tituloConsumoOrdenCliente">
+                            <div class="ordenes-cliente__bloque-titulo">
+                                <h3 id="tituloConsumoOrdenCliente"><i class="bi bi-cart"></i> Detalle del trabajo</h3>
+                            </div>
+                            <div class="panel-tabla__scroll">
+                                <table class="table tabla-sistema tabla-sistema--compact mb-0 ordenes-cliente__tabla-consumo">
+                                    <thead>
+                                        <tr>
+                                            <th>TIPO</th>
+                                            <th>DESCRIPCIÓN</th>
+                                            <th>CANT.</th>
+                                            <th>P. UNIT.</th>
+                                            <th>SUBTOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Servicio</td>
+                                            <td>Inspección del sistema de frenos</td>
+                                            <td>1</td>
+                                            <td>S/ 50.00</td>
+                                            <td>S/ 50.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Producto</td>
+                                            <td>Pastillas de freno delanteras</td>
+                                            <td>1</td>
+                                            <td>S/ 150.00</td>
+                                            <td>S/ 150.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <section class="ordenes-cliente__bloque" aria-labelledby="tituloEvidenciasOrdenCliente">
+                            <div class="ordenes-cliente__bloque-titulo">
+                                <h3 id="tituloEvidenciasOrdenCliente"><i class="bi bi-images"></i> Evidencias compartidas</h3>
+                            </div>
+                            <div class="orden-cliente-evidencia-vacia">
+                                <i class="bi bi-camera"></i>
+                                <span>Las evidencias que el taller comparta aparecerán aquí.</span>
+                            </div>
+                        </section>
+                        <p class="ordenes-cliente__solo-lectura"><i class="bi bi-eye"></i> Vista informativa: los cambios de la orden los realiza el taller.</p>
+                    </div>
+                </section>
+
+                <aside class="panel-tabla ordenes-cliente__resumen" aria-labelledby="tituloResumenOrdenCliente">
+                    <div class="panel-tabla__header">
+                        <h2 class="panel-tabla__titulo" id="tituloResumenOrdenCliente"><i class="bi bi-clipboard-check"></i> Resumen</h2>
+                    </div>
+                    <div class="panel-tabla__body ordenes-cliente__resumen-body">
+                        <div class="ordenes-cliente__total-linea"><span>Subtotal:</span><strong>S/ 200.00</strong></div>
+                        <div class="ordenes-cliente__total-linea"><span>IGV (18%):</span><strong>S/ 36.00</strong></div>
+                        <div class="ordenes-cliente__total"><strong>TOTAL</strong><span>S/ 236.00</span></div>
+                        <div class="ordenes-cliente__observacion">
+                            <strong>Observaciones / Detalles</strong>
+                            <p>Revisión y cambio de pastillas delanteras.</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
         </section>
     </template>
 
