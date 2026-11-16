@@ -17,6 +17,7 @@ const fragmento = document.createDocumentFragment();
 
 // Capturar los templates de las secciones
 const templateDashboard              = document.querySelector('#templateDashboardMecanico').content;
+const templateContenedorMiAvance     = document.querySelector('#templateContenedorMiAvance').content;
 const templateContenedorOrdenes      = document.querySelector('#templateContenedorOrdenes').content;
 const templateContenedorAgenda       = document.querySelector('#templateContenedorAgenda').content;
 const templateContenedorCotizaciones = document.querySelector('#templateContenedorCotizaciones').content;
@@ -195,6 +196,7 @@ function enlazarMenu() {
     const menuMap = {
         '#btnMenuInicio':       renderDashboard,
         '#btnMenuOrdenes':      renderOrdenes,
+        '#btnMenuAvance':       renderMiAvance,
         '#btnMenuAgenda':       renderAgenda,
         '#btnMenuCotizaciones': renderCotizaciones,
         '#btnMenuCitas':        renderCitas,
@@ -529,20 +531,20 @@ function fechaISO(fecha) {
     return `${y}-${m}-${dia}`;
 }
 
-// Selecciona las clases visuales de Bootstrap según el estado.
+// Asigna las clases compartidas de estado usadas en las vistas Mecánico.
 function claseBadgeEstado(estado) {
     switch (estado) {
-        case 'PENDIENTE':   return 'badge-estado badge-estado--pendiente';
-        case 'EN PROCESO':  return 'badge-estado badge-estado--proceso';
-        case 'FINALIZADA':  return 'badge-estado badge-estado--finalizada';
-        case 'CANCELADA':   return 'badge-estado badge-estado--cancelada';
-        case 'CONFIRMADA':  return 'badge-estado badge-estado--confirmada';
-        case 'ATENDIDA':    return 'badge-estado badge-estado--atendida';
-        case 'APROBADA':    return 'badge-estado badge-estado--aprobada';
-        case 'RECHAZADA':   return 'badge-estado badge-estado--rechazada';
-        case 'ACTIVO':      return 'badge-estado badge-estado--activo';
-        case 'INACTIVO':    return 'badge-estado badge-estado--inactivo';
-        default:            return 'badge-estado badge-estado--sin-definir';
+        case 'PENDIENTE':   return 'badge-estado badge-estado-pendiente';
+        case 'EN PROCESO':  return 'badge-estado badge-estado-proceso';
+        case 'FINALIZADA':  return 'badge-estado badge-estado-finalizada';
+        case 'CANCELADA':   return 'badge-estado badge-estado-cancelada';
+        case 'CONFIRMADA':  return 'badge-estado badge-estado-confirmada';
+        case 'ATENDIDA':    return 'badge-estado badge-estado-atendida';
+        case 'APROBADA':    return 'badge-estado badge-estado-aprobada';
+        case 'RECHAZADA':   return 'badge-estado badge-estado-rechazada';
+        case 'ACTIVO':      return 'badge-estado badge-estado-activo';
+        case 'INACTIVO':    return 'badge-estado badge-estado-inactivo';
+        default:            return 'badge-estado badge-estado-sin-definir';
     }
 }
 
@@ -685,7 +687,7 @@ function confirmarAccionModal(opciones) {
     mensaje.textContent = opciones.mensaje || '¿Desea continuar?';
     botonConfirmar.textContent = opciones.textoConfirmar || 'Confirmar';
     botonConfirmar.classList.toggle('btn-accion-peligro', opciones.peligro === true);
-    botonConfirmar.classList.toggle('btn-primario', opciones.peligro !== true);
+    botonConfirmar.classList.add('btn-primario');
     icono.classList.toggle('text-danger', opciones.peligro === true);
     icono.classList.toggle('text-primary', opciones.peligro !== true);
     icono.classList.toggle('bi-exclamation-triangle', opciones.peligro === true);
@@ -954,6 +956,9 @@ function actualizarPaginacionClientes(pagina, totalPaginas, totalRegistros, regi
 // Pinta los vehículos asociados al cliente seleccionado.
 function listarVehiculosCliente() {
     let contenedorVehiculos = document.querySelector('#contenedorVehiculosCliente');
+    const contador = document.querySelector('#contadorVehiculosCliente');
+
+    if (contador) contador.textContent = vehiculosClienteActual.length;
     if (!contenedorVehiculos) return;
     const templateFilaVehiculo = document.querySelector('#templateFilaVehiculoCliente').content;
     contenedorVehiculos.innerHTML = "";
@@ -973,10 +978,6 @@ function listarVehiculosCliente() {
         clone.querySelector('.anio-vehiculo').textContent = vehiculo.anio;
         clone.querySelector('.color-vehiculo').textContent = vehiculo.color;
 
-        const badge = clone.querySelector('.estado-vehiculo');
-        badge.textContent = textoEstadoBadge(vehiculo.estado);
-        badge.className = 'estado-vehiculo badge ' + claseBadgeEstado(vehiculo.estado);
-
         clone.querySelector('.btn-editar-vehiculo').dataset.id = vehiculo.id_vehiculo;
         clone.querySelector('.btn-eliminar-vehiculo').dataset.id = vehiculo.id_vehiculo;
 
@@ -986,6 +987,9 @@ function listarVehiculosCliente() {
     const formulario = document.querySelector('#formularioVehiculoCliente');
     const formularioAbierto = Boolean(formulario && !formulario.classList.contains('d-none'));
     actualizarInteraccionVehiculosCliente(formularioAbierto);
+
+    const tablaResponsive = document.querySelector('#modalVerCliente .table-responsive');
+    if (tablaResponsive) tablaResponsive.scrollLeft = 0;
 }
 
 // ============================================================
@@ -1035,6 +1039,7 @@ function mostrarFormularioVehiculoCliente(mostrar, titulo = 'NUEVO VEHÍCULO') {
 
     formulario.classList.toggle('d-none', !mostrar);
     botonAgregar.disabled = mostrar;
+    botonAgregar.classList.toggle('d-none', mostrar);
     actualizarInteraccionVehiculosCliente(mostrar);
     botonCerrar.classList.toggle('d-none', mostrar);
     botonCancelar.classList.toggle('d-none', !mostrar);
@@ -1209,15 +1214,6 @@ document.addEventListener('click', function (event) {
     abrirModal('#modalNuevoCliente');
 });
 
-// Maneja el evento change del control #chkVehiculoTambien.
-document.addEventListener('change', function (event) {
-    const chk = event.target.closest('#chkVehiculoTambien');
-    if (!chk) return;
-
-    const seccion = document.querySelector('#seccionVehiculoNuevo');
-    if (seccion) seccion.classList.toggle('d-none', !chk.checked);
-});
-
 // Cambia entre los campos de persona natural y persona jurídica.
 document.addEventListener('change', function (event) {
     const selector = event.target.closest('#selectTipoDocumentoCliente');
@@ -1254,7 +1250,6 @@ document.addEventListener('click', async function (event) {
     const password = 'innova123';
     const telefono = document.querySelector('#inputTelefonoCliente').value.trim();
     const direccion = document.querySelector('#inputDireccionCliente').value.trim();
-    const chkVehiculo = document.querySelector('#chkVehiculoTambien').checked;
     if (_enviandoCliente) return;
 
     if (!documento || !nombres || (!esRuc && !apellidos) || !telefono) {
@@ -1277,9 +1272,6 @@ document.addEventListener('click', async function (event) {
 
     if (!validarCamposCliente(nombres, correo, esRuc, apellidos, telefono)) return;
 
-    const datosVehiculo = chkVehiculo ? leerDatosVehiculoNuevo() : null;
-    if (chkVehiculo && !validarFormularioVehiculo({ ...datosVehiculo, id_persona: 'nuevo' })) return;
-
     _enviandoCliente = true;
     boton.disabled = true;
     try {
@@ -1300,15 +1292,7 @@ document.addEventListener('click', async function (event) {
             return;
         }
 
-        const idPersona = res.data.id_persona;
-
-        if (chkVehiculo) {
-            const okVehiculo = await guardarVehiculoDesdeModalCliente(idPersona, datosVehiculo);
-            if (!okVehiculo) return;
-        }
-
         await cargarPersonas();
-        await cargarVehiculos();
         listarClientes();
 
         limpiarModalNuevoCliente();
@@ -1344,16 +1328,12 @@ document.addEventListener('click', async function (event) {
 
     document.querySelector('#inputIdClienteVer').value = persona.id_persona;
     document.querySelector('#verClienteDocumento').textContent = persona.documento;
-    document.querySelector('#verClienteTipoDocumento').textContent = persona.tipo_documento;
     document.querySelector('#verClienteNombre').textContent =
         `${persona.nombres || ''} ${persona.apellidos || ''}`.trim();
     document.querySelector('#verClienteTelefono').textContent = persona.telefono;
     document.querySelector('#verClienteCorreo').textContent = persona.correo;
     document.querySelector('#verClienteDireccion').textContent = persona.direccion;
 
-    const badge = document.querySelector('#verClienteEstado');
-    badge.textContent = textoEstadoBadge(persona.estado);
-    badge.className = 'badge ' + claseBadgeEstado(persona.estado);
 
     await cargarVehiculosPorPersona(persona.id_persona);
     listarVehiculosCliente();
@@ -1564,7 +1544,7 @@ function actualizarCamposTipoDocumentoCliente() {
     actualizarCorreoGeneradoCliente();
 }
 
-// Restablece los campos del formulario de cliente y vehículo.
+// Restablece los campos del formulario de cliente.
 function limpiarModalNuevoCliente() {
     document.querySelector('#selectTipoDocumentoCliente').value = 'DNI';
     document.querySelector('#inputDocumentoCliente').value = '';
@@ -1574,64 +1554,6 @@ function limpiarModalNuevoCliente() {
     actualizarCamposTipoDocumentoCliente();
     document.querySelector('#inputTelefonoCliente').value = '';
     document.querySelector('#inputDireccionCliente').value = '';
-
-    const chk = document.querySelector('#chkVehiculoTambien');
-    if (chk) chk.checked = false;
-
-    const seccion = document.querySelector('#seccionVehiculoNuevo');
-    if (seccion) seccion.classList.add('d-none');
-
-    document.querySelector('#inputPlacaNuevo').value = '';
-    document.querySelector('#inputVinNuevo').value = '';
-    document.querySelector('#inputMarcaNuevo').value = '';
-    document.querySelector('#inputModeloNuevo').value = '';
-    document.querySelector('#inputAnioNuevo').value = '';
-    document.querySelector('#inputColorNuevo').value = '';
-    document.querySelector('#inputNumeroMotorNuevo').value = '';
-    document.querySelector('#inputNumeroChasisNuevo').value = '';
-    document.querySelector('#inputObservacionesNuevo').value = '';
-}
-
-// Lee y valida el vehículo opcional antes de registrar al cliente.
-function leerDatosVehiculoNuevo() {
-    return {
-        placa: document.querySelector('#inputPlacaNuevo').value.trim().toUpperCase(),
-        vin: document.querySelector('#inputVinNuevo').value.trim(),
-        marca: document.querySelector('#inputMarcaNuevo').value.trim(),
-        modelo: document.querySelector('#inputModeloNuevo').value.trim(),
-        anio: document.querySelector('#inputAnioNuevo').value,
-        color: document.querySelector('#inputColorNuevo').value.trim(),
-        numeroMotor: document.querySelector('#inputNumeroMotorNuevo').value.trim(),
-        numeroChasis: document.querySelector('#inputNumeroChasisNuevo').value.trim(),
-        observaciones: document.querySelector('#inputObservacionesNuevo').value.trim()
-    };
-}
-
-// Registra el vehículo opcional con el ID del cliente recién creado.
-async function guardarVehiculoDesdeModalCliente(idPersona, datos) {
-    try {
-        const res = await axios.post('/api/registrarVehiculo', {
-            id_persona: idPersona,
-            placa: datos.placa,
-            vin: datos.vin,
-            marca: datos.marca,
-            modelo: datos.modelo,
-            anio: Number(datos.anio),
-            color: datos.color,
-            numero_motor: datos.numeroMotor,
-            numero_chasis: datos.numeroChasis,
-            observaciones: datos.observaciones
-        });
-        if (!res.data.ok) {
-            mostrarToast('error', 'Error al registrar vehículo', res.data.mensaje || 'Revise los datos del vehículo.');
-            return false;
-        }
-        return true;
-    } catch (error) {
-        console.error(error);
-        mostrarToast('error', 'Error al registrar vehículo', error.response?.data?.mensaje || 'No se pudo registrar el vehículo.');
-        return false;
-    }
 }
 
 // ============================================================
@@ -2235,9 +2157,9 @@ function renderCotizaciones() {
     const selectorTamanoCotizacion = document.querySelector('#porPaginaCotizacionesListado');
     if (selectorTamanoCotizacion) selectorTamanoCotizacion.value = '10';
 
-    const btnTodasCot = document.querySelector('.filtro-cotizacion[data-filtro="todas"]');
+    const btnTodasCot = document.querySelector('.filtro-cotizacion-listado[data-filtro="todas"]');
     if (btnTodasCot) {
-        document.querySelectorAll('.filtro-cotizacion').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.filtro-cotizacion-listado').forEach(b => b.classList.remove('active'));
         btnTodasCot.classList.add('active');
     }
 
@@ -3030,12 +2952,12 @@ document.addEventListener('click', async function (event) {
     }
 });
 
-// Maneja el evento click del control .filtro-cotizacion.
+// Maneja el evento click de los filtros de la lista de cotizaciones.
 document.addEventListener('click', function (event) {
-    const boton = event.target.closest('.filtro-cotizacion, .filtro-cotizacion-listado');
+    const boton = event.target.closest('.filtro-cotizacion-listado');
     if (!boton) return;
 
-    document.querySelectorAll('.filtro-cotizacion, .filtro-cotizacion-listado').forEach(b => {
+    document.querySelectorAll('.filtro-cotizacion-listado').forEach(b => {
         b.classList.toggle('active', b.dataset.filtro === boton.dataset.filtro);
     });
 
@@ -3150,16 +3072,23 @@ function recalcularTotalesCotizacion() {
 // Muestra el cliente y vehículo asociados a la cotización.
 function mostrarInfoClienteCotizacion(persona, vehiculo) {
     const contCliente  = document.querySelector('#contenedorInfoClienteCotizacion');
-    const contVehiculo = document.querySelector('#contenedorInfoVehiculoCotizacion');
     const vacio        = document.querySelector('#contenedorVacioCliente');
-    if (!contCliente || !contVehiculo || !vacio) return;
+    if (!contCliente || !vacio) return;
+
+    const personaRegistrada = listadoGeneralPersonas.find(p =>
+        Number(p.id_persona) === Number(persona.id_persona)
+    );
+    const documento = persona.documento
+        || persona.cliente_documento
+        || persona.documento_persona
+        || (personaRegistrada && personaRegistrada.documento);
 
     contCliente.classList.remove('d-none');
-    contVehiculo.classList.remove('d-none');
     vacio.classList.add('d-none');
 
     document.querySelector('#clienteNombre').textContent =
         `${persona.nombres || ''} ${persona.apellidos || ''}`.trim() || '—';
+    document.querySelector('#clienteDocumento').textContent = documento || '—';
     document.querySelector('#clienteTelefono').textContent = persona.telefono || '—';
 
     document.querySelector('#vehiculoPlaca').textContent = vehiculo.placa || '—';
@@ -3175,15 +3104,14 @@ function mostrarInfoClienteCotizacion(persona, vehiculo) {
 // Quita de la vista el cliente y vehículo seleccionados.
 function limpiarInfoClienteCotizacion() {
     const contCliente  = document.querySelector('#contenedorInfoClienteCotizacion');
-    const contVehiculo = document.querySelector('#contenedorInfoVehiculoCotizacion');
     const vacio        = document.querySelector('#contenedorVacioCliente');
-    if (!contCliente || !contVehiculo || !vacio) return;
+    if (!contCliente || !vacio) return;
 
     contCliente.classList.add('d-none');
-    contVehiculo.classList.add('d-none');
     vacio.classList.remove('d-none');
 
     document.querySelector('#clienteNombre').textContent = '--';
+    document.querySelector('#clienteDocumento').textContent = '--';
     document.querySelector('#clienteTelefono').textContent = '--';
 
     document.querySelector('#vehiculoPlaca').textContent = '--';
@@ -3287,9 +3215,9 @@ function renderOrdenes() {
     const inpProdOT = document.querySelector('#inputBuscarProductoOT');
     if (inpProdOT) inpProdOT.value = '';
 
-    const botonesFiltro = document.querySelectorAll('.filtro-orden');
+    const botonesFiltro = document.querySelectorAll('.filtro-orden-listado');
     botonesFiltro.forEach(b => b.classList.remove('active'));
-    const btnTodas = document.querySelector('.filtro-orden[data-filtro="todas"]');
+    const btnTodas = document.querySelector('.filtro-orden-listado[data-filtro="todas"]');
     if (btnTodas) btnTodas.classList.add('active');
 
     const inputBuscar = document.querySelector('#inputBuscarOrden');
@@ -3318,12 +3246,10 @@ function limpiarDetalleOrden() {
     const badge = document.querySelector('#consumoOrdenEstado');
     if (badge) {
         badge.textContent = '--';
-        badge.className = 'badge badge-estado badge-estado--sin-definir';
+        badge.className = 'badge badge-estado badge-estado-sin-definir badge-estado-compacto';
     }
 
     vehiculoBuscadoOT = null;
-    const tarjetaVehiculo = document.querySelector('#contenedorVehiculoBuscadoOT');
-    if (tarjetaVehiculo) tarjetaVehiculo.classList.add('d-none');
     const accionCrearOT = document.querySelector('#contenedorAccionCrearOrdenDirecta');
     if (accionCrearOT) accionCrearOT.classList.add('d-none');
 
@@ -3332,6 +3258,15 @@ function limpiarDetalleOrden() {
 
     const vacioOrden = document.querySelector('#contenedorVacioOrden');
     if (vacioOrden) vacioOrden.classList.remove('d-none');
+
+    const inicioNuevaOT = document.querySelector('#contenedorInicioNuevaOT');
+    if (inicioNuevaOT) inicioNuevaOT.classList.remove('d-none');
+    const infoNuevaOT = document.querySelector('#contenedorInfoNuevaOT');
+    if (infoNuevaOT) infoNuevaOT.classList.add('d-none');
+    const origenesNuevaOT = document.querySelector('#contenedorOrigenesNuevaOT');
+    if (origenesNuevaOT) origenesNuevaOT.classList.add('d-none');
+    const avisoOrdenActiva = document.querySelector('#avisoOrdenActivaOT');
+    if (avisoOrdenActiva) avisoOrdenActiva.classList.add('d-none');
 
     const acciones = document.querySelector('#contenedorAccionesOrden');
     if (acciones) acciones.classList.add('d-none');
@@ -3542,8 +3477,6 @@ async function cargarOrdenActual(idOrden) {
         ordenActual = orden;
         alternarBuscadorVehiculoOT(false);
         vehiculoBuscadoOT = null;
-        const tarjetaVehiculo = document.querySelector('#contenedorVehiculoBuscadoOT');
-        if (tarjetaVehiculo) tarjetaVehiculo.classList.add('d-none');
         const observacionDirecta = document.querySelector('#contenedorObservacionOrdenDirecta');
         if (observacionDirecta) observacionDirecta.classList.add('d-none');
 
@@ -3638,7 +3571,7 @@ function aplicarReglasEstadoOrden(orden) {
     const txtDesc = document.querySelector('#textareaDescripcionEvidencia');
     if (txtDesc) txtDesc.disabled = !esEnProceso;
 
-    document.querySelectorAll('#albumEvidencias .evidencia-card__quitar').forEach(btn => {
+    document.querySelectorAll('#albumEvidencias .evidencia-card-quitar').forEach(btn => {
         if (btn.classList.contains('btn-quitar-evidencia-pendiente')) return;
         btn.disabled = !esEnProceso;
         btn.classList.toggle('d-none', !esEnProceso);
@@ -3675,7 +3608,7 @@ function pintarDetalleOrden(orden) {
     const badge = document.querySelector('#consumoOrdenEstado');
     if (badge) {
         badge.textContent = textoEstadoBadge(orden.estado);
-        badge.className = 'badge ' + claseBadgeEstado(orden.estado);
+        badge.className = 'badge ' + claseBadgeEstado(orden.estado) + ' badge-estado-compacto';
     }
 }
 
@@ -4005,12 +3938,12 @@ function pintarEvidenciasOT() {
     evidenciasGuardadas.forEach(ev => {
         const clone = templateGuardada.cloneNode(true);
 
-        clone.querySelector('.evidencia-card__img').src = ev.url_archivo || '';
-        clone.querySelector('.evidencia-card__desc').textContent = ev.descripcion || '';
-        clone.querySelector('.evidencia-card__fecha').textContent =
+        clone.querySelector('.evidencia-card-img').src = ev.url_archivo || '';
+        clone.querySelector('.evidencia-card-desc').textContent = ev.descripcion || '';
+        clone.querySelector('.evidencia-card-fecha').textContent =
             ev.fecha_registro ? formatearFecha(ev.fecha_registro) : '';
 
-        clone.querySelector('.evidencia-card__quitar').dataset.id = ev.id_evidencia;
+        clone.querySelector('.evidencia-card-quitar').dataset.id = ev.id_evidencia;
 
         album.appendChild(clone);
     });
@@ -4019,9 +3952,9 @@ function pintarEvidenciasOT() {
     evidenciasPendientes.forEach((ev, index) => {
         const clone = templatePendiente.cloneNode(true);
 
-        clone.querySelector('.evidencia-card__img').src = ev.urlPreview || '';
+        clone.querySelector('.evidencia-card-img').src = ev.urlPreview || '';
 
-        const btn = clone.querySelector('.evidencia-card__quitar');
+        const btn = clone.querySelector('.evidencia-card-quitar');
         btn.dataset.index = index;
         btn.classList.add('btn-quitar-evidencia-pendiente');
 
@@ -4031,12 +3964,12 @@ function pintarEvidenciasOT() {
     if (ordenActual) aplicarReglasEstadoOrden(ordenActual);
 }
 
-// Maneja el evento click del control .filtro-orden.
+// Maneja los filtros de la lista principal de órdenes.
 document.addEventListener('click', function (event) {
-    const boton = event.target.closest('.filtro-orden, .filtro-orden-listado');
+    const boton = event.target.closest('.filtro-orden-listado');
     if (!boton) return;
 
-    document.querySelectorAll('.filtro-orden, .filtro-orden-listado').forEach(b => {
+    document.querySelectorAll('.filtro-orden-listado').forEach(b => {
         b.classList.toggle('active', b.dataset.filtro === boton.dataset.filtro);
     });
 
@@ -4084,7 +4017,7 @@ document.addEventListener('click', async function (event) {
     alternarBuscadorVehiculoOT(true);
     const busqueda = document.querySelector('#inputBuscarOrden');
     if (busqueda) busqueda.value = '';
-    abrirModal('#modalGestionOrdenes');
+    abrirModal('#modalNuevaOrdenOT');
 });
 
 document.addEventListener('click', async function (event) {
@@ -4147,13 +4080,13 @@ function pintarOrigenesVehiculoOT(vehiculo) {
         opcion.className = 'opcion-origen-ot form-check';
 
         const icono = document.createElement('span');
-        icono.className = 'opcion-origen-ot__icono';
+        icono.className = 'opcion-origen-ot-icono';
         icono.innerHTML = tipo === 'CITA'
             ? '<i class="bi bi-calendar-check"></i>'
             : '<i class="bi bi-file-earmark-text"></i>';
 
         const texto = document.createElement('span');
-        texto.className = 'opcion-origen-ot__texto';
+        texto.className = 'opcion-origen-ot-texto';
         const titulo = document.createElement('strong');
         const detalle = document.createElement('small');
 
@@ -4196,8 +4129,21 @@ function pintarOrigenesVehiculoOT(vehiculo) {
     const tieneOrdenActiva = Number(vehiculo.tiene_orden_activa) === 1 ||
         vehiculo.tiene_orden_activa === true;
     const vehiculoActivo = String(vehiculo.estado || '').toUpperCase() === 'ACTIVO';
-    if (botonCrear) botonCrear.disabled = !vehiculoActivo || tieneOrdenActiva;
-    if (contenedorAccionCrear) contenedorAccionCrear.classList.toggle('d-none', tieneOrdenActiva || !vehiculoActivo);
+    const avisoOrdenActiva = document.querySelector('#avisoOrdenActivaOT');
+    const textoAvisoOrdenActiva = avisoOrdenActiva ? avisoOrdenActiva.querySelector('span') : null;
+    const contenedorOrigenes = document.querySelector('#contenedorOrigenesNuevaOT');
+    const inicioNuevaOT = document.querySelector('#contenedorInicioNuevaOT');
+    const mostrarBloqueo = tieneOrdenActiva || !vehiculoActivo;
+    if (avisoOrdenActiva) avisoOrdenActiva.classList.toggle('d-none', !mostrarBloqueo);
+    if (textoAvisoOrdenActiva) {
+        textoAvisoOrdenActiva.textContent = tieneOrdenActiva
+            ? 'Este vehículo ya tiene una orden de trabajo activa. No se puede crear otra.'
+            : 'El vehículo está inactivo y no puede recibir una nueva orden.';
+    }
+    if (contenedorOrigenes) contenedorOrigenes.classList.toggle('d-none', mostrarBloqueo);
+    if (inicioNuevaOT) inicioNuevaOT.classList.add('d-none');
+    if (botonCrear) botonCrear.disabled = mostrarBloqueo;
+    if (contenedorAccionCrear) contenedorAccionCrear.classList.toggle('d-none', mostrarBloqueo);
 }
 // Mantiene visible la selección actual del origen.
 document.addEventListener('change', function (event) {
@@ -4242,23 +4188,38 @@ async function buscarVehiculoParaNuevaOrden() {
         setTexto('#vehiculoBuscadoDocumento', vehiculo.cliente_documento || '—');
         setTexto('#vehiculoBuscadoDescripcion', ((vehiculo.marca || '') + ' ' + (vehiculo.modelo || '')).trim() || '—');
         setTexto('#vehiculoBuscadoAnioColor', [vehiculo.anio, vehiculo.color].filter(Boolean).join(' · ') || '—');
+        setTexto('#vehiculoBuscadoFecha', formatearFecha(new Date()));
+        setTexto('#vehiculoBuscadoMecanico', mecanicoActual
+            ? ((mecanicoActual.nombres || '') + ' ' + (mecanicoActual.apellidos || '')).trim() || '—'
+            : '—');
+        const infoNuevaOT = document.querySelector('#contenedorInfoNuevaOT');
+        if (infoNuevaOT) infoNuevaOT.classList.remove('d-none');
         pintarOrigenesVehiculoOT(vehiculo);
 
-        const tarjeta = document.querySelector('#contenedorVehiculoBuscadoOT');
-        if (tarjeta) tarjeta.classList.remove('d-none');
-        const observacionDirecta = document.querySelector('#contenedorObservacionOrdenDirecta');
-        if (observacionDirecta) observacionDirecta.classList.remove('d-none');
-
+        const inicioNuevaOT = document.querySelector('#contenedorInicioNuevaOT');
+        if (inicioNuevaOT) inicioNuevaOT.classList.add('d-none');
         const botonCrear = document.querySelector('#btnCrearOrdenDesdeVehiculo');
-        if (botonCrear) botonCrear.title = botonCrear.disabled ? 'El vehículo está inactivo' : '';
+        const observacionDirecta = document.querySelector('#contenedorObservacionOrdenDirecta');
+        if (observacionDirecta) observacionDirecta.classList.toggle('d-none', !botonCrear || botonCrear.disabled);
+        if (botonCrear) botonCrear.title = botonCrear.disabled
+            ? (Number(vehiculo.tiene_orden_activa) === 1 ? 'El vehículo ya tiene una orden activa' : 'El vehículo está inactivo')
+            : '';
 
         const observacion = document.querySelector('#textareaObservacionOrdenDirecta');
         if (observacion) observacion.value = '';
     } catch (error) {
         console.error(error);
         vehiculoBuscadoOT = null;
-        const tarjeta = document.querySelector('#contenedorVehiculoBuscadoOT');
-        if (tarjeta) tarjeta.classList.add('d-none');
+        const inicioNuevaOT = document.querySelector('#contenedorInicioNuevaOT');
+        if (inicioNuevaOT) inicioNuevaOT.classList.remove('d-none');
+        const infoNuevaOT = document.querySelector('#contenedorInfoNuevaOT');
+        if (infoNuevaOT) infoNuevaOT.classList.add('d-none');
+        const origenesNuevaOT = document.querySelector('#contenedorOrigenesNuevaOT');
+        if (origenesNuevaOT) origenesNuevaOT.classList.add('d-none');
+        const accionCrearOT = document.querySelector('#contenedorAccionCrearOrdenDirecta');
+        if (accionCrearOT) accionCrearOT.classList.add('d-none');
+        const observacionDirecta = document.querySelector('#contenedorObservacionOrdenDirecta');
+        if (observacionDirecta) observacionDirecta.classList.add('d-none');
         const mensaje = error.response && error.response.data && error.response.data.mensaje;
         mostrarToast('error', 'No se encontró el vehículo', mensaje || error.message || 'Verifica la placa e inténtalo nuevamente.');
     }
@@ -4343,18 +4304,26 @@ document.addEventListener('click', async function (event) {
         }
 
         mostrarToast('exito', 'Orden creada', 'La orden de trabajo quedó vinculada a su origen.');
-        const tarjeta = document.querySelector('#contenedorVehiculoBuscadoOT');
-        if (tarjeta) tarjeta.classList.add('d-none');
         const accionCrearOT = document.querySelector('#contenedorAccionCrearOrdenDirecta');
         if (accionCrearOT) accionCrearOT.classList.add('d-none');
         vehiculoBuscadoOT = null;
         filtroOrdenActual = 'todas';
-        document.querySelectorAll('.filtro-orden').forEach(filtro => {
+        document.querySelectorAll('.filtro-orden-listado').forEach(filtro => {
             filtro.classList.toggle('active', filtro.dataset.filtro === 'todas');
         });
         await Promise.all([cargarOrdenes(), cargarCitas(), cargarCotizaciones()]);
         listarOrdenes();
         await cargarOrdenActual(respuesta.data.id_orden_trabajo);
+        if (ordenActual) {
+            const modalNuevaOT = document.querySelector('#modalNuevaOrdenOT');
+            if (modalNuevaOT && modalNuevaOT.classList.contains('show')) {
+                await new Promise(resolve => {
+                    modalNuevaOT.addEventListener('hidden.bs.modal', resolve, { once: true });
+                    cerrarModal('#modalNuevaOrdenOT');
+                });
+            }
+            abrirModal('#modalGestionOrdenes');
+        }
     } catch (error) {
         console.error(error);
         const mensaje = error.response && error.response.data && error.response.data.mensaje;
@@ -4904,9 +4873,9 @@ document.addEventListener('click', function (event) {
     pintarEvidenciasOT();
 });
 
-// Maneja el evento click del control .evidencia-card__quitar.
+// Maneja el evento click del control .evidencia-card-quitar.
 document.addEventListener('click', async function (event) {
-    const boton = event.target.closest('.evidencia-card__quitar');
+    const boton = event.target.closest('.evidencia-card-quitar');
     if (!boton) return;
     if (boton.classList.contains('btn-quitar-evidencia-pendiente')) return;
 
@@ -5297,12 +5266,12 @@ document.addEventListener('click', async function (event) {
                 evidencias.forEach(ev => {
                     const clone = templateEv.cloneNode(true);
 
-                    clone.querySelector('.evidencia-card__img').src = ev.url_archivo || '';
-                    clone.querySelector('.evidencia-card__desc').textContent = ev.descripcion || '';
-                    clone.querySelector('.evidencia-card__fecha').textContent =
+                    clone.querySelector('.evidencia-card-img').src = ev.url_archivo || '';
+                    clone.querySelector('.evidencia-card-desc').textContent = ev.descripcion || '';
+                    clone.querySelector('.evidencia-card-fecha').textContent =
                         ev.fecha_registro ? formatearFecha(ev.fecha_registro) : '';
 
-                    const btn = clone.querySelector('.evidencia-card__quitar');
+                    const btn = clone.querySelector('.evidencia-card-quitar');
                     if (btn) btn.remove();
 
                     album.appendChild(clone);
@@ -5326,8 +5295,115 @@ document.addEventListener('click', async function (event) {
 });
 
 // ============================================================
-// SECCION AGENDA (accesible, NO funcional por ahora)
+// SECCIONES MI AVANCE Y AGENDA
 // ============================================================
+// Inserta la vista visual de avance sin solicitar datos al servidor.
+function renderMiAvance() {
+    if (!contenedorReactivo) return;
+
+    contenedorReactivo.innerHTML = '';
+    const clone = templateContenedorMiAvance.cloneNode(true);
+    fragmento.appendChild(clone);
+    contenedorReactivo.appendChild(fragmento);
+
+    actualizarVistaMiAvance();
+}
+
+// Calcula los indicadores y la actividad con las órdenes ya cargadas del mecánico.
+function actualizarVistaMiAvance() {
+    const ordenes = Array.isArray(listadoGeneralOrdenes) ? listadoGeneralOrdenes : [];
+    const estadoOrden = orden => String(orden.estado || '').trim().toUpperCase();
+    const pendientes = ordenes.filter(orden => estadoOrden(orden) === 'PENDIENTE');
+    const enProceso = ordenes.filter(orden => estadoOrden(orden) === 'EN PROCESO');
+    const finalizadas = ordenes.filter(orden => estadoOrden(orden) === 'FINALIZADA');
+    const hoy = fechaISO(new Date());
+
+    const fechaOrden = orden => {
+        const valor = String(orden.fecha_atencion || '');
+        const fechaCorta = valor.slice(0, 10);
+        return /^\d{4}-\d{2}-\d{2}$/.test(fechaCorta)
+            ? fechaCorta
+            : fechaISO(new Date(orden.fecha_atencion));
+    };
+
+    const finalizadasHoy = finalizadas.filter(orden => fechaOrden(orden) === hoy);
+    const placasFinalizadasHoy = new Set(
+        finalizadasHoy
+            .map(orden => String(orden.placa || '').trim().toUpperCase())
+            .filter(Boolean)
+    );
+
+    setTexto('#avanceVehiculosHoy', placasFinalizadasHoy.size);
+    setTexto('#avanceOrdenesPendientes', pendientes.length);
+    setTexto('#avanceOrdenesProceso', enProceso.length);
+    setTexto('#avanceOrdenesFinalizadas', finalizadas.length);
+    setTexto('#avanceTotalFinalizadas', finalizadas.length);
+    setTexto('#avanceTotalOrdenes', ordenes.length);
+
+    const montoFinalizadasEnCentimos = finalizadas.reduce((total, orden) => {
+        const monto = Number(orden.total);
+        return total + (Number.isFinite(monto) ? Math.round(monto * 100) : 0);
+    }, 0);
+    setTexto('#avanceMontoFinalizadas', 'S/ ' + (montoFinalizadasEnCentimos / 100).toFixed(2));
+
+    const porcentaje = ordenes.length
+        ? Math.round((finalizadas.length / ordenes.length) * 100)
+        : 0;
+    setTexto('#avancePorcentaje', porcentaje + '%');
+
+    const barra = document.querySelector('#barraAvanceOrdenes');
+    const rellenoBarra = barra?.querySelector('.progress-bar');
+    if (barra && rellenoBarra) {
+        barra.setAttribute('aria-valuenow', String(porcentaje));
+        rellenoBarra.style.width = porcentaje + '%';
+    }
+
+    const cuerpo = document.querySelector('#tablaActividadAvance');
+    const mensajeVacio = document.querySelector('#vacioActividadAvance');
+    if (!cuerpo) return;
+
+    while (cuerpo.firstChild) cuerpo.removeChild(cuerpo.firstChild);
+
+    const recientes = [...ordenes]
+        .sort((a, b) => Number(b.id_orden_trabajo || 0) - Number(a.id_orden_trabajo || 0))
+        .slice(0, 10);
+    const filas = document.createDocumentFragment();
+
+    recientes.forEach(orden => {
+        const fila = document.createElement('tr');
+        const codigo = 'OT-' + String(orden.id_orden_trabajo || '').padStart(4, '0');
+        const vehiculo = [orden.placa, [orden.marca, orden.modelo].filter(Boolean).join(' ')]
+            .filter(Boolean)
+            .join(' · ') || '—';
+        const cliente = `${orden.cliente_nombres || ''} ${orden.cliente_apellidos || ''}`.trim() || '—';
+        const valores = [
+            codigo,
+            orden.fecha_atencion ? formatearFecha(orden.fecha_atencion) : '—',
+            vehiculo,
+            cliente,
+            orden.observacion || '—'
+        ];
+
+        valores.forEach(valor => {
+            const celda = document.createElement('td');
+            celda.textContent = valor;
+            fila.appendChild(celda);
+        });
+
+        const celdaEstado = document.createElement('td');
+        celdaEstado.className = 'text-center';
+        const badge = document.createElement('span');
+        badge.className = 'badge ' + claseBadgeEstado(orden.estado);
+        badge.textContent = textoEstadoBadge(orden.estado);
+        celdaEstado.appendChild(badge);
+        fila.appendChild(celdaEstado);
+        filas.appendChild(fila);
+    });
+
+    cuerpo.appendChild(filas);
+    if (mensajeVacio) mensajeVacio.classList.toggle('d-none', recientes.length > 0);
+}
+
 // Inserta la vista de agenda y muestra el nombre del mecánico.
 function renderAgenda() {
     contenedorReactivo.innerHTML = "";

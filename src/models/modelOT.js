@@ -97,6 +97,11 @@ const listarOrdenesPorMecanico = async (idMecanico, estado = null) => {
             ot.id_persona,
             ot.id_sucursal,
             ot.id_vehiculo,
+            (
+                SELECT COALESCE(SUM(det.subtotal), 0)
+                FROM detalles_ot det
+                WHERE det.id_orden_trabajo = ot.id_orden_trabajo
+            ) AS total,
             ot.observacion,
             ot.fecha_atencion,
             ot.estado,
