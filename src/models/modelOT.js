@@ -329,6 +329,36 @@ const registrarOrden = async (datos) => {
     try {
         await conn.beginTransaction();
 
+        // Serializa la creación de órdenes por vehículo y evita duplicar órdenes activas.
+        const [vehiculosBloqueados] = await conn.query(
+            `SELECT id_vehiculo
+             FROM VEHICULOS
+             WHERE id_vehiculo = ?
+             FOR UPDATE`,
+            [id_vehiculo]
+        );
+
+        if (vehiculosBloqueados.length === 0) {
+            const error = new Error('El vehículo ya no está disponible para crear la orden');
+            error.code = 'VEHICULO_NO_DISPONIBLE_OT';
+            throw error;
+        }
+
+        const [ordenesActivas] = await conn.query(
+            `SELECT id_orden_trabajo
+             FROM ORDENES_TRABAJO
+             WHERE id_vehiculo = ? AND estado IN (?, ?)
+             LIMIT 1
+             FOR UPDATE`,
+            [id_vehiculo, 'PENDIENTE', 'EN PROCESO']
+        );
+
+        if (ordenesActivas.length > 0) {
+            const error = new Error('El vehículo ya tiene una orden de trabajo activa');
+            error.code = 'VEHICULO_CON_ORDEN_ACTIVA';
+            throw error;
+        }
+
         // Valida la cita seleccionada dentro de la transacción para evitar reutilizarla.
         if (id_cita) {
             const [citasOrigen] = await conn.query(
@@ -340,7 +370,8 @@ const registrarOrden = async (datos) => {
             const citaOrigen = citasOrigen[0];
             if (!citaOrigen || Number(citaOrigen.id_persona) !== Number(id_persona) ||
                 Number(citaOrigen.id_sucursal) !== Number(id_sucursal) || Number(citaOrigen.id_vehiculo) !== Number(id_vehiculo) ||
-                citaOrigen.estado === 'CANCELADA' || Number(citaOrigen.tiene_ot) === 1) {
+                !['PENDIENTE', 'CONFIRMADA'].includes(String(citaOrigen.estado || '').toUpperCase()) ||
+                Number(citaOrigen.tiene_ot) === 1) {
                 const error = new Error('La cita ya no está disponible para crear esta orden');
                 error.code = 'CITA_NO_DISPONIBLE_OT';
                 throw error;
@@ -365,22 +396,11 @@ const registrarOrden = async (datos) => {
             }
         }
 
-        // Crea una cita de ingreso atendida dentro de la transacción para una OT directa.
+        // Crea una cita confirmada dentro de la transacción para una OT directa.
         if (crear_cita_automatica) {
-            const [ordenesActivas] = await conn.query(
-                "SELECT id_orden_trabajo FROM ORDENES_TRABAJO WHERE id_vehiculo = ? AND estado IN (?, ?) LIMIT 1 FOR UPDATE",
-                [id_vehiculo, 'PENDIENTE', 'EN PROCESO']
-            );
-
-            if (ordenesActivas.length > 0) {
-                const error = new Error('El vehículo ya tiene una orden de trabajo activa');
-                error.code = 'VEHICULO_CON_ORDEN_ACTIVA';
-                throw error;
-            }
-
             const [resultadoCita] = await conn.query(
                 "INSERT INTO CITAS (id_persona, id_sucursal, id_vehiculo, fecha_cita, hora_cita, motivo, estado) VALUES (?, ?, ?, CURDATE(), CURTIME(), ?, ?)",
-                [id_persona, id_sucursal, id_vehiculo, observacion, 'ATENDIDA']
+                [id_persona, id_sucursal, id_vehiculo, observacion, 'CONFIRMADA']
             );
             id_cita = resultadoCita.insertId;
         }
@@ -445,6 +465,16 @@ const registrarOrden = async (datos) => {
             );
         }
 
+        // Vincular una cita pendiente a la orden también la deja confirmada.
+        if (id_cita && !crear_cita_automatica) {
+            await conn.query(
+                `UPDATE CITAS
+                 SET estado = 'CONFIRMADA', fecha_modificacion = CURDATE()
+                 WHERE id_cita = ? AND estado = 'PENDIENTE'`,
+                [id_cita]
+            );
+        }
+
         await conn.commit();
         return { id_orden_trabajo: idOrden, id_cita };
     } catch (error) {
@@ -463,7 +493,6 @@ const actualizarOrden = async (idOrden, datos) => {
         UPDATE ORDENES_TRABAJO SET
             observacion        = ?,
             fecha_atencion     = ?,
-            estado             = ?,
             fecha_modificacion = CURDATE()
         WHERE id_orden_trabajo = ?
     `;
@@ -472,7 +501,6 @@ const actualizarOrden = async (idOrden, datos) => {
         const [result] = await poolDB.query(sql, [
             datos.observacion || null,
             toISODate(datos.fecha_atencion),
-            datos.estado || 'PENDIENTE',
             idOrden
         ]);
         return result;
@@ -485,18 +513,70 @@ const actualizarOrden = async (idOrden, datos) => {
 // CAMBIAR ESTADO DE LA ORDEN
 // ======================================================
 const cambiarEstadoOrden = async (idOrden, estado) => {
-    const sql = `
-        UPDATE ORDENES_TRABAJO SET
-            estado = ?,
-            fecha_modificacion = CURDATE()
-        WHERE id_orden_trabajo = ?
-    `;
+    const conn = await poolDB.getConnection();
 
     try {
-        const [result] = await poolDB.query(sql, [estado, idOrden]);
+        await conn.beginTransaction();
+
+        // Bloquear la orden para validar la transición y sincronizar su cita.
+        const [ordenes] = await conn.query(
+            `SELECT id_orden_trabajo, id_cita, estado
+             FROM ORDENES_TRABAJO
+             WHERE id_orden_trabajo = ?
+             FOR UPDATE`,
+            [idOrden]
+        );
+
+        const orden = ordenes[0];
+        if (!orden) {
+            const error = new Error('No se encontró la orden de trabajo');
+            error.code = 'ORDEN_NO_ENCONTRADA';
+            throw error;
+        }
+
+        const transicionesPermitidas = {
+            PENDIENTE: ['EN PROCESO', 'CANCELADA'],
+            'EN PROCESO': ['FINALIZADA', 'CANCELADA'],
+            FINALIZADA: [],
+            CANCELADA: []
+        };
+        const permitidos = transicionesPermitidas[orden.estado] || [];
+
+        if (!permitidos.includes(estado)) {
+            const error = new Error(`No se puede cambiar la orden de ${orden.estado} a ${estado}`);
+            error.code = 'TRANSICION_OT_NO_PERMITIDA';
+            throw error;
+        }
+
+        const [result] = await conn.query(
+            `UPDATE ORDENES_TRABAJO
+             SET estado = ?, fecha_modificacion = CURDATE()
+             WHERE id_orden_trabajo = ?`,
+            [estado, idOrden]
+        );
+
+        // La cita refleja el avance de la orden vinculada.
+        if (orden.id_cita) {
+            const estadosCita = {
+                'EN PROCESO': 'EN PROCESO',
+                FINALIZADA: 'ATENDIDA',
+                CANCELADA: 'CANCELADA'
+            };
+            await conn.query(
+                `UPDATE CITAS
+                 SET estado = ?, fecha_modificacion = CURDATE()
+                 WHERE id_cita = ?`,
+                [estadosCita[estado], orden.id_cita]
+            );
+        }
+
+        await conn.commit();
         return result;
     } catch (error) {
+        await conn.rollback();
         throw error;
+    } finally {
+        conn.release();
     }
 };
 

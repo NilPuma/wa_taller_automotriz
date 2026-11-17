@@ -191,6 +191,25 @@ function actualizarBotonesPaginacion(prefijo, pagina, totalPaginas) {
 // ============================================================
 // MENU LATERAL
 // ============================================================
+// Cierra el menú y devuelve la interacción a la vista principal.
+function cerrarMenuLateral() {
+    const sideMenu = document.querySelector('#sideMenu');
+    const bodyAdmin = document.querySelector('#bodyAdministrador');
+    const boton = document.querySelector('#menuBtn');
+    const contenido = document.querySelector('#contenedorPrincipal');
+    if (!sideMenu || !bodyAdmin) return;
+
+    sideMenu.classList.remove('menu-expandido');
+    sideMenu.classList.add('menu-colapsado');
+    bodyAdmin.classList.remove('body-expandido');
+    document.body.classList.remove('menu-movil-abierto');
+    if (boton) {
+        boton.setAttribute('aria-expanded', 'false');
+        boton.setAttribute('aria-label', 'Abrir menú');
+    }
+    if (contenido) contenido.inert = false;
+}
+
 // Conecta las opciones del menú con las funciones que muestran cada sección.
 function enlazarMenu() {
     const menuMap = {
@@ -210,6 +229,7 @@ function enlazarMenu() {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 fn();
+                if (window.matchMedia('(max-width: 767.98px)').matches) cerrarMenuLateral();
             });
         }
     });
@@ -217,21 +237,41 @@ function enlazarMenu() {
     if (document.body.dataset.sidebarBound === '1') return;
     document.body.dataset.sidebarBound = '1';
 
-// Maneja el evento pointerdown del control #menuBtn.
     document.addEventListener('pointerdown', function (event) {
+        if (event.target.closest('#menuBackdrop')) {
+            cerrarMenuLateral();
+            return;
+        }
+
         const boton = event.target.closest('#menuBtn');
         if (!boton) return;
 
-        const sideMenu  = document.querySelector('#sideMenu');
+        const sideMenu = document.querySelector('#sideMenu');
         const bodyAdmin = document.querySelector('#bodyAdministrador');
+        const contenido = document.querySelector('#contenedorPrincipal');
         if (!sideMenu || !bodyAdmin) return;
 
         const expandido = sideMenu.classList.toggle('menu-expandido');
         sideMenu.classList.toggle('menu-colapsado', !expandido);
         bodyAdmin.classList.toggle('body-expandido', expandido);
+
+        const menuMovilAbierto = expandido && window.matchMedia('(max-width: 767.98px)').matches;
+        document.body.classList.toggle('menu-movil-abierto', menuMovilAbierto);
+        boton.setAttribute('aria-expanded', String(expandido));
+        boton.setAttribute('aria-label', expandido ? 'Cerrar menú' : 'Abrir menú');
+        if (contenido) contenido.inert = menuMovilAbierto;
+    });
+
+    document.addEventListener('click', function (event) {
+        if (event.target.closest('#menuBackdrop')) cerrarMenuLateral();
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && document.body.classList.contains('menu-movil-abierto')) {
+            cerrarMenuLateral();
+        }
     });
 }
-
 // ============================================================
 // ARRANQUE
 // ============================================================
@@ -1606,6 +1646,8 @@ function listarCitas(filtradas) {
         }
     }
 
+    setTexto('#contadorCitas', String(base.length));
+
     const totalPaginas = Math.max(1, Math.ceil(base.length / porPaginaCitas));
     if (paginaCitasActual > totalPaginas) paginaCitasActual = totalPaginas;
     const inicio = (paginaCitasActual - 1) * porPaginaCitas;
@@ -1758,7 +1800,7 @@ document.addEventListener('click', async function (event) {
     const citaActiva = listadoGeneralCitas.find(cita =>
         Number(cita.id_vehiculo) === Number(cot.id_vehiculo) &&
         Number(cita.id_sucursal) === Number(sucursalActual.id_sucursal) &&
-        ['PENDIENTE', 'CONFIRMADA', 'ATENDIDA'].includes(String(cita.estado || '').toUpperCase()) &&
+        ['PENDIENTE', 'CONFIRMADA'].includes(String(cita.estado || '').toUpperCase()) &&
         Number(cita.tiene_ot) !== 1 && !citaTieneOrden(cita.id_cita)
     );
     if (citaActiva) {
@@ -1825,7 +1867,7 @@ document.addEventListener('click', async function (event) {
         await cargarCitas();
         const citaActiva = listadoGeneralCitas.find(cita =>
             Number(cita.id_vehiculo) === Number(idVehiculo) && Number(cita.id_sucursal) === Number(sucursalActual.id_sucursal) &&
-            ['PENDIENTE', 'CONFIRMADA', 'ATENDIDA'].includes(String(cita.estado || '').toUpperCase()) &&
+            ['PENDIENTE', 'CONFIRMADA'].includes(String(cita.estado || '').toUpperCase()) &&
             Number(cita.tiene_ot) !== 1 && !citaTieneOrden(cita.id_cita)
         );
         if (citaActiva) {
@@ -1895,6 +1937,8 @@ document.addEventListener('click', async function (event) {
         mostrarInfoClienteCotizacion(clienteActual, vehiculo);
         document.querySelector('#inputPlacaCotizacion').value = vehiculo.placa || cita.placa || '';
         document.querySelector('#textareaObservacionesCotizacion').value = cita.motivo || '';
+        alternarModoSoloLecturaCotizacion(false);
+        abrirModal('#modalGestionCotizaciones');
         mostrarToast('exito', 'Cotización preparada', 'Cliente y vehículo cargados. Añada los productos o servicios antes de generarla.');
     } catch (error) {
         console.error(error);
@@ -1957,50 +2001,77 @@ document.addEventListener('click', async function (event) {
     }
 });
 
-// Maneja el evento click del control .btn-tomar-cita.
+// Toma la cita y crea una OT vinculada desde la vista de citas.
 document.addEventListener('click', async function (event) {
     const boton = event.target.closest('.btn-tomar-cita');
     if (!boton) return;
+    if (boton.disabled) return;
 
     const idCita = boton.dataset.id;
-
     const cita = listadoGeneralCitas.find(c => Number(c.id_cita) === Number(idCita));
-    if (cita) {
-        if (cita.estado !== 'PENDIENTE') {
-            mostrarToast('advertencia', 'No permitido', 'Solo puede tomar citas pendientes');
-            return;
-        }
-        if (citaTieneOrden(idCita)) {
-            mostrarToast('advertencia', 'No permitido', 'Esta cita ya tiene una orden de trabajo asociada');
+    if (!cita) {
+        mostrarToast('advertencia', 'Cita no disponible', 'Actualice la lista e inténtelo nuevamente.');
+        return;
+    }
+
+    if (cita.estado !== 'PENDIENTE') {
+        mostrarToast('advertencia', 'No permitido', 'Solo puede tomar citas pendientes.');
+        return;
+    }
+
+    if (citaTieneOrden(idCita)) {
+        mostrarToast('advertencia', 'Cita ya utilizada', 'Esta cita ya tiene una orden de trabajo asociada.');
+        return;
+    }
+
+    const confirmar = await confirmarAccionModal({
+        titulo: 'Tomar cita y crear orden',
+        mensaje: 'Se creará una orden de trabajo vinculada a esta cita. ¿Desea continuar?',
+        textoConfirmar: 'Crear orden'
+    });
+    if (!confirmar) return;
+
+    if (ordenActual) {
+        await flushAutoguardadoConsumo();
+        if (_autoguardadoConsumoPendiente) {
+            mostrarToast('advertencia', 'Guardado pendiente',
+                'Espera a que se guarden los cambios de la orden actual.');
             return;
         }
     }
 
-    const confirmar = await confirmarAccionModal({
-        titulo: 'Confirmar cita',
-        mensaje: '¿Desea confirmar (tomar) esta cita?',
-        textoConfirmar: 'Confirmar cita'
-    });
-    if (!confirmar) return;
+    boton.disabled = true;
 
     try {
-        const res = await axios.patch('/api/actualizarEstadoCita/' + idCita, { estado: 'CONFIRMADA' });
+        const res = await axios.post('/api/registrarOrden', {
+            id_cita: Number(cita.id_cita),
+            id_persona: Number(cita.id_persona),
+            id_sucursal: Number(cita.id_sucursal || sucursalActual.id_sucursal),
+            id_vehiculo: Number(cita.id_vehiculo),
+            observacion: cita.motivo || null,
+            fecha_atencion: fechaISO(new Date()),
+            ids_mecanicos: mecanicoActual ? [mecanicoActual.id_mecanico] : [],
+            items: []
+        });
 
-        if (!res.data.ok) {
-            mostrarToast('error', 'Error', res.data.mensaje);
-            return;
+        if (!res.data || !res.data.ok || !res.data.id_orden_trabajo) {
+            throw new Error(res.data?.mensaje || 'No se pudo crear la orden de trabajo.');
         }
 
-        await cargarCitas();
+        await Promise.all([cargarOrdenes(), cargarCitas()]);
         listarCitas();
 
-        mostrarToast('exito', 'Correcto', 'Cita confirmada correctamente');
+        mostrarToast('exito', 'Orden creada',
+            'La cita fue tomada y se creó la OT-' +
+            String(res.data.id_orden_trabajo).padStart(4, '0') + ' vinculada.');
 
     } catch (error) {
-        console.error(error);
-        if (error.response) {
-            mostrarToast('error', 'Error', error.response.data.mensaje);
-        }
+        console.error('Error al tomar la cita y crear la orden:', error);
+        const mensaje = error.response?.data?.mensaje || error.message ||
+            'No se pudo crear la orden de trabajo.';
+        mostrarToast('error', 'No se pudo crear la orden', mensaje);
+    } finally {
+        boton.disabled = false;
     }
 });
 
@@ -4048,7 +4119,7 @@ function pintarOrigenesVehiculoOT(vehiculo) {
     const citasDisponibles = listadoGeneralCitas
         .filter(cita => Number(cita.id_vehiculo) === Number(vehiculo.id_vehiculo) &&
             Number(cita.id_sucursal) === sucursalId &&
-            ['PENDIENTE', 'CONFIRMADA', 'ATENDIDA'].includes(String(cita.estado || '').toUpperCase()) &&
+            ['PENDIENTE', 'CONFIRMADA'].includes(String(cita.estado || '').toUpperCase()) &&
             Number(cita.tiene_ot) !== 1)
         .sort((a, b) => Number(b.id_cita) - Number(a.id_cita));
     const cotizacionesDisponibles = listadoGeneralCotizaciones
@@ -4268,7 +4339,7 @@ document.addEventListener('click', async function (event) {
             const citaActiva = listadoGeneralCitas.find(cita =>
                 Number(cita.id_vehiculo) === Number(vehiculoBuscadoOT.id_vehiculo) &&
                 Number(cita.id_sucursal) === Number(sucursalActual.id_sucursal) &&
-                ['PENDIENTE', 'CONFIRMADA', 'ATENDIDA'].includes(String(cita.estado || '').toUpperCase()) &&
+                ['PENDIENTE', 'CONFIRMADA'].includes(String(cita.estado || '').toUpperCase()) &&
                 Number(cita.tiene_ot) !== 1 && !citaTieneOrden(cita.id_cita)
             );
             if (citaActiva) {
@@ -4607,6 +4678,7 @@ document.addEventListener('click', async function (event) {
         }
 
         await cargarOrdenes();
+        await cargarCitas();
         await cargarOrdenActual(idOrdenActualizada);
         listarOrdenes();
 
@@ -5367,6 +5439,7 @@ function actualizarVistaMiAvance() {
     const recientes = [...ordenes]
         .sort((a, b) => Number(b.id_orden_trabajo || 0) - Number(a.id_orden_trabajo || 0))
         .slice(0, 10);
+    setTexto('#contadorActividadAvance', String(recientes.length));
     const filas = document.createDocumentFragment();
 
     recientes.forEach(orden => {

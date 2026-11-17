@@ -665,7 +665,13 @@ a:hover {
 
 /* ---------------- GENERAL DEL PORTAL ---------------- */
 
-/* Ajustes temporales de expansión del menú para el portal Mecánico. */
+/* Sidebar sobre las tablas y su fondo de cierre en móvil. */
+#sideMenu {
+  z-index: 1051;
+}
+.menu-fondo {
+  display: none;
+}
 #bodyAdministrador.body-expandido {
   margin-left: var(--width);
 }
@@ -677,6 +683,36 @@ a:hover {
 
   #sideMenu.menu-expandido {
     width: min(var(--width), calc(100vw - 1rem));
+    height: 100vh;
+    height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #sideMenu.menu-expandido #menuItems {
+    overflow: visible;
+  }
+
+  #sideMenu.menu-expandido #menuItems .item {
+    width: 100%;
+  }
+
+  #bodyAdministrador.body-expandido > .menu-fondo {
+    position: fixed;
+    z-index: 1050;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(19, 31, 51, 0.42);
+  }
+
+  body.menu-movil-abierto {
+    overflow: hidden;
   }
 }
 
@@ -723,7 +759,7 @@ a:hover {
   justify-content: center;
   padding: 0.3rem 0.65rem;
   border: 0;
-  border-radius: 0;
+  border-radius: 4px;
   font-size: 0.68rem;
   font-weight: 600;
   line-height: 1;
@@ -731,13 +767,13 @@ a:hover {
 }
 
 /* Colores de estado: amarillo para pendientes, celeste para proceso, naranja para citas confirmadas, verde para estados positivos y rojo para cierres negativos. */
-.badge-estado-pendiente { color: #574100; background: #FEC107; }
-.badge-estado-proceso { color: #07314A; background: #29B6F6; }
-.badge-estado-confirmada { color: #4A2600; background: #F57C00; }
+.badge-estado-pendiente { color: #ffffff; background: #d49f00; }
+.badge-estado-proceso { color: #ffffff; background: #1D5FA0; }
+.badge-estado-confirmada { color: #ffffff; background: #F57C00; }
 .badge-estado-finalizada,
 .badge-estado-atendida,
 .badge-estado-aprobada,
-.badge-estado-activo { color: #062900; background: #11A900; }
+.badge-estado-activo { color: #ffffff; background: #11A900; }
 .badge-estado-cancelada,
 .badge-estado-rechazada,
 .badge-estado-inactivo { color: #FFFFFF; background: #D11400; }
@@ -807,6 +843,16 @@ main#dashboard #tablaOrdenesPendientes td {
   white-space: nowrap;
 }
 
+/* Dashboard en pantallas compactas: permite recorrer sus tarjetas y actividad. */
+@media (max-width: 767.98px) {
+  main#dashboard {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Dashboard en móvil: mantiene espacios compactos y altura adaptable de la tabla. */
 @media (max-width: 575.98px) {
   main#dashboard {
@@ -819,17 +865,13 @@ main#dashboard #tablaOrdenesPendientes td {
 }
 
 /* Base de las vistas de registro: dimensiones, scroll y distribución vertical. */
-#ordenes,
-#cotizaciones,
-#citas,
-#clientes,
-#agenda,
-#miAvance {
+.vista-registros-mecanico {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   gap: 1rem;
   width: 100%;
+  max-width: 100%;
   min-width: 0;
   height: 100%;
   min-height: 0;
@@ -844,14 +886,47 @@ main#dashboard #tablaOrdenesPendientes td {
   overflow-x: hidden;
   overflow-y: auto;
 }
-#miAvance > .panel-tabla,
-#miAvance > .panel-tabla > .panel-tabla-body {
+#miAvance > .panel-tabla {
   flex: 0 0 auto;
   min-height: auto;
 }
 #miAvance > .panel-tabla > .panel-tabla-body {
+  flex: 0 0 auto;
+  min-height: auto;
   overflow: visible;
 }
+/* Tabla de actividad: conserva columnas legibles y limita el scroll a la tabla. */
+#miAvance .panel-tabla-body > .table-responsive {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+#miAvance .panel-tabla-body > .table-responsive > .tabla-sistema {
+  width: 100%;
+  min-width: 860px;
+  table-layout: fixed;
+}
+#miAvance .panel-tabla-body > .table-responsive th,
+#miAvance .panel-tabla-body > .table-responsive td {
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+#miAvance .panel-tabla-body > .table-responsive th:nth-child(1),
+#miAvance .panel-tabla-body > .table-responsive td:nth-child(1) { width: 95px; }
+#miAvance .panel-tabla-body > .table-responsive th:nth-child(2),
+#miAvance .panel-tabla-body > .table-responsive td:nth-child(2) { width: 105px; }
+#miAvance .panel-tabla-body > .table-responsive th:nth-child(3),
+#miAvance .panel-tabla-body > .table-responsive td:nth-child(3) { width: 175px; }
+#miAvance .panel-tabla-body > .table-responsive th:nth-child(4),
+#miAvance .panel-tabla-body > .table-responsive td:nth-child(4) { width: 150px; }
+#miAvance .panel-tabla-body > .table-responsive th:nth-child(5),
+#miAvance .panel-tabla-body > .table-responsive td:nth-child(5) { width: 220px; }
+#miAvance .panel-tabla-body > .table-responsive th:nth-child(6),
+#miAvance .panel-tabla-body > .table-responsive td:nth-child(6) { width: 115px; }
 
 /* Indicadores visuales de vehículos y órdenes. */
 .avance-indicador {
@@ -878,14 +953,12 @@ main#dashboard #tablaOrdenesPendientes td {
 .avance-icono-azul { color: #284473; background: #e8ebf0; }
 .avance-icono-verde { color: #1f6a3a; background: #cdefd6; }
 .avance-icono-naranja { color: #a65e00; background: #fff2dc; }
-.avance-indicador-etiqueta,
-.avance-indicador-valor {
-  display: block;
-}
 .avance-indicador-etiqueta {
+  display: block;
   color: var(--texto-secundario);
 }
 .avance-indicador-valor {
+  display: block;
   margin-top: 0.2rem;
   color: var(--texto-principal);
   font-size: 1.25rem;
@@ -1683,6 +1756,17 @@ main#dashboard #tablaOrdenesPendientes td {
   flex-wrap: wrap;
   min-width: 0;
 }
+/* Encabezado del listado: mantiene el contador junto al título. */
+#ordenes > .panel-tabla > .panel-tabla-header,
+#cotizaciones > .panel-tabla > .panel-tabla-header,
+#citas > .panel-tabla > .panel-tabla-header,
+#clientes > .panel-tabla > .panel-tabla-header {
+  flex-wrap: nowrap;
+}
+.vista-registros-mecanico > .panel-tabla > .panel-tabla-header > .badge {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
 .panel-tabla-titulo {
   font-size: 0.95rem;
   font-weight: 700;
@@ -1723,6 +1807,50 @@ main#dashboard #tablaOrdenesPendientes td {
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: #284473 transparent;
+}
+/* Tablas de registros: dimensiones y desplazamiento contenidos en cada tabla. */
+
+.vista-registros-mecanico > .panel-tabla {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+.vista-registros-mecanico .panel-tabla-body {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+.vista-registros-mecanico .panel-tabla-body > .table-responsive,
+.vista-registros-mecanico .panel-tabla-body > .panel-tabla-scroll {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #284473 transparent;
+}
+.vista-registros-mecanico .panel-tabla-body > .table-responsive thead th,
+.vista-registros-mecanico .panel-tabla-body > .panel-tabla-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.vista-registros-mecanico .panel-tabla-body > .table-responsive > .tabla-sistema,
+.vista-registros-mecanico .panel-tabla-body > .panel-tabla-scroll > .tabla-sistema {
+  width: 100%;
+  margin-bottom: 0;
+}
+#ordenes .panel-tabla-body > .table-responsive > .tabla-sistema,
+#cotizaciones .panel-tabla-body > .table-responsive > .tabla-sistema,
+#citas .panel-tabla-body > .panel-tabla-scroll > .tabla-sistema,
+#clientes .panel-tabla-body > .panel-tabla-scroll > .tabla-sistema {
+  min-width: 720px;
 }
 .panel-tabla-scroll::-webkit-scrollbar {
   width: 6px;
@@ -1970,18 +2098,7 @@ main#dashboard #tablaOrdenesPendientes td {
   justify-self: start;
   color: #fff;
 }
-/* Listas de Órdenes y Cotizaciones: limita el ancho de paneles y tablas. */
-.vista-registros-mecanico,
-.vista-registros-mecanico > .panel-tabla,
-.vista-registros-mecanico .table-responsive {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-inline: contain;
-  -webkit-overflow-scrolling: touch;
-}
+
 .modal-registros-mecanico .modal-body {
   overflow-x: hidden;
 }
@@ -3140,7 +3257,7 @@ main#dashboard #tablaOrdenesPendientes td {
   #modalNuevaOrdenOT .busqueda-placa-card #contenedorBuscarVehiculoOT {
     width: 100%;
     min-width: 0;
-    margin-left: 0;
+    margin: 0;
   }
 
   #modalNuevaOrdenOT .modal-nueva-ot-contenido .row.vista-row-altura > [class*="col-"] {
@@ -3236,6 +3353,61 @@ main#dashboard #tablaOrdenesPendientes td {
   #miAvance.vista-registros-mecanico,
   #agenda.vista-registros-mecanico {
     padding: 0.75rem;
+  }
+  /* Mi Avance: métricas en dos columnas y resumen compacto en teléfono. */
+  #miAvance > .panel-tabla:first-child > .panel-tabla-body > .row.g-3 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin: 0;
+  }
+  #miAvance > .panel-tabla:first-child > .panel-tabla-body > .row.g-3 > [class*="col-"] {
+    width: auto;
+    max-width: none;
+    padding: 0;
+  }
+  #miAvance .avance-indicador {
+    min-height: 4.75rem;
+    gap: 0.65rem;
+    padding: 0.7rem;
+  }
+  #miAvance .avance-indicador-icono {
+    flex-basis: 2.25rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 1rem;
+  }
+  #miAvance .avance-indicador-etiqueta {
+    font-size: 0.72rem;
+    line-height: 1.25;
+  }
+  #miAvance .avance-indicador-valor {
+    font-size: 1.1rem;
+  }
+  #miAvance .panel-tabla-body > .table-responsive {
+    max-height: 60vh;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  #miAvance .avance-meta {
+    margin-top: 0.85rem !important;
+    padding: 0.85rem;
+  }
+  #miAvance .avance-meta > .d-flex {
+    align-items: flex-start !important;
+  }
+  #miAvance .avance-monto-total {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 0.8rem;
+  }
+  #miAvance .avance-monto-valor {
+    font-size: 1.2rem;
+  }
+  #miAvance .avance-aclaracion {
+    padding: 0.75rem 0.85rem;
+    font-size: 0.8rem;
   }
 
   /* Vista OT: selector de servicios, productos, consumo y evidencias. */
@@ -3419,9 +3591,12 @@ main#dashboard #tablaOrdenesPendientes td {
     grid-template-columns: 1fr;
   }
 
-  /* Componentes compartidos: paginación, datos y comprobante. */
+  /* Paginación adaptable: rango arriba y controles compactos en una fila. */
   .vista-registros-mecanico .paginador-wrap {
+    display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.55rem;
   }
 
   .vista-registros-mecanico .paginador-info {
@@ -3430,15 +3605,38 @@ main#dashboard #tablaOrdenesPendientes td {
 
   .vista-registros-mecanico .paginacion-listado-mecanico {
     justify-self: start;
-    min-width: max-content;
+    min-width: 0;
+  }
+
+  .vista-registros-mecanico .paginacion-listado-mecanico .pagination {
+    flex-wrap: nowrap;
   }
 
   .vista-registros-mecanico .paginacion-listado-mecanico .page-link {
+    min-width: 2.15rem;
+    padding: 0.35rem 0.55rem;
+    text-align: center;
     white-space: nowrap;
   }
 
   .vista-registros-mecanico .paginacion-listado-mecanico .page-item.active .page-link {
-    min-width: 3rem;
+    min-width: 2.25rem;
+  }
+
+  .vista-registros-mecanico .selector-por-pagina-wrap {
+    justify-self: end;
+    gap: 0.25rem;
+  }
+
+  .vista-registros-mecanico .selector-por-pagina-wrap .input-group-text {
+    padding: 0.35rem 0.5rem;
+  }
+
+  .vista-registros-mecanico .selector-por-pagina-wrap .selector-por-pagina {
+    flex: 0 0 3.25rem;
+    width: 3.25rem;
+    min-width: 3.25rem;
+    padding: 0.35rem 1.2rem 0.35rem 0.45rem;
   }
 
   .comprobante-visual {
@@ -3681,27 +3879,35 @@ main#dashboard #tablaOrdenesPendientes td {
 }
 
 
-/* Card y controles de búsqueda alineados con el ancho conjunto de ambos paneles. */
+/* Cabecera blanca vacía con buscador alineado sobre la columna Resumen. */
 #modalNuevaOrdenOT .busqueda-placa-fila,
 #modalGestionCotizaciones .modal-cotizaciones-mecanico-contenido > .busqueda-placa-fila {
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
   gap: 1rem;
   width: 100%;
+  min-width: 0;
   margin: 0 0 0.85rem;
+  box-sizing: border-box;
 }
 #modalNuevaOrdenOT .busqueda-placa-card,
 #modalGestionCotizaciones .busqueda-placa-card {
   display: flex;
   grid-column: 1 / -1;
+  justify-content: flex-end;
+  width: auto;
   min-width: 0;
-  padding: 0;
+  margin: 0 8px;
+  padding: 0.75rem;
+  background: var(--superficie);
+  box-sizing: border-box;
 }
 #modalNuevaOrdenOT #contenedorBuscarVehiculoOT,
 #modalGestionCotizaciones .busqueda-placa-resumen {
   display: flex;
-  width: 100%;
-  min-width: 0;
+  width: calc((100% + 0.1rem) / 2.7);
+  max-width: none;
+  min-width: 280px;
   gap: 0.5rem;
   margin: 0;
 }
@@ -3909,13 +4115,15 @@ main#dashboard #tablaOrdenesPendientes td {
   width: 100%;
   max-width: 100%;
 }
-#modalGestionCotizaciones .resumen-sticky .input-style,
-#modalGestionCotizaciones .resumen-sticky textarea {
+#modalGestionCotizaciones .resumen-sticky .input-style {
   display: block;
   width: 100%;
   min-width: 0;
 }
 #modalGestionCotizaciones .resumen-sticky textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
   min-height: 100px;
   resize: vertical;
 }
@@ -3989,6 +4197,20 @@ main#dashboard #tablaOrdenesPendientes td {
   }
 }
 @media (max-width: 991.98px) {
+  #modalNuevaOrdenOT .busqueda-placa-fila,
+  #modalGestionCotizaciones .modal-cotizaciones-mecanico-contenido > .busqueda-placa-fila {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #modalNuevaOrdenOT .busqueda-placa-card,
+  #modalGestionCotizaciones .busqueda-placa-card {
+    grid-column: 1;
+  }
+  #modalNuevaOrdenOT #contenedorBuscarVehiculoOT,
+  #modalGestionCotizaciones .busqueda-placa-resumen {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
   #modalGestionCotizaciones .modal-dialog {
     width: calc(100% - 1rem);
     max-width: none;
@@ -4008,7 +4230,7 @@ main#dashboard #tablaOrdenesPendientes td {
   #modalGestionCotizaciones .busqueda-placa-resumen {
     width: 100%;
     min-width: 0;
-    margin-left: 0;
+    margin: 0;
   }
   #modalGestionCotizaciones .datos-modal-mecanico-tarjeta {
     grid-template-columns: minmax(0, 1fr);
@@ -4075,12 +4297,12 @@ main#dashboard #tablaOrdenesPendientes td {
   --bs-gutter-y: 0.9rem;
 }
 #modalNuevaCita form,
-#modalNuevaCita .input-style,
-#modalVerCita .datos-modal-mecanico {
+#modalNuevaCita .input-style {
   min-width: 0;
 }
 #modalVerCita .datos-modal-mecanico {
   display: grid;
+  min-width: 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.2rem;
   width: 100%;
@@ -4145,7 +4367,6 @@ main#dashboard #tablaOrdenesPendientes td {
 #modalNuevoCliente .row,
 #modalNuevoCliente .input-style,
 #modalVerCliente #contenidoDetalleCliente,
-#modalVerCliente #formularioVehiculoCliente,
 #modalVerCliente form,
 #modalVerCliente .row,
 #modalVerCliente .input-style {
@@ -4171,6 +4392,7 @@ main#dashboard #tablaOrdenesPendientes td {
   grid-template-columns: max-content minmax(0, 1fr);
 }
 #modalVerCliente #formularioVehiculoCliente {
+  min-width: 0;
   margin-top: 1rem;
   padding-top: 0.85rem;
   border-top: 1px solid #E8EDF3;

@@ -351,7 +351,7 @@ const registrarOrden = async (req, res) => {
     } catch (error) {
         console.error(error);
 
-        if (error.code === 'VEHICULO_CON_ORDEN_ACTIVA') {
+        if (error.code === 'VEHICULO_CON_ORDEN_ACTIVA' || error.code === 'VEHICULO_NO_DISPONIBLE_OT') {
             return res.status(409).json({ ok: false, mensaje: error.message });
         }
 
@@ -401,21 +401,17 @@ const actualizarOrden = async (req, res) => {
             });
         }
 
-        // Si se envía un estado nuevo, debe respetar las transiciones permitidas
+        // Los cambios de estado pasan por el endpoint dedicado para sincronizar la cita.
         if (estado && estado !== orden.estado) {
-            const permitidos = TRANSICIONES_ESTADO[orden.estado] || [];
-            if (!permitidos.includes(estado)) {
-                return res.status(409).json({
-                    ok: false,
-                    mensaje: `Transición no permitida: ${orden.estado} → ${estado}.`
-                });
-            }
+            return res.status(409).json({
+                ok: false,
+                mensaje: 'Cambie el estado mediante la acción de estado de la orden.'
+            });
         }
 
         await model.actualizarOrden(id, {
             observacion: observacion || null,
-            fecha_atencion: fecha_atencion || null,
-            estado: estado || orden.estado
+            fecha_atencion: fecha_atencion || null
         });
 
         return res.json({
@@ -493,6 +489,15 @@ const cambiarEstadoOrden = async (req, res) => {
 
     } catch (error) {
         console.error(error);
+
+        if (error.code === 'ORDEN_NO_ENCONTRADA') {
+            return res.status(404).json({ ok: false, mensaje: error.message });
+        }
+
+        if (error.code === 'TRANSICION_OT_NO_PERMITIDA') {
+            return res.status(409).json({ ok: false, mensaje: error.message });
+        }
+
         return res.status(500).json({
             ok: false,
             mensaje: 'Error al cambiar estado de la orden'

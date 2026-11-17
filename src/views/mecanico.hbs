@@ -4,7 +4,7 @@
     <div id="sideMenu" class="menu-colapsado">
         <div id="cabecera">
             <div id="titulo"><span>MI TALLER</span></div>
-            <div id="menuBtn" role="button" tabindex="0" aria-label="Abrir menú">
+            <div id="menuBtn" role="button" tabindex="0" aria-label="Abrir menú" aria-controls="sideMenu" aria-expanded="false">
                 <div class="btn-hamburger"></div>
                 <div class="btn-hamburger"></div>
                 <div class="btn-hamburger"></div>
@@ -74,6 +74,8 @@
             </div>
         </nav>
     </div>
+
+    <button id="menuBackdrop" class="menu-fondo" type="button" aria-label="Cerrar menú"></button>
 
     {{!-- CONTENEDOR BASE --}}
     <section id="contenedorPrincipal">
@@ -721,7 +723,7 @@
                         <div class="row g-3">
                             <div class="col-12 col-sm-6 col-xl-3">
                                 <article class="avance-indicador">
-                                    <div class="avance-indicador-icono avance-icono-azul"><i class="bi bi-truck" aria-hidden="true"></i></div>
+                                    <div class="avance-indicador-icono avance-icono-azul"><i class="bi bi-car-front-fill" aria-hidden="true"></i></div>
                                     <div>
                                         <small class="avance-indicador-etiqueta">Vehículos finalizados hoy</small>
                                         <strong class="avance-indicador-valor" id="avanceVehiculosHoy">0</strong>
@@ -784,7 +786,7 @@
                 <section class="panel-tabla">
                     <div class="panel-tabla-header">
                         <h5 class="panel-tabla-titulo"><i class="bi bi-list-check"></i> Actividad reciente</h5>
-                        <span class="text-muted small">Últimas órdenes registradas</span>
+                        <span class="text-muted small">Últimas órdenes registradas <span class="badge bg-secondary ms-1" id="contadorActividadAvance">0</span></span>
                     </div>
                     <div class="panel-tabla-body">
                         <div class="table-responsive">
@@ -1196,6 +1198,7 @@
                             <i class="bi bi-calendar-check"></i>
                             Listado de Citas
                         </h5>
+                        <span class="badge bg-secondary" id="contadorCitas">0</span>
                     </div>
                     <div class="panel-tabla-body">
                         <div class="panel-tabla-scroll">
@@ -1283,6 +1286,7 @@
                             <i class="bi bi-people"></i>
                             Listado de Clientes
                         </h5>
+                        <span class="badge bg-secondary" id="contadorClientes">0</span>
                     </div>
                     <div class="panel-tabla-body">
                         <div class="panel-tabla-scroll">
@@ -1711,21 +1715,21 @@
                                 </tr>
                             </thead>
                             <tbody id="contenedorVerHistorialConsumo"></tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="3" class="text-end small">Subtotal:</td>
-                                    <td class="text-end small campo-mecanico-valor" id="verHistorialSubtotalConsumo">S/ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3" class="text-end small" id="etiquetaIGVHistorial">IGV:</td>
-                                    <td class="text-end small campo-mecanico-valor" id="verHistorialIgvConsumo">S/ 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="3" class="text-end fw-bold small">TOTAL DEL FILTRO:</td>
-                                    <td class="text-end small campo-mecanico-valor fw-bold" id="verHistorialTotalConsumo">S/ 0.00</td>
-                                </tr>
-                            </tfoot>
                         </table>
+                    </div>
+                    <div class="comprobante-visual-totales">
+                        <div>
+                            <span>Subtotal</span>
+                            <span id="verHistorialSubtotalConsumo">S/ 0.00</span>
+                        </div>
+                        <div>
+                            <span id="etiquetaIGVHistorial">IGV:</span>
+                            <span id="verHistorialIgvConsumo">S/ 0.00</span>
+                        </div>
+                        <div class="comprobante-visual-total">
+                            <b>Total del filtro</b>
+                            <b id="verHistorialTotalConsumo">S/ 0.00</b>
+                        </div>
                     </div>
 
                     <hr>
