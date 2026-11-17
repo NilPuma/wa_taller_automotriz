@@ -2094,6 +2094,12 @@ main#dashboard #tablaOrdenesPendientes td {
   overflow-wrap: anywhere;
   word-break: break-word;
 }
+.datos-modal-mecanico-fila > span.badge.bg-warning { color: #ffffff !important; background: #d49f00 !important; }
+.datos-modal-mecanico-fila > span.badge.bg-primary { color: #ffffff !important; background: #1D5FA0 !important; }
+.datos-modal-mecanico-fila > span.badge.bg-info { color: #ffffff !important; background: #F57C00 !important; }
+.datos-modal-mecanico-fila > span.badge.bg-success { color: #ffffff !important; background: #11A900 !important; }
+.datos-modal-mecanico-fila > span.badge.bg-danger { color: #ffffff !important; background: #D11400 !important; }
+.datos-modal-mecanico-fila > span.badge.bg-secondary { color: #435166 !important; background: #DCE2EA !important; }
 .datos-modal-mecanico-fila > .badge:not(.badge-estado) {
   justify-self: start;
   color: #fff;
@@ -4315,6 +4321,11 @@ main#dashboard #tablaOrdenesPendientes td {
 #modalVerCita .datos-modal-mecanico-fila-motivo {
   grid-column: 1 / -1;
   grid-template-columns: max-content minmax(0, 1fr);
+}
+#modalVerCita #verCitaEstado {
+  color: #ffffff !important;
+  font-weight: 600;
+  opacity: 1 !important;
 }
 
 /* En móvil, los modales de cita y cliente comparten ancho y scroll interno. */
